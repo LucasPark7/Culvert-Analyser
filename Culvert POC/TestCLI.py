@@ -62,8 +62,8 @@ def process_video(video_path):
             values.append(results)
             check.append(f)
     
-    #print(values)
-    #print(check)
+    print(values)
+    print(check)
 
     # reprocess possible incorrect values for marked frames
     for c in check:
@@ -77,11 +77,12 @@ def process_video(video_path):
         elif c < 1 or c > len(values)-1:
             values[c] = num1
         else:
-            pre = values[c][0] - values[c-1]
-            if (pre > 0) and (values[c][1] - values[c-1]) < pre:
+            pre = num1 - values[c-1]
+            if (abs(num2 - values[c-1]) < abs(pre)):
                 values[c] = num2
             else:
                 values[c] = num1
+                #print("PRE", num1, num2, pre, values[c-1])
     
     return values
 
@@ -102,22 +103,24 @@ def compare_videos(video1_path, video2_path):
     return df
 
 if __name__ == "__main__":
-    video2 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
-    #video2 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut.mp4"
+    video1 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
+    video2 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut.mp4"
 
-    #df = compare_videos(video1, video2)
+    df = compare_videos(video1, video2)
+    
+    '''
     series1 = process_video(video2)
     df = pd.DataFrame({
         "time": list(range(len(series1))),
         "video1": series1
     })
+    '''
 
-
-    print(df.to_string())
+    #print(df.to_string())
 
     # Plot
     plt.plot(df["time"], df["video1"], label="Video 1")
-    #plt.plot(df["time"], df["video2"], label="Video 2")
+    plt.plot(df["time"], df["video2"], label="Video 2")
     plt.xlabel("Frame Index (sampled)")
     plt.ylabel("Extracted Number")
     plt.legend()
