@@ -2,10 +2,10 @@ import cv2
 import pytesseract
 import re
 
-# Load a frame from your video
-video_path = r"C:\Users\Lucas\Desktop\Culvert POC\78kCulvCut.mp4"
+# Load a frame from video
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (115*60))
+cap.set(cv2.CAP_PROP_POS_FRAMES, (125*60)+2)
 ret, frame = cap.read()
 cap.release()
 
@@ -45,7 +45,7 @@ while True:
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-    _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
+    _, thresh = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
 
     if roi.size > 0:
         cv2.imshow("Cropped ROI", thresh)
@@ -59,10 +59,9 @@ while True:
         #gray = cv2.cvtColor(display_frame, cv2.COLOR_BGR2GRAY)
         #_, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
 
-        text = pytesseract.image_to_string(thresh, lang='eng', config="--psm 6 digits")
-        print(f"OCR Result: {text}")
-        #match = re.search(r"\d+", text)
-        #print(int(match.group())) if match else None
+        text = pytesseract.image_to_string(thresh, config="--psm 6 digits")
+        match = re.search(r"\d+", text)
+        print(int(match.group())) if match else None
 
         print(f"Final ROI: (x={x}, y={y}, w={w}, h={h})")
         break

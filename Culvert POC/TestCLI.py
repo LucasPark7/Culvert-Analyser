@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # --------- CONFIG ---------
-FRAME_STEP = 60  # process every 30th frame (~1s at 30fps)
+FRAME_STEP = 60  # process every 30th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
 # ---------------------------
 
@@ -33,12 +33,13 @@ def extract_number_from_frame(frame, roi=None):
     # Convert to grayscale for better OCR
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
-    _, thresh2 = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
+    _, thresh2 = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
 
     text1 = pytesseract.image_to_string(thresh, config="--psm 6 digits")
     text2 = pytesseract.image_to_string(thresh2, config="--psm 6 digits")
     return clean_number(text1, text2)
 
+# convert text from pytesseract to integer
 def clean_number(text1, text2):
     num1 = re.search(r"\d+", text1)
     num1 = int(num1.group()) if num1 else None
@@ -48,6 +49,7 @@ def clean_number(text1, text2):
    
     return [num1, num2]
 
+# get all frames from video and add all numbers from each frame to list
 def process_video(video_path):
     frames = extract_frames(video_path)
     values = []
@@ -60,21 +62,26 @@ def process_video(video_path):
             values.append(results)
             check.append(f)
     
-    print(values)
-    print(check)
+    #print(values)
+    #print(check)
 
     # reprocess possible incorrect values for marked frames
     for c in check:
         num1 = values[c][0]
         num2 = values[c][1]
-        if c < 1 or c > len(values)-1:
-            values[c] = num1
-        elif values[c-1] <= num1 <= values[c+1]:
-            values[c] = num1
-        elif values[c-1] <= num2 <= values[c+1]:
+        
+        if num1 is None:
             values[c] = num2
-        else:
+        elif num2 is None:
             values[c] = num1
+        elif c < 1 or c > len(values)-1:
+            values[c] = num1
+        else:
+            pre = values[c][0] - values[c-1]
+            if (pre > 0) and (values[c][1] - values[c-1]) < pre:
+                values[c] = num2
+            else:
+                values[c] = num1
     
     return values
 
@@ -95,8 +102,8 @@ def compare_videos(video1_path, video2_path):
     return df
 
 if __name__ == "__main__":
-    #video1 = r"C:\Users\Lucas\Desktop\Culvert POC\78kCulv.mp4"
-    video2 = r"C:\Users\Lucas\Desktop\Culvert POC\78kCulvCut.mp4"
+    video2 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
+    #video2 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut.mp4"
 
     #df = compare_videos(video1, video2)
     series1 = process_video(video2)
