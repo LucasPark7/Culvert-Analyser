@@ -3,6 +3,7 @@ import pytesseract
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
+import math
 
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 30th frame (~1s at 60fps)
@@ -54,16 +55,20 @@ def process_video(video_path):
     frames = extract_frames(video_path)
     values = []
     check = []
+    noneCount = 0
     for f in range(len(frames)):
         results = extract_number_from_frame(frames[f], ROI)
         if results[0] == results[1]:
-            values.append(results[0])
+            if results[0] is None:
+                noneCount += 1
+            else:
+                values.append(results[0])
         else:
             values.append(results)
-            check.append(f)
+            check.append(f - noneCount)
     
-    print(values)
-    print(check)
+    #print(values)
+    #print(check)
 
     # reprocess possible incorrect values for marked frames
     for c in check:
@@ -86,9 +91,29 @@ def process_video(video_path):
     
     return values
 
+# normalize values to scale one score to the other
+def normalize(video1, video2):
+    end1 = video1[-1]
+    end2 = video2[-1]
+
+    scale = max(end1, end2) / min(end1, end2)
+
+    if min(end1, end2) == end1:
+        for i in range(len(video1)):
+            video1[i] = math.floor(video1[i] * scale)
+    else:
+        for i in range(len(video2)):
+            video2[i] = math.floor(video2[i] * scale)
+    
+    return [video1, video2]
+
 def compare_videos(video1_path, video2_path):
     series1 = process_video(video1_path)
     series2 = process_video(video2_path)
+
+    normResult = normalize(series1, series2)
+    series1 = normResult[0]
+    series2 = normResult[1]
 
     # Align lengths
     min_len = min(len(series1), len(series2))
@@ -108,6 +133,7 @@ if __name__ == "__main__":
 
     df = compare_videos(video1, video2)
     
+    # code to test 1 video
     '''
     series1 = process_video(video2)
     df = pd.DataFrame({
