@@ -3,7 +3,7 @@ import cv2
 # Load a frame from video
 video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (124*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (75*60)+2)
 ret, frame = cap.read()
 cap.release()
 
@@ -45,7 +45,7 @@ while True:
     fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\FatalStrikeIcon.png")
 
     # Convert to grayscale for better template matching
-    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
 
     if roi.size > 0:

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import math
 
 # --------- CONFIG ---------
-FRAME_STEP = 60  # process every 30th frame (~1s at 60fps)
+FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
 # ---------------------------
 
@@ -26,7 +26,8 @@ def extract_frames(video_path, step=FRAME_STEP):
     cap.release()
     return frames
 
-def extract_number_from_frame(frame, roi=None):
+def extract_info_from_frame(frame, roi=None):
+    full_frame = frame
     if roi:
         x, y, w, h = roi
         frame = frame[y:y+h, x:x+w]
@@ -38,7 +39,21 @@ def extract_number_from_frame(frame, roi=None):
 
     text1 = pytesseract.image_to_string(thresh, config="--psm 6 digits")
     text2 = pytesseract.image_to_string(thresh2, config="--psm 6 digits")
-    return clean_number(text1, text2)
+
+    # Scan for fatal strike using template matching
+    fullGray = gray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
+    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\FatalStrikeIcon.png")
+    grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
+    res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+    threshold = 0.8
+    if max_val >= threshold:
+        fatal_active = True
+    else:
+        fatal_active = False
+
+    return [clean_number(text1, text2), fatal_active]
 
 # convert text from pytesseract to integer
 def clean_number(text1, text2):
@@ -54,41 +69,35 @@ def clean_number(text1, text2):
 def process_video(video_path):
     frames = extract_frames(video_path)
     values = []
-    check = []
-    noneCount = 0
     for f in range(len(frames)):
-        results = extract_number_from_frame(frames[f], ROI)
-        if results[0] == results[1]:
-            if results[0] is None:
-                noneCount += 1
+        result = extract_info_from_frame(frames[f], ROI)
+        print(result)
+        if result[0][0] == result[0][1]: # if both OCR checks match then confidence in result is high
+            if (result[0][0] is None) or (result[0][1] is None):
+                continue
             else:
-                values.append(results[0])
-        else:
-            values.append(results)
-            check.append(f - noneCount)
+                entry = [result[0][0], result[1]]
+                values.append(entry)
+        else:   # if OCR checks do not match check which one is more likely to be real
+            num1 = result[0][0]
+            num2 = result[0][1]
+        
+            if num1 is None:
+                result[0] = num2
+            elif num2 is None:
+                result[0] = num1
+            else:
+                pre = num1 - values[-1][0]
+                if (abs(num2 - values[-1][0]) < abs(pre)):
+                    result[0] = num2
+                else:
+                    result[0] = num1
+            
+            values.append(result)
     
     #print(values)
     #print(check)
-
-    # reprocess possible incorrect values for marked frames
-    for c in check:
-        num1 = values[c][0]
-        num2 = values[c][1]
-        
-        if num1 is None:
-            values[c] = num2
-        elif num2 is None:
-            values[c] = num1
-        elif c < 1 or c > len(values)-1:
-            values[c] = num1
-        else:
-            pre = num1 - values[c-1]
-            if (abs(num2 - values[c-1]) < abs(pre)):
-                values[c] = num2
-            else:
-                values[c] = num1
-                #print("PRE", num1, num2, pre, values[c-1])
-    
+   
     return values
 
 # normalize values to scale one score to the other
@@ -111,9 +120,11 @@ def compare_videos(video1_path, video2_path):
     series1 = process_video(video1_path)
     series2 = process_video(video2_path)
 
+    '''
     normResult = normalize(series1, series2)
     series1 = normResult[0]
     series2 = normResult[1]
+    '''
 
     # Align lengths
     min_len = min(len(series1), len(series2))
@@ -131,23 +142,41 @@ if __name__ == "__main__":
     video1 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
     video2 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut.mp4"
 
-    df = compare_videos(video1, video2)
+    #df = compare_videos(video1, video2)
     
     # code to test 1 video
-    '''
-    series1 = process_video(video2)
-    df = pd.DataFrame({
-        "time": list(range(len(series1))),
-        "video1": series1
-    })
-    '''
+    series1 = process_video(video1)
+    data = []
+    for i in range(len(series1)):
+        data.append({
+            "time": i,
+            "score": series1[i][0],
+            "fatal_active": series1[i][1]
+        })
+    df = pd.DataFrame(data)
 
     #print(df.to_string())
 
     # Plot
-    plt.plot(df["time"], df["video1"], label="Video 1")
-    plt.plot(df["time"], df["video2"], label="Video 2")
-    plt.xlabel("Frame Index (sampled)")
-    plt.ylabel("Extracted Number")
+    plt.plot(df["time"], df["score"], label="Video 1")
+    #plt.plot(df["time"], df["video2"], label="Video 2")
+
+    # Shade fatal time
+    active_periods = []
+    active_start = None
+    for i, row in df.iterrows():
+        if row["fatal_active"] and active_start is None:
+            active_start = row["time"]
+        if not row["fatal_active"] and active_start is not None:
+            active_periods.append((active_start, row["time"]))
+            active_start = None
+    if active_start is not None:  # if buff was active till the end
+        active_periods.append((active_start, df["time"].iloc[-1]))
+
+    for start, end in active_periods:
+        plt.axvspan(start, end, color="blue", alpha=0.3, label="Fatal Active")
+
+    plt.xlabel("Frame")
+    plt.ylabel("Score")
     plt.legend()
     plt.show()
