@@ -12,24 +12,31 @@ import time
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
-path = str(Path().absolute()) + "\Culvert POC\\"
+path = str(Path().absolute()) + r"\Culvert POC\\"
+frame_queue = queue.Queue()
+pause_queue = False
+values = []
 # ---------------------------
 
 def extract_frames(video_path, step=FRAME_STEP):
+    global pause_queue
     cap = cv2.VideoCapture(video_path)
-    frames = []
     frame_idx = 0
 
-    while True:
+    while cap.isOpened() and not pause_queue:
         ret, frame = cap.read()
         if not ret:
             break
-        if frame_idx % step == 0:
-            frames.append(frame)
-        frame_idx += 1
+        try:
+            if frame_idx % step == 0:
+                frame_queue.put(frame, timeout=1)
+            frame_idx += 1
+        except queue.Full:
+                pass
+    
+    pause_queue = True
 
     cap.release()
-    return frames
 
 def extract_info_from_frame(frame, roi=None):
     full_frame = frame
@@ -71,39 +78,43 @@ def clean_number(text1, text2):
     return [num1, num2]
 
 # get all frames from video and add all numbers from each frame to list
-def process_video(video_path):
-    frames = extract_frames(video_path)
-    values = []
-    for f in range(len(frames)):
-        result = extract_info_from_frame(frames[f], ROI)
-        print(result)
-        if result[0][0] == result[0][1]: # if both OCR checks match then confidence in result is high
-            if (result[0][0] is None) or (result[0][1] is None):
-                continue
-            else:
-                entry = [result[0][0], result[1]]
-                values.append(entry)
-        else:   # if OCR checks do not match check which one is more likely to be real
-            num1 = result[0][0]
-            num2 = result[0][1]
-        
-            if num1 is None:
-                result[0] = num2
-            elif num2 is None:
-                result[0] = num1
-            else:
-                pre = num1 - values[-1][0]
-                if (abs(num2 - values[-1][0]) < abs(pre)):
-                    result[0] = num2
+def process_video():
+    global pause_queue
+    global values
+    while not pause_queue or not frame_queue.empty():
+        try:
+            frame = frame_queue.get(timeout=1)
+            result = extract_info_from_frame(frame, ROI)
+            print(result)
+            if result[0][0] == result[0][1]: # if both OCR checks match then confidence in result is high
+                if (result[0][0] is None) or (result[0][1] is None):
+                    continue
                 else:
+                    entry = [result[0][0], result[1]]
+                    values.append(entry)
+            else:   # if OCR checks do not match check which one is more likely to be real
+                num1 = result[0][0]
+                num2 = result[0][1]
+        
+                if num1 is None:
+                    result[0] = num2
+                elif num2 is None:
                     result[0] = num1
-            
-            values.append(result)
+                else:
+                    pre = num1 - values[-1][0]
+                    if (abs(num2 - values[-1][0]) < abs(pre)):
+                        result[0] = num2
+                    else:
+                        result[0] = num1
+
+                values.append(result)
+        except queue.Empty:
+            continue
     
     #print(values)
     #print(check)
    
-    return values
+    #return values
 
 # normalize values to scale one score to the other
 def normalize(video1, video2):
@@ -125,6 +136,7 @@ def compare_videos(video1_path, video2_path):
     series1 = process_video(video1_path)
     series2 = process_video(video2_path)
 
+    # call normalize on two videos
     '''
     normResult = normalize(series1, series2)
     series1 = normResult[0]
@@ -148,9 +160,18 @@ if __name__ == "__main__":
     video2 = path + "78kCulvCut.mp4"
 
     #df = compare_videos(video1, video2)
+
+    reader_thread = threading.Thread(target=extract_frames, args=(video1,))
+    analyzer_thread = threading.Thread(target=process_video)
+
+    reader_thread.start()
+    analyzer_thread.start()
+
+    reader_thread.join()
+    analyzer_thread.join()
     
     # code to test 1 video
-    series1 = process_video(video1)
+    series1 = values
     data = []
     for i in range(len(series1)):
         data.append({
