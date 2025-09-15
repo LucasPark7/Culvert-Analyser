@@ -7,7 +7,6 @@ import math
 from pathlib import Path
 import threading
 import queue
-import time
 
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
