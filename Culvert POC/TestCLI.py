@@ -4,10 +4,15 @@ import re
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
+from pathlib import Path
+import threading
+import queue
+import time
 
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
+path = str(Path().absolute()) + "\Culvert POC\\"
 # ---------------------------
 
 def extract_frames(video_path, step=FRAME_STEP):
@@ -42,12 +47,12 @@ def extract_info_from_frame(frame, roi=None):
 
     # Scan for fatal strike using template matching
     fullGray = gray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
-    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\FatalStrikeIcon.png")
+    fatal = cv2.imread(path + "FatalStrikeIcon.png")
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
     res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-    threshold = 0.8
+    threshold = 0.78
     if max_val >= threshold:
         fatal_active = True
     else:
@@ -139,8 +144,8 @@ def compare_videos(video1_path, video2_path):
     return df
 
 if __name__ == "__main__":
-    video1 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
-    video2 = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut.mp4"
+    video1 = path + "78kCulvCut2.mp4"
+    video2 = path + "78kCulvCut.mp4"
 
     #df = compare_videos(video1, video2)
     
