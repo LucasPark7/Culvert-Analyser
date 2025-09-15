@@ -58,7 +58,7 @@ def extract_info_from_frame(frame, roi=None):
     res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-    threshold = 0.78
+    threshold = 0.75
     if max_val >= threshold:
         fatal_active = True
     else:
@@ -86,7 +86,7 @@ def process_video():
             result = extract_info_from_frame(frame, ROI)
             print(result)
             if result[0][0] == result[0][1]: # if both OCR checks match then confidence in result is high
-                if (result[0][0] is None) or (result[0][1] is None):
+                if (result[0][0] is None) or (result[0][1] is None) or (result[0][0] == 4):
                     continue
                 else:
                     entry = [result[0][0], result[1]]
@@ -155,7 +155,7 @@ def compare_videos(video1_path, video2_path):
     return df
 
 if __name__ == "__main__":
-    video1 = path + "78kCulvCut2.mp4"
+    video1 = path + "TestVid1.mp4"
     video2 = path + "78kCulvCut.mp4"
 
     #df = compare_videos(video1, video2)

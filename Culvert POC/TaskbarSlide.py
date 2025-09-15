@@ -3,9 +3,9 @@ import pytesseract
 import re
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\TestVid1.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (125*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (2*60)+2)
 ret, frame = cap.read()
 cap.release()
 
