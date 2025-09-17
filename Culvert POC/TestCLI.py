@@ -7,6 +7,7 @@ import math
 from pathlib import Path
 import threading
 import queue
+from itertools import groupby
 
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
@@ -15,6 +16,7 @@ path = str(Path().absolute()) + r"\Culvert POC\\"
 frame_queue = queue.Queue()
 pause_queue = False
 values = []
+lock = threading.Lock()
 # ---------------------------
 
 def extract_frames(video_path, step=FRAME_STEP):
@@ -47,9 +49,11 @@ def extract_info_from_frame(frame, roi=None):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
     _, thresh2 = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
+    _, thresh3 = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
 
     text1 = pytesseract.image_to_string(thresh, config="--psm 6 digits")
     text2 = pytesseract.image_to_string(thresh2, config="--psm 6 digits")
+    text3 = pytesseract.image_to_string(thresh3, config="--psm 6 digits")
 
     # Scan for fatal strike using template matching
     fullGray = gray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
@@ -64,17 +68,25 @@ def extract_info_from_frame(frame, roi=None):
     else:
         fatal_active = False
 
-    return [clean_number(text1, text2), fatal_active]
+    return [clean_number(text1, text2, text3), fatal_active]
 
 # convert text from pytesseract to integer
-def clean_number(text1, text2):
+def clean_number(text1, text2, text3):
     num1 = re.search(r"\d+", text1)
     num1 = int(num1.group()) if num1 else None
 
     num2 = re.search(r"\d+", text2)
     num2 = int(num2.group()) if num2 else None
+
+    num3 = re.search(r"\d+", text3)
+    num3 = int(num3.group()) if num3 else None
    
-    return [num1, num2]
+    return [num1, num2, num3]
+
+# helper function for processing frames
+def all_equal(iterable):
+    g = groupby(iterable)
+    return next(g, True) and not next(g, False)
 
 # get all frames from video and add all numbers from each frame to list
 def process_video():
@@ -85,35 +97,38 @@ def process_video():
             frame = frame_queue.get(timeout=1)
             result = extract_info_from_frame(frame, ROI)
             print(result)
-            if result[0][0] == result[0][1]: # if both OCR checks match then confidence in result is high
-                if (result[0][0] is None) or (result[0][1] is None) or (result[0][0] == 4):
+            OCRList = result[0]
+            if all_equal(OCRList): # if all OCR checks match then confidence in result is high
+                if OCRList[0] is None or OCRList[0] == 4:
                     continue
                 else:
-                    entry = [result[0][0], result[1]]
-                    values.append(entry)
+                    result[0] = result[0][0]
+                    values.append(result)
             else:   # if OCR checks do not match check which one is more likely to be real
-                num1 = result[0][0]
-                num2 = result[0][1]
-        
-                if num1 is None:
-                    result[0] = num2
-                elif num2 is None:
-                    result[0] = num1
-                else:
-                    pre = num1 - values[-1][0]
-                    if (abs(num2 - values[-1][0]) < abs(pre)):
-                        result[0] = num2
+                with lock:
+                    if values:
+                        max_diff = math.inf
                     else:
-                        result[0] = num1
+                        max_diff = OCRList[0]
 
-                values.append(result)
+                    freq = max(set(OCRList), key=OCRList.count)
+                    if OCRList.count(freq) == 1:
+                        for num in OCRList:
+                            if num is None or num < values[-1][0]:
+                                continue
+                            elif num - values[-1][0] < max_diff:
+                                max_diff = num - values[-1][0]
+                                result[0] = num
+                    else:
+                        if freq is None or freq == 4:
+                            continue
+                        else:
+                            result[0] = freq
+                            values.append(result)
+
+                    values.append(result)
         except queue.Empty:
             continue
-    
-    #print(values)
-    #print(check)
-   
-    #return values
 
 # normalize values to scale one score to the other
 def normalize(video1, video2):
@@ -180,7 +195,7 @@ if __name__ == "__main__":
         })
     df = pd.DataFrame(data)
 
-    #print(df.to_string())
+    print(df.to_string())
 
     # Plot
     plt.plot(df["time"], df["score"], label="Video 1")
