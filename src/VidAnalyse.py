@@ -8,7 +8,9 @@ from pathlib import Path
 import threading
 import queue
 from itertools import groupby
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, HTTPException
+import tempfile
+import os
 
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
@@ -29,6 +31,10 @@ def extract_frames(video_path, step=FRAME_STEP):
     global pause_queue
     cap = cv2.VideoCapture(video_path)
     frame_idx = 0
+
+    if not cap.isOpened():
+        os.remove(video_path)
+        raise HTTPException(status_code=400, detail="Could not open video")
 
     while cap.isOpened() and not pause_queue:
         ret, frame = cap.read()
@@ -175,21 +181,35 @@ def compare_videos(video1_path, video2_path):
 
     return df
 
-if __name__ == "__main__":
-    video1 = path + "TestVid1.mp4"
-    video2 = path + "78kCulvCut.mp4"
+@app.post("/analyse")
+async def anaylse(file: UploadFile = File(...)):
+    if not file.filename.endswith(".mp4"):
+        raise HTTPException(status_code=400, detail="Only .mp4 files supported")
 
-    #df = compare_videos(video1, video2)
+    try:
+        # Save the uploaded file to a temporary file
+        temp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
+        temp.write(await file.read())
+        temp.close()
 
-    reader_thread = threading.Thread(target=extract_frames, args=(video1,))
-    analyzer_thread = threading.Thread(target=process_video)
+        #df = compare_videos(video1, video2)
 
-    reader_thread.start()
-    analyzer_thread.start()
+        reader_thread = threading.Thread(target=extract_frames, args=(temp.name,))
+        analyzer_thread = threading.Thread(target=process_video)
 
-    reader_thread.join()
-    analyzer_thread.join()
-    
+        reader_thread.start()
+        analyzer_thread.start()
+
+        reader_thread.join()
+        analyzer_thread.join()
+
+        return {"filename": file.filename, "results": values}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+    '''
     # code to test 1 video
     series1 = values
     data = []
@@ -226,3 +246,5 @@ if __name__ == "__main__":
     plt.ylabel("Score")
     plt.legend()
     plt.show()
+    '''
+    
