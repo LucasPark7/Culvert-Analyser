@@ -8,6 +8,7 @@ from pathlib import Path
 import threading
 import queue
 from itertools import groupby
+from fastapi import FastAPI
 
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
@@ -17,7 +18,12 @@ frame_queue = queue.Queue()
 pause_queue = False
 values = []
 lock = threading.Lock()
+app = FastAPI()
 # ---------------------------
+
+@app.get("/")
+def home():
+    return {"status": "ok", "message": "Hello from Render!"}
 
 def extract_frames(video_path, step=FRAME_STEP):
     global pause_queue
