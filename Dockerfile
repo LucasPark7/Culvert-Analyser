@@ -1,25 +1,28 @@
-# Use slim Python base
-FROM python:3.11-slim
+FROM python:3.13-slim
 
-# Install system packages (tesseract + deps)
+# Install system dependencies (needed for opencv, tesseract, etc.)
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     libtesseract-dev \
-    ffmpeg \
+    libgl1 \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
+# Set workdir
 WORKDIR /app
 
-# Install Python dependencies
-COPY requirements.txt .
+# Copy dependencies first
+COPY requirements.txt /app/
+
+# Upgrade pip first (important for some modern deps)
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy your code
-COPY . .
+# Copy project
+COPY . /app/
 
-# Expose Render's required port
+# Expose Render port
 EXPOSE 10000
 
 # Run FastAPI with uvicorn
-CMD ["uvicorn", "src.VidAnalyse:app", "--host", "0.0.0.0", "--port", "10000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "10000"]
