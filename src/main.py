@@ -38,8 +38,7 @@ def extract_frames(video_path, step=FRAME_STEP):
     while cap.isOpened() and not pause_queue:
         ret, frame = cap.read()
         if not ret:
-            os.remove(video_path)
-            raise HTTPException(status_code=400, detail="Could not open video")
+            break
         try:
             if frame_idx % step == 0:
                 frame_queue.put(frame, timeout=1)

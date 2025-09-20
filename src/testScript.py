@@ -18,10 +18,6 @@ if not ret:
 else:
     print("First frame shape:", frame.shape)
 
-with open(video_path, "wb") as f:
-    f.write(contents)
-cap = cv2.VideoCapture("temp_video.mp4")
-
 # Open the file in binary mode and send a POST request
 with open(video_path, "rb") as f:
     files = {"file": (video_path, f, "video/mp4")}
