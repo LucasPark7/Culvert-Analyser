@@ -15,7 +15,6 @@ import os
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
-path = str(Path().absolute()) + r"\Culvert POC\\"
 frame_queue = queue.Queue()
 pause_queue = False
 values = []
@@ -39,7 +38,8 @@ def extract_frames(video_path, step=FRAME_STEP):
     while cap.isOpened() and not pause_queue:
         ret, frame = cap.read()
         if not ret:
-            break
+            os.remove(video_path)
+            raise HTTPException(status_code=400, detail="Could not open video")
         try:
             if frame_idx % step == 0:
                 frame_queue.put(frame, timeout=1)
@@ -69,7 +69,7 @@ def extract_info_from_frame(frame, roi=None):
 
     # Scan for fatal strike using template matching
     fullGray = gray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
-    fatal = cv2.imread(path + "FatalStrikeIcon.png")
+    fatal = cv2.imread("resources/FatalStrikeIcon.png")
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
     res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
