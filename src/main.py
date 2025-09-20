@@ -9,6 +9,7 @@ import threading
 import queue
 from itertools import groupby
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import tempfile
 import os
 
@@ -20,6 +21,13 @@ pause_queue = False
 values = []
 lock = threading.Lock()
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://lucaspark7.github.io"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # ---------------------------
 
 @app.get("/")
