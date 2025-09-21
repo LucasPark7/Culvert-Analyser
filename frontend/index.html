@@ -17,8 +17,8 @@
   <input type="file" id="videoFile" accept="video/mp4">
   <button onclick="uploadVideo()">Upload & Process</button>
 
-  <div id="loading">Processing video... Please wait</div>
-  <div id="result"></div>
+  <p id="loadingText" style="display:none; color:blue;">Processing...</p>
+  <pre id="result"></pre>
 
   <script>
     async function uploadVideo() {
@@ -30,6 +30,9 @@
         alert("Please select a video file first!");
         return;
       }
+
+      loadingText.style.display = "block";
+      resultBox.textContent = "";
 
       const formData = new FormData();
       formData.append("file", fileInput.files[0]);  // "file" must match your FastAPI parameter name
@@ -48,11 +51,13 @@
         }
 
         const data = await response.json();
+        loadingText.style.display = "none";
         result.innerText = "Done: " + JSON.stringify(data);
       } catch (err) {
+        loadingText.style.display = "none";
         result.innerText = "Error: " + err;
       } finally {
-        loading.style.display = "none";
+        loadingText.style.display = "none";
       }
     }
   </script>
