@@ -37,6 +37,7 @@ async def anaylse(file: UploadFile = File(...)):
     values = []
     frame_queue = queue.Queue()
     lock = threading.Lock()
+    pause_queue = False
 
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
