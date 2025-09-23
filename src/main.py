@@ -12,6 +12,7 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import tempfile
 import os
+from threading import Event
 
 # --------- CONFIG ---------
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
@@ -19,7 +20,7 @@ ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://lucaspark7.github.io"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,8 +38,7 @@ async def anaylse(file: UploadFile = File(...)):
     values = []
     frame_queue = queue.Queue()
     lock = threading.Lock()
-    pause_queue = False
-
+    pause_queue = Event()
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
         frame_idx = 0
@@ -47,7 +47,7 @@ async def anaylse(file: UploadFile = File(...)):
             os.remove(video_path)
             raise HTTPException(status_code=400, detail="Could not open video")
 
-        while cap.isOpened() and not pause_queue:
+        while cap.isOpened() and not pause_queue.is_set():
             ret, frame = cap.read()
             if not ret:
                 break
@@ -58,7 +58,7 @@ async def anaylse(file: UploadFile = File(...)):
             except queue.Full:
                     pass
         
-        pause_queue = True
+        pause_queue.set()
 
         cap.release()
 
