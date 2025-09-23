@@ -34,11 +34,6 @@ def home():
 @app.post("/analyse")
 async def anaylse(file: UploadFile = File(...)):
 
-    # reset global vars
-    values = []
-    frame_queue = queue.Queue()
-    lock = threading.Lock()
-    pause_queue = Event()
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
         frame_idx = 0
@@ -56,7 +51,7 @@ async def anaylse(file: UploadFile = File(...)):
                     frame_queue.put(frame, timeout=1)
                 frame_idx += 1
             except queue.Full:
-                    pass
+                pass
         
         pause_queue.set()
 
@@ -113,7 +108,7 @@ async def anaylse(file: UploadFile = File(...)):
 
     # get all frames from video and add all numbers from each frame to list
     def process_video():
-        while not pause_queue or not frame_queue.empty():
+        while not pause_queue.is_set() or not frame_queue.empty():
             try:
                 frame = frame_queue.get(timeout=1)
                 result = extract_info_from_frame(frame, ROI)
@@ -189,6 +184,12 @@ async def anaylse(file: UploadFile = File(...)):
         })
 
         return df
+    
+    # reset global vars
+    values = []
+    frame_queue = queue.Queue()
+    lock = threading.Lock()
+    pause_queue = Event()
 
     if not file.filename.endswith(".mp4"):
         raise HTTPException(status_code=400, detail="Only .mp4 files supported")

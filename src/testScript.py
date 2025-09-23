@@ -3,7 +3,7 @@ import os
 import cv2
 
 url = "http://127.0.0.1:10000/analyse"
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\TestVid1.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\TestVid1Cut.mp4"
 
 if not os.path.exists(video_path):
     print("Video file does not exist:", video_path)
