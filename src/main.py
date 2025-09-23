@@ -190,6 +190,11 @@ def compare_videos(video1_path, video2_path):
 
 @app.post("/analyse")
 async def anaylse(file: UploadFile = File(...)):
+
+    # reset global vars
+    values = []
+    frame_queue = queue.Queue()
+
     if not file.filename.endswith(".mp4"):
         raise HTTPException(status_code=400, detail="Only .mp4 files supported")
 
