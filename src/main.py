@@ -23,7 +23,7 @@ lock = threading.Lock()
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://lucaspark7.github.io"],
+    allow_origins=["https://lucaspark7.github.io", "https://lucaspark7.github.io/Culvert-Analyser/frontend/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
