@@ -20,7 +20,7 @@ ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://lucaspark7.github.io"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
