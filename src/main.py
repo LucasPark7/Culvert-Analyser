@@ -29,7 +29,7 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"status": "ok", "message": "Hello from Render!"}
+    return {"status": "ok", "message": "Good Response"}
 
 @app.post("/analyse")
 async def anaylse(file: UploadFile = File(...)):
