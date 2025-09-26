@@ -1,4 +1,4 @@
-import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3
+import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -205,7 +205,10 @@ while True:
         task_id = job["task_id"]
         file_path = job["s3_key"]
 
-        s3.download_file(BUCKET_NAME, file_path, file_path)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
+            s3.download_file(BUCKET_NAME, file_path, temp.name)
+            temp_path = temp.name
+        
         result = process_video(file_path)
 
         # save result
