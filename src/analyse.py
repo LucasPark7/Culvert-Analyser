@@ -202,7 +202,7 @@ while True:
     if job_data:
         _, job_json = job_data
         job = json.loads(job_json)
-        task_id = job["task_id"]
+        task_id = job["job_id"]
         file_path = job["s3_key"]
 
         #with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
