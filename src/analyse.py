@@ -105,7 +105,6 @@ def process_video(file_path):
             try:
                 frame = frame_queue.get(timeout=1)
                 result = extract_info_from_frame(frame, ROI)
-                print(result)
                 OCRList = result[0]
                 if all_equal(OCRList): # if all OCR checks match then confidence in result is high
                     if OCRList[0] is None or OCRList[0] == 4:
