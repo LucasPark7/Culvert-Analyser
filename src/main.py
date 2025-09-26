@@ -1,4 +1,4 @@
-import cv2, pytesseract, re, math, threading, queue, tempfile, uuid, os, time, json
+import tempfile, uuid, json
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
