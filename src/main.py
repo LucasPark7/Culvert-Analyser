@@ -1,4 +1,4 @@
-import tempfile, uuid, json, boto3, os
+import tempfile, uuid, json, boto3, os, botocore
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -63,7 +63,11 @@ async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...
         analyzer_thread.join()
         '''
 
-        #s3.upload_file(temp.name, BUCKET_NAME, f"videos/{job_id}.mp4")
+        try:
+            s3.upload_file(temp.name, BUCKET_NAME, f"videos/{job_id}.mp4")
+        except botocore.exceptions.ClientError as e:
+            print("S3 upload failed:", e.response["Error"]["Code"], e.response["Error"]["Message"])
+            raise
         job = {"job_id": job_id, "s3_key": f"{job_id}"}
         redis.lpush("video_jobs", json.dumps(job))
         os.remove(temp.name)

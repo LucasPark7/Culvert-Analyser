@@ -205,9 +205,9 @@ while True:
         task_id = job["task_id"]
         file_path = job["s3_key"]
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
-            s3.download_file(BUCKET_NAME, file_path, temp.name)
-            temp_path = temp.name
+        #with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
+            #s3.download_file(BUCKET_NAME, file_path, temp.name)
+            #temp_path = temp.name
         
         result = process_video(file_path)
 
