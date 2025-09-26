@@ -1,4 +1,4 @@
-import cv2, pytesseract, re, math, threading, queue, os, time, json, requests, boto3
+import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -8,7 +8,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
 
-redis = Redis.from_url("redis://red-d3a4umk9c44c738slpo0:6379", decode_responses=True)
+redis = Redis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
+
+AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+
+# Initialize boto3 client
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY,
+    region_name=AWS_REGION
+)
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
@@ -186,15 +199,18 @@ def process_video(file_path):
 
 while True:
     job_data = redis.brpop("video_jobs", timeout=5)
+
     if job_data:
         _, job_json = job_data
         job = json.loads(job_json)
         task_id = job["task_id"]
         file_path = job["file"]
 
+        s3.download_file(BUCKET_NAME, AWS_ACCESS_KEY, file_path)
         result = process_video(file_path)
 
         # save result
         redis.set(f"result:{task_id}", json.dumps(result))
+
     else:
         time.sleep(1)

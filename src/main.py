@@ -1,4 +1,4 @@
-import tempfile, uuid, json
+import tempfile, uuid, json, boto3, os
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -17,7 +17,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-redis = Redis.from_url("redis://red-d3a4umk9c44c738slpo0:6379", decode_responses=True)
+redis = Redis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
+
+AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY,
+    region_name=AWS_REGION
+)
 # ---------------------------
 
 @app.get("/")
@@ -51,7 +63,8 @@ async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...
         analyzer_thread.join()
         '''
 
-        job = {"task_id": job_id, "file": temp.name}
+        s3.upload_file(temp.name, BUCKET_NAME, AWS_ACCESS_KEY)
+        job = {"job_id": job_id, "file": f"{temp.name}"}
         redis.lpush("video_jobs", json.dumps(job))
 
         return {"job_id": job_id, "status": "processing"}

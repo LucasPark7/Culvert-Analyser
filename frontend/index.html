@@ -53,6 +53,19 @@
         const data = await response.json();
         loading.style.display = "none";
         result.innerText = "Done: " + JSON.stringify(data);
+
+        const interval = setInterval(async () => {
+        const statusResp = await fetch(`https://culvert-analyse.onrender.com/status/${data.job_id}`);
+        const statusData = await statusResp.json();
+
+        if (statusData.status === "complete") {
+          clearInterval(interval);
+          statusBox.innerHTML = "Processing complete!";
+          resultBox.innerHTML = JSON.stringify(statusData.results, null, 2);
+        } else {
+          statusBox.innerHTML = `Processing... (${statusData.progress || "pending"})`;
+        }
+      }, 2000); // poll every 2 seconds
       } catch (err) {
         loading.style.display = "none";
         result.innerText = "Error: " + err;
