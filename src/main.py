@@ -1,4 +1,4 @@
-import tempfile, uuid, json, boto3, os, botocore
+import tempfile, uuid, json, boto3, os, botocore, logging
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -30,6 +30,10 @@ s3 = boto3.client(
     aws_secret_access_key=AWS_SECRET_KEY,
     region_name=AWS_REGION
 )
+
+boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
+
+logger = logging.getLogger("uvicorn.error")
 # ---------------------------
 
 @app.get("/")
@@ -64,10 +68,12 @@ async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...
         '''
 
         try:
+            logger.info(f"Uploading {temp.name} to s3://{BUCKET_NAME}/{job_id}")
             s3.upload_file(temp.name, BUCKET_NAME, f"videos/{job_id}.mp4")
-        except botocore.exceptions.ClientError as e:
-            print("S3 upload failed:", e.response["Error"]["Code"], e.response["Error"]["Message"])
-            raise
+            logger.info("Upload successful")
+        except Exception as e:
+            logger.error("S3 upload failed", exc_info=True)  # full traceback
+            raise HTTPException(status_code=500, detail=f"S3 upload failed: {str(e)}")
         job = {"job_id": job_id, "s3_key": f"{job_id}"}
         redis.lpush("video_jobs", json.dumps(job))
         os.remove(temp.name)
