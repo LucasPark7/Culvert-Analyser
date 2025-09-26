@@ -63,7 +63,7 @@ async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...
         analyzer_thread.join()
         '''
 
-        s3.upload_file(temp.name, BUCKET_NAME, f"videos/{job_id}.mp4")
+        #s3.upload_file(temp.name, BUCKET_NAME, f"videos/{job_id}.mp4")
         job = {"job_id": job_id, "s3_key": f"{job_id}"}
         redis.lpush("video_jobs", json.dumps(job))
         os.remove(temp.name)
