@@ -203,9 +203,9 @@ while True:
         _, job_json = job_data
         job = json.loads(job_json)
         task_id = job["task_id"]
-        file_path = job["file"]
+        file_path = job["s3_key"]
 
-        s3.download_file(BUCKET_NAME, AWS_ACCESS_KEY, file_path)
+        s3.download_file(BUCKET_NAME, file_path, file_path)
         result = process_video(file_path)
 
         # save result
