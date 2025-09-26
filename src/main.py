@@ -34,6 +34,11 @@ s3 = boto3.client(
 boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
 
 logger = logging.getLogger("uvicorn.error")
+
+logger.info(f"AWS_ACCESS_KEY_ID={os.getenv('AWS_ACCESS_KEY_ID')}")
+logger.info(f"AWS_SECRET_ACCESS_KEY exists={os.getenv('AWS_SECRET_ACCESS_KEY') is not None}")
+logger.info(f"AWS_REGION={os.getenv('AWS_REGION')}")
+logger.info(f"S3_BUCKET_NAME={os.getenv('S3_BUCKET_NAME')}")
 # ---------------------------
 
 @app.get("/")
