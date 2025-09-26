@@ -17,6 +17,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+redis = Redis.from_url(os.getenv('REDIS_URL'), decode_responses=True)
+AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_REGION = os.getenv('AWS_DEFAULT_REGION')
+BUCKET_NAME = os.getenv('BUCKET_NAME')
+
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY,
+    region_name=AWS_REGION
+)
+
+boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
+
+logger = logging.getLogger("uvicorn.error")
+
+logger.info(f"AWS_ACCESS_KEY_ID={os.getenv('AWS_ACCESS_KEY_ID')}")
+logger.info(f"AWS_SECRET_ACCESS_KEY exists={os.getenv('AWS_SECRET_ACCESS_KEY') is not None}")
+logger.info(f"AWS_REGION={os.getenv('AWS_REGION')}")
+logger.info(f"S3_BUCKET_NAME={os.getenv('S3_BUCKET_NAME')}")
 # ---------------------------
 
 @app.get("/")
@@ -26,27 +47,7 @@ def home():
 @app.post("/analyse")
 async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     # reset global vars
-    redis = Redis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
-    AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-    AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
-    BUCKET_NAME = os.getenv("BUCKET_NAME")
-
-    s3 = boto3.client(
-        "s3",
-        aws_access_key_id=AWS_ACCESS_KEY,
-        aws_secret_access_key=AWS_SECRET_KEY,
-        region_name=AWS_REGION
-    )
-
-    boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
-
-    logger = logging.getLogger("uvicorn.error")
-
-    logger.info(f"AWS_ACCESS_KEY_ID={os.getenv('AWS_ACCESS_KEY_ID')}")
-    logger.info(f"AWS_SECRET_ACCESS_KEY exists={os.getenv('AWS_SECRET_ACCESS_KEY') is not None}")
-    logger.info(f"AWS_REGION={os.getenv('AWS_REGION')}")
-    logger.info(f"S3_BUCKET_NAME={os.getenv('S3_BUCKET_NAME')}")
+    
     job_id = str(uuid.uuid4())
 
     if not file.filename.endswith(".mp4"):
