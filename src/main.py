@@ -18,8 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 redis = Redis.from_url(os.environ.get('REDIS_URL'), decode_responses=True)
-AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY')
+AWS_SECRET_KEY = os.environ.get('AWS_SECRET_KEY')
 AWS_REGION = os.environ.get('AWS_DEFAULT_REGION')
 BUCKET_NAME = os.environ.get('BUCKET_NAME')
 
