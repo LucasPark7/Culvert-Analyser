@@ -65,7 +65,7 @@
         } else {
           loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
         }
-      }, 5000); // poll every 5 seconds
+        }, 5000); // poll every 5 seconds
       } catch (err) {
         loading.style.display = "none";
         result.innerText = "Error: " + err;

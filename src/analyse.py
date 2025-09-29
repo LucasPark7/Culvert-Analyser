@@ -204,11 +204,11 @@ while True:
         task_id = job["job_id"]
         file_path = job["s3_key"]
 
-        #with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
-            #s3.download_file(BUCKET_NAME, file_path, temp.name)
-            #temp_path = temp.name
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
+            s3.download_file(BUCKET_NAME, file_path, temp.name)
+            temp_path = temp.name
         
-        result = process_video(file_path)
+        result = process_video(temp_path)
 
         # save result
         redis.set(f"result:{task_id}", json.dumps(result))
