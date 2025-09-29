@@ -201,21 +201,22 @@ def process_video(file_path):
     
     return values
 
-while True:
-    job_data = redis.brpop("video_jobs")
-    if job_data:
-        _, job_id = job_data
-        logger.info("Job Found: ", job_id)
+if __name__ == "__main__":
+    while True:
+        job_data = redis.brpop("video_jobs")
+        if job_data:
+            _, job_id = job_data
+            logger.info("Job Found: ", job_id)
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
-            logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
-            s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
-            temp_path = temp.name
-        logger.info("temp ", temp, temp.name)
-        result = process_video(temp_path)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
+                logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
+                s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
+                temp_path = temp.name
+            logger.info("temp ", temp, temp.name)
+            result = process_video(temp_path)
 
-        # save result
-        redis.set(f"result:{job_id}", json.dumps(result))
+            # save result
+            redis.set(f"result:{job_id}", json.dumps(result))
 
-    else:
-        time.sleep(1)
+        else:
+            time.sleep(1)
