@@ -79,8 +79,7 @@ async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...
         except Exception as e:
             logger.error("S3 upload failed", exc_info=True)  # full traceback
             raise HTTPException(status_code=500, detail=f"S3 upload failed: {str(e)}")
-        job = {"job_id": job_id, "s3_key": f"{job_id}"}
-        redis.lpush("video_jobs", json.dumps(job))
+        redis.lpush("video_jobs", job_id)
         os.remove(temp.name)
 
         return {"job_id": job_id, "status": "processing"}

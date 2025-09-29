@@ -1,4 +1,4 @@
-import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile
+import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging
 import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import groupby
@@ -21,6 +21,8 @@ s3 = boto3.client(
     aws_secret_access_key=AWS_SECRET_KEY,
     region_name=AWS_REGION
 )
+boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
+logger = logging.getLogger("uvicorn.error")
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
@@ -199,19 +201,17 @@ while True:
     job_data = redis.brpop("video_jobs", timeout=5)
 
     if job_data:
-        _, job_json = job_data
-        job = json.loads(job_json)
-        task_id = job["job_id"]
-        file_path = job["s3_key"]
+        _, job_id = job_data
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
-            s3.download_file(BUCKET_NAME, file_path, temp.name)
+            logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
+            s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
             temp_path = temp.name
         
         result = process_video(temp_path)
 
         # save result
-        redis.set(f"result:{task_id}", json.dumps(result))
+        redis.set(f"result:{job_id}", json.dumps(result))
 
     else:
         time.sleep(1)
