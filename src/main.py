@@ -34,10 +34,10 @@ boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
 
 logger = logging.getLogger("uvicorn.error")
 
-logger.info(f"AWS_ACCESS_KEY_ID={os.environ.get('AWS_ACCESS_KEY_ID')}")
-logger.info(f"AWS_SECRET_ACCESS_KEY exists={os.environ.get('AWS_SECRET_ACCESS_KEY') is not None}")
-logger.info(f"AWS_REGION={os.environ.get('AWS_REGION')}")
-logger.info(f"S3_BUCKET_NAME={os.environ.get('S3_BUCKET_NAME')}")
+logger.info(f"AWS_ACCESS_KEY={os.environ.get('AWS_ACCESS_KEY')}")
+logger.info(f"AWS_SECRET_KEY exists={os.environ.get('AWS_SECRET_KEY') is not None}")
+logger.info(f"AWS_DEFAULT_REGION={os.environ.get('AWS_DEFAULT_REGION')}")
+logger.info(f"BUCKET_NAME={os.environ.get('BUCKET_NAME')}")
 # ---------------------------
 
 @app.get("/")
