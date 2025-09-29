@@ -1,19 +1,18 @@
 import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile
 import pandas as pd
 import matplotlib.pyplot as plt
-from pathlib import Path
 from itertools import groupby
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
 
-redis = Redis.from_url(os.getenv("REDIS_URL"), decode_responses=True)
+redis = Redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 
-AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_REGION = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
-BUCKET_NAME = os.getenv("BUCKET_NAME")
+AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
+BUCKET_NAME = os.environ.get("BUCKET_NAME")
 
 # Initialize boto3 client
 s3 = boto3.client(

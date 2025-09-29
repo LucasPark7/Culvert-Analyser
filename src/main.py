@@ -17,11 +17,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-redis = Redis.from_url(os.getenv('REDIS_URL'), decode_responses=True)
-AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-AWS_REGION = os.getenv('AWS_DEFAULT_REGION')
-BUCKET_NAME = os.getenv('BUCKET_NAME')
+redis = Redis.from_url(os.environ.get('REDIS_URL'), decode_responses=True)
+AWS_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_REGION = os.environ.get('AWS_DEFAULT_REGION')
+BUCKET_NAME = os.genviron.get('BUCKET_NAME')
 
 s3 = boto3.client(
     "s3",
@@ -34,10 +34,10 @@ boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
 
 logger = logging.getLogger("uvicorn.error")
 
-logger.info(f"AWS_ACCESS_KEY_ID={os.getenv('AWS_ACCESS_KEY_ID')}")
-logger.info(f"AWS_SECRET_ACCESS_KEY exists={os.getenv('AWS_SECRET_ACCESS_KEY') is not None}")
-logger.info(f"AWS_REGION={os.getenv('AWS_REGION')}")
-logger.info(f"S3_BUCKET_NAME={os.getenv('S3_BUCKET_NAME')}")
+logger.info(f"AWS_ACCESS_KEY_ID={os.environ.get('AWS_ACCESS_KEY_ID')}")
+logger.info(f"AWS_SECRET_ACCESS_KEY exists={os.environ.get('AWS_SECRET_ACCESS_KEY') is not None}")
+logger.info(f"AWS_REGION={os.environ.get('AWS_REGION')}")
+logger.info(f"S3_BUCKET_NAME={os.environ.get('S3_BUCKET_NAME')}")
 # ---------------------------
 
 @app.get("/")
