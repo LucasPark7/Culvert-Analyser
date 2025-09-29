@@ -106,6 +106,9 @@ def process_video(file_path):
             try:
                 frame = frame_queue.get(timeout=1)
                 result = extract_info_from_frame(frame, ROI)
+
+                logger.info(result)
+
                 OCRList = result[0]
                 if all_equal(OCRList): # if all OCR checks match then confidence in result is high
                     if OCRList[0] is None or OCRList[0] == 4:
@@ -198,7 +201,7 @@ def process_video(file_path):
     return values
 
 while True:
-    job_data = redis.brpop("video_jobs", timeout=5)
+    job_data = redis.brpop("video_jobs", timeout=0)
 
     if job_data:
         _, job_id = job_data
@@ -207,7 +210,7 @@ while True:
             logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
             s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
             temp_path = temp.name
-        
+        logger.info(temp, temp.name)
         result = process_video(temp_path)
 
         # save result
