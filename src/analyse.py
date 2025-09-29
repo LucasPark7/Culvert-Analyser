@@ -23,6 +23,7 @@ s3 = boto3.client(
 )
 boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
 logger = logging.getLogger("uvicorn.error")
+logger.info("Worker started and waiting for jobs...")
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
@@ -201,16 +202,16 @@ def process_video(file_path):
     return values
 
 while True:
-    job_data = redis.brpop("video_jobs", timeout=0)
-
+    job_data = redis.brpop("video_jobs")
     if job_data:
         _, job_id = job_data
+        logger.info("Job Found: ", job_id)
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
             logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
             s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
             temp_path = temp.name
-        logger.info(temp, temp.name)
+        logger.info("temp ", temp, temp.name)
         result = process_video(temp_path)
 
         # save result
