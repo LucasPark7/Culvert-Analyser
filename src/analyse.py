@@ -1,4 +1,4 @@
-import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging
+import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging, sys
 import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import groupby
@@ -11,7 +11,7 @@ redis = Redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 
 AWS_ACCESS_KEY = os.environ.get("AWS_ACCESS_KEY")
 AWS_SECRET_KEY = os.environ.get("AWS_SECRET_KEY")
-AWS_REGION = os.environ.get("AWS_DEFAULT_REGION", "us-west-1")
+AWS_REGION = os.environ.get("AWS_DEFAULT_REGION", "us-west-2")
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 
 # Initialize boto3 client
@@ -21,8 +21,13 @@ s3 = boto3.client(
     aws_secret_access_key=AWS_SECRET_KEY,
     region_name=AWS_REGION
 )
-boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
-logger = logging.getLogger("uvicorn.error")
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger(__name__)
 logger.info("Worker started and waiting for jobs...")
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
