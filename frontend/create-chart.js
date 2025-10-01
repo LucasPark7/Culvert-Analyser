@@ -1,7 +1,7 @@
-//import { dataSet } from "analyse-page.js";
-var testSet = require('./test_set.json');
-const indexes = testSet.map((_, i) => i);
-const values = testSet.map(item => item[0]);
+import { dataSet } from "analyse-page.js";
+import { map } from './test_set.json';
+const indexes = map((_, i) => i);
+const values = map(item => item[0]);
 
 new Chart("resultChart", {
   type: "line",
