@@ -209,6 +209,7 @@ def process_video(file_path):
 if __name__ == "__main__":
     while True:
         job_data = redis.brpop("video_jobs")
+        logger.info("QUEUE: ", job_data)
         if job_data:
             _, job_id = job_data
             logger.info("Job Found: ", job_id)
