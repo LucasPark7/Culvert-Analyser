@@ -54,18 +54,28 @@
         loading.style.display = "none";
         result.innerText = "Done: " + JSON.stringify(data);
 
-        const interval = setInterval(async () => {
-        const statusResp = await fetch(`https://culvert-analyse.onrender.com/status/${data.job_id}`);
-        const statusData = await statusResp.json();
+        const maxTime = 600 * 1000;
+        const startTime = Date.now();
 
-        if (statusData.status === "complete") {
-          clearInterval(interval);
-          loading.innerHTML = "Processing complete!";
-          result.innerHTML = JSON.stringify(statusData.results, null, 2);
-        } else {
-          loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
-        }
-        }, 5000); // poll every 5 seconds
+        const interval = setInterval(async () => {
+          const statusResp = await fetch(`https://culvert-analyse.onrender.com/status/${data.job_id}`);
+          const statusData = await statusResp.json();
+
+          if (statusData.status === "complete") {
+            clearInterval(interval);      
+            loading.innerHTML = "Processing complete!";
+            result.innerHTML = JSON.stringify(statusData.results, null, 2);
+          } else {
+            loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
+          }
+
+          // timeout
+          if (Date.now() - startTime > maxTime) {
+            clearInterval(interval);
+            loading.innerHTML = "process timeout error";
+            return;
+          }
+        }, 10000); // poll every 10 seconds
       } catch (err) {
         loading.style.display = "none";
         result.innerText = "Error: " + err;

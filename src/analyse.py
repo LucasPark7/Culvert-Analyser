@@ -209,7 +209,7 @@ if __name__ == "__main__":
         job_data = redis.brpop("video_jobs")
         if job_data:
             _, job_id = job_data
-            logger.info("Job Found: ", job_id)
+            logger.info(f"Job Found: {job_id}")
 
             with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
                 logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
