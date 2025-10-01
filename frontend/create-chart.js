@@ -1,4 +1,4 @@
-import { dataSet } from "analyse-page.js";
+import { dataSet } from "./analyse-page.js";
 import { map } from './test_set.json';
 const indexes = map((_, i) => i);
 const values = map(item => item[0]);
