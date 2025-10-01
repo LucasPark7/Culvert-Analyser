@@ -12,7 +12,7 @@ async function uploadVideo() {
     result.textContent = "";
 
     const formData = new FormData();
-    formData.append("file", fileInput.files[0]);  // "file" must match your FastAPI parameter name
+    formData.append("file", fileInput.files[0]);
 
     loading.style.display = "block";
     result.innerText = "";
@@ -42,6 +42,7 @@ async function uploadVideo() {
         clearInterval(interval);      
         loading.innerHTML = "Processing complete!";
         result.innerHTML = JSON.stringify(statusData.results, null, 2);
+        module.exports = JSON.stringify(statusData.results, null, 2);
         } else {
         loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
         }

@@ -12,14 +12,26 @@
   </style>
 </head>
 <body>
-  <h2>Upload MP4 and Send to API</h2>
+  <div>
+    <h2>Upload MP4 and Send to API</h2>
 
-  <input type="file" id="videoFile" accept="video/mp4">
-  <button onclick="uploadVideo()">Upload & Process</button>
+    <input type="file" id="videoFile" accept="video/mp4">
+    <button onclick="uploadVideo()">Upload & Process</button>
 
-  <p id="loadingText" style="display:none; color:blue;">Processing...</p>
-  <pre id="result"></pre>
+    <p id="loadingText" style="display:none; color:blue;">Processing...</p>
+    <pre id="result"></pre>
 
-  <script src="analyse-page.js"></script>
+    <script src="analyse-page.js"></script>
+  </div>
+
+  <div>
+    <h3>Result:</h3>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="create-chart.js"></script>
+    <canvas id="resultChart" style="width:100%;max-width:700px"></canvas>
+  </div>
+  
+  <noscript>To use this site, please enable JavaScript.</noscript>
 </body>
 </html>
