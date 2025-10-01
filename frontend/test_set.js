@@ -1,4 +1,4 @@
-var test_set = [
+export var test_set = [
   [
     20868,
     false
