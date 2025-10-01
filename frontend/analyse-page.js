@@ -1,3 +1,5 @@
+export var dataSet;
+
 async function uploadVideo() {
     const fileInput = document.getElementById("videoFile");
     const loading = document.getElementById("loadingText");
@@ -41,7 +43,7 @@ async function uploadVideo() {
         if (statusData.status === "complete") {
         clearInterval(interval);      
         loading.innerHTML = "Processing complete!";
-        var dataSet = JSON.stringify(statusData.results, null, 2);
+        dataSet = JSON.stringify(statusData.results, null, 2);
         result.innerHTML = dataSet;
         } else {
         loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
