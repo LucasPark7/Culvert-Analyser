@@ -1,4 +1,4 @@
-const map = [
+var test_set = [
   [
     20868,
     false
@@ -84,5 +84,3 @@ const map = [
     false
   ]
 ];
-
-module.exports = map;
