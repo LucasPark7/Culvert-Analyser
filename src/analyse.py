@@ -74,7 +74,7 @@ def process_video(file_path):
         text3 = pytesseract.image_to_string(thresh3, config="--psm 6 digits")
 
         # Scan for fatal strike using template matching
-        fullGray = gray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
+        fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
         fatal = cv2.imread("resources/FatalStrikeIcon.png")
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
         res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
@@ -112,8 +112,6 @@ def process_video(file_path):
             try:
                 frame = frame_queue.get(timeout=1)
                 result = extract_info_from_frame(frame, ROI)
-
-                logger.info(result)
 
                 OCRList = result[0]
                 if all_equal(OCRList): # if all OCR checks match then confidence in result is high
@@ -209,7 +207,6 @@ def process_video(file_path):
 if __name__ == "__main__":
     while True:
         job_data = redis.brpop("video_jobs")
-        logger.info("QUEUE: ", job_data)
         if job_data:
             _, job_id = job_data
             logger.info("Job Found: ", job_id)
@@ -218,7 +215,6 @@ if __name__ == "__main__":
                 logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
                 s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
                 temp_path = temp.name
-            logger.info("temp ", temp, temp.name)
             result = process_video(temp_path)
 
             # save result

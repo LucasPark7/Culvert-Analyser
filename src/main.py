@@ -131,5 +131,6 @@ async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...
 def get_status(job_id: str):
     result = redis.get(f"result:{job_id}")
     if result:
+        logger.info("RESULTS: ", json.loads(result))
         return {"task_id": job_id, "result": json.loads(result)}
     return {"task_id": job_id, "status": "processing"}
