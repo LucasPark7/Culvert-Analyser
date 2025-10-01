@@ -45,7 +45,7 @@ def home():
     return {"status": "ok", "message": "Good Response"}
 
 @app.post("/analyse")
-async def anaylse(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+async def anaylse(file: UploadFile = File(...)):
     # reset global vars
     
     job_id = str(uuid.uuid4())

@@ -31,8 +31,8 @@ def poll_status(task_id: str, interval: int = 3, timeout: int = 300):
 
         print("Status:", status_data)
 
-        if status_data["status"] == "completed":
-            return status_data["result"]
+        if status_data["status"] == "complete":
+            return status_data["results"]
         elif status_data["status"] == "failed":
             raise RuntimeError(f"Task {task_id} failed: {status_data}")
 
