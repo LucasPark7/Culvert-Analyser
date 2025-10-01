@@ -1,4 +1,4 @@
-[
+const map = [
   [
     20868,
     false
@@ -83,4 +83,6 @@
     26688,
     false
   ]
-]
+];
+
+module.exports = map;
