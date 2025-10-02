@@ -222,6 +222,7 @@ if __name__ == "__main__":
             result = process_video(temp_path)
 
             # save result
+            logger.info(f"JOB COMPLETED")
             redis.set(f"result:{job_id}", json.dumps(result))
 
         else:
