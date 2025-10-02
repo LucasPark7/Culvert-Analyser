@@ -1,5 +1,3 @@
-export var dataSet;
-
 async function uploadVideo() {
     const fileInput = document.getElementById("videoFile");
     const loading = document.getElementById("loadingText");
@@ -41,10 +39,25 @@ async function uploadVideo() {
         const statusData = await statusResp.json();
 
         if (statusData.status === "complete") {
-        clearInterval(interval);      
-        loading.innerHTML = "Processing complete!";
-        dataSet = JSON.stringify(statusData.results, null, 2);
-        result.innerHTML = dataSet;
+            clearInterval(interval);      
+            loading.innerHTML = "Processing complete!";
+            var dataSet = JSON.stringify(statusData.results, null, 2);
+            //result.innerHTML = dataSet;
+            const indexes = dataSet.map((_, i) => i);
+            const values = dataSet.map(item => item[0]);
+            
+            new Chart("resultChart", {
+            type: "line",
+            data: {
+                labels: indexes,
+                datasets: [{
+                backgroundColor:"rgba(0,0,255,1.0)",
+                borderColor: "rgba(0,0,255,0.1)",
+                data: values
+                }]
+            },
+            options: {}
+            });
         } else {
         loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
         }
