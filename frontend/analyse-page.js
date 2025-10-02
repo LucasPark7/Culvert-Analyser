@@ -24,13 +24,16 @@ async function uploadVideo() {
     const loading = document.getElementById("loadingText");
     const result = document.getElementById("result");
 
+    var file = fileInput.files[0];
+
     if (fileInput.files.length === 0) {
     alert("Please select a video file first!");
     return;
     }
 
-    if (fileInput.files[0].size > 200 * 1024 * 1024) {
+    if (file.size > (200 * 1024 * 1024)) {
       alert(`File too large! Reduce size and try again`);
+      file = "";
       return;
     }
 
@@ -38,7 +41,7 @@ async function uploadVideo() {
     result.textContent = "";
 
     const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
+    formData.append("file", file);
 
     loading.style.display = "block";
     result.innerText = "";
