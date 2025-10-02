@@ -1,19 +1,19 @@
-function getShadedRanges(xValues, flags) {
+function getShadedRanges(indexes, fatal_list) {
   let ranges = [];
   let start = null;
 
-  flags.forEach((flag, i) => {
+  fatal_list.forEach((flag, i) => {
     if (flag && start === null) {
-      start = xValues[i];
+      start = indexes[i];
     } else if (!flag && start !== null) {
-      ranges.push([start, xValues[i]]);
+      ranges.push([start, indexes[i]]);
       start = null;
     }
   });
 
   // if ended inside a shaded block
   if (start !== null) {
-    ranges.push([start, xValues[xValues.length - 1]]);
+    ranges.push([start, indexes[indexes.length - 1]]);
   }
 
   return ranges;
@@ -55,7 +55,7 @@ async function uploadVideo() {
 
     const data = await response.json();
     loading.style.display = "none";
-    result.innerText = "Done: " + JSON.stringify(data);
+    result.innerText = JSON.stringify(data);
 
     const maxTime = 600 * 1000;
     const startTime = Date.now();
@@ -79,7 +79,7 @@ async function uploadVideo() {
                 fatal_list.push(value[1]);
             });
 
-            const shadedRanges = getShadedRanges(values, fatal_list);
+            const shadedRanges = getShadedRanges(indexes, fatal_list);
 
             const fatal_region = {};
             shadedRanges.forEach(function (range, idx) {
