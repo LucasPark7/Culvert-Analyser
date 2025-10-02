@@ -8,7 +8,7 @@ async function uploadVideo() {
     return;
     }
 
-    if (fileInput.size > 200 * 1024 * 1024) {
+    if (fileInput.files[0].size > 200 * 1024 * 1024) {
       alert(`File too large! Reduce size and try again`);
       return;
     }
@@ -46,15 +46,19 @@ async function uploadVideo() {
         if (statusData.status === "complete") {
             clearInterval(interval);      
             loading.innerHTML = "Processing complete!";
-            var dataSet = JSON.stringify(statusData.results, null, 2);
+            const dataSet = JSON.stringify(statusData.results, null, 2);
             //result.innerHTML = dataSet;
-            const indexes = dataSet.map((_, i) => i);
-            const values = dataSet.map(item => item[0]);
+            var frames = [];
+            var values = [];
+            dataSet.forEach(function (value, index) {
+                frames.push(index + 1);
+                values.push(value);
+            });
             
             new Chart("resultChart", {
             type: "line",
             data: {
-                labels: indexes,
+                labels: frames,
                 datasets: [{
                 backgroundColor:"rgba(0,0,255,1.0)",
                 borderColor: "rgba(0,0,255,0.1)",
