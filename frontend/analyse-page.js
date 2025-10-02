@@ -79,7 +79,7 @@ async function uploadVideo() {
                 fatal_list.push(value[1]);
             });
 
-            const shadedRanges = getShadedRanges(indexes, fatal_list);
+            const shadedRanges = getShadedRanges(frames, fatal_list);
 
             const fatal_region = {};
             shadedRanges.forEach(function (range, idx) {
