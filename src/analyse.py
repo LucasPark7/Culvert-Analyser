@@ -114,6 +114,7 @@ def process_video(file_path):
                 result = extract_info_from_frame(frame, ROI)
 
                 OCRList = result[0]
+                logging.info(f"TESSERACT RESULT: {result}")
                 if all_equal(OCRList): # if all OCR checks match then confidence in result is high
                     if OCRList[0] is None or OCRList[0] == 4:
                         continue
