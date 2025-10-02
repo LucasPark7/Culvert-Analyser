@@ -8,6 +8,11 @@ async function uploadVideo() {
     return;
     }
 
+    if (fileInput.size > 200 * 1024 * 1024) {
+      alert(`File too large! Reduce size and try again`);
+      return;
+    }
+
     loading.style.display = "block";
     result.textContent = "";
 

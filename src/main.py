@@ -61,17 +61,6 @@ async def anaylse(file: UploadFile = File(...)):
 
         #df = compare_videos(video1, video2)
 
-        '''
-        reader_thread = threading.Thread(target=extract_frames, args=(temp.name,))
-        analyzer_thread = threading.Thread(target=process_video)
-
-        reader_thread.start()
-        analyzer_thread.start()
-
-        reader_thread.join()
-        analyzer_thread.join()
-        '''
-
         try:
             logger.info(f"Uploading {temp.name} to s3://{BUCKET_NAME}/{job_id}")
             s3.upload_file(temp.name, BUCKET_NAME, f"videos/{job_id}.mp4")
@@ -86,46 +75,6 @@ async def anaylse(file: UploadFile = File(...)):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-    '''
-    # code to test 1 video
-    series1 = values
-    data = []
-    for i in range(len(series1)):
-        data.append({
-            "time": i,
-            "score": series1[i][0],
-            "fatal_active": series1[i][1]
-        })
-    df = pd.DataFrame(data)
-
-    print(df.to_string())
-
-    # Plot
-    plt.plot(df["time"], df["score"], label="Video 1")
-    #plt.plot(df["time"], df["video2"], label="Video 2")
-
-    # Shade fatal time
-    active_periods = []
-    active_start = None
-    for i, row in df.iterrows():
-        if row["fatal_active"] and active_start is None:
-            active_start = row["time"]
-        if not row["fatal_active"] and active_start is not None:
-            active_periods.append((active_start, row["time"]))
-            active_start = None
-    if active_start is not None:  # if buff was active till the end
-        active_periods.append((active_start, df["time"].iloc[-1]))
-
-    for start, end in active_periods:
-        plt.axvspan(start, end, color="blue", alpha=0.3, label="Fatal Active")
-
-    plt.xlabel("Frame")
-    plt.ylabel("Score")
-    plt.legend()
-    plt.show()
-    '''
     
 @app.get("/status/{job_id}")
 def get_status(job_id: str):
