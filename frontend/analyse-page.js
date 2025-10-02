@@ -1,3 +1,5 @@
+let chartInstance = null;
+
 function getShadedRanges(indexes, fatal_list) {
   let ranges = [];
   let start = null;
@@ -23,6 +25,7 @@ async function uploadVideo() {
     const fileInput = document.getElementById("videoFile");
     const loading = document.getElementById("loadingText");
     const result = document.getElementById("result");
+    const ctx = document.getElementById("resultChart");
 
     var file = fileInput.files[0];
 
@@ -35,6 +38,10 @@ async function uploadVideo() {
       alert(`File too large! Reduce size and try again`);
       file = "";
       return;
+    }
+
+    if (chartInstance) {
+        chartInstance.destroy();
     }
 
     loading.style.display = "block";
@@ -97,7 +104,7 @@ async function uploadVideo() {
                 };
             });
             
-            new Chart("resultChart", {
+            chartInstance = new Chart(ctx, {
             type: "line",
             data: {
                 labels: frames,
