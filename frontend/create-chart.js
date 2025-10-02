@@ -1,6 +1,6 @@
-import { dataSet } from "./analyse-page.js";
+//import { dataSet } from "./analyse-page.js";
 //import { test_set } from './test_set.js';
-const indexes = dataSet.map((_, i) => i);
+/*const indexes = dataSet.map((_, i) => i);
 const values = dataSet.map(item => item[0]);
 
 new Chart("resultChart", {
@@ -14,4 +14,4 @@ new Chart("resultChart", {
     }]
   },
   options: {}
-});
+});*/
