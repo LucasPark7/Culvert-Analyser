@@ -1,5 +1,3 @@
-import { test_set } from './test_set.js';
-
 async function uploadVideo() {
     const fileInput = document.getElementById("videoFile");
     const loading = document.getElementById("loadingText");
