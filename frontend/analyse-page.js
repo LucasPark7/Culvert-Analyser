@@ -51,9 +51,11 @@ async function uploadVideo() {
             //result.innerHTML = dataSet;
             var frames = [];
             var values = [];
+            var fatal_list = [];
             dataSet.forEach(function (value, index) {
                 frames.push(index + 1);
-                values.push(value);
+                values.push(value[0]);
+                fatal_list.push(value[1]);
             });
             
             new Chart("resultChart", {
