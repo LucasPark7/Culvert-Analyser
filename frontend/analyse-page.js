@@ -1,3 +1,5 @@
+import { test_set } from './test_set.js';
+
 async function uploadVideo() {
     const fileInput = document.getElementById("videoFile");
     const loading = document.getElementById("loadingText");
@@ -47,6 +49,7 @@ async function uploadVideo() {
             clearInterval(interval);      
             loading.innerHTML = "Processing complete!";
             const dataSet = JSON.stringify(statusData.results, null, 2);
+            dataSet = JSON.parse(dataSet);
             //result.innerHTML = dataSet;
             var frames = [];
             var values = [];
