@@ -76,7 +76,7 @@ async function uploadVideo() {
                 datasets: [{
                 label: "Culvert Score",
                 backgroundColor:"rgba(0,0,255,1.0)",
-                borderColor: "rgba(0,0,255,0.1)",
+                borderColor: "rgba(0, 0, 255, 0.3)",
                 data: values
                 }]
             },
