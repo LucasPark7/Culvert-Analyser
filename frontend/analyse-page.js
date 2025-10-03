@@ -1,26 +1,5 @@
 let chartInstance = null;
 
-function getShadedRanges(indexes, fatal_list) {
-  let ranges = [];
-  let start = null;
-
-  fatal_list.forEach((flag, i) => {
-    if (flag && start === null) {
-      start = indexes[i];
-    } else if (!flag && start !== null) {
-      ranges.push([start, indexes[i]]);
-      start = null;
-    }
-  });
-
-  // if ended inside a shaded block
-  if (start !== null) {
-    ranges.push([start, indexes[indexes.length - 1]]);
-  }
-
-  return ranges;
-}
-
 async function uploadVideo() {
     const fileInput = document.getElementById("videoFile");
     const loading = document.getElementById("loadingText");
@@ -88,26 +67,12 @@ async function uploadVideo() {
                 values.push(value[0]);
                 fatal_list.push(value[1]);
             });
-
-            const shadedRanges = getShadedRanges(frames, fatal_list);
-
-            const fatal_region = {};
-            shadedRanges.forEach(function (range, idx) {
-                fatal_region[`box${idx}`] = {
-                    type: "box",
-                    xMin: range[0],
-                    xMax: range[1],
-                    yMin: 0,
-                    yMax: 1,
-                    backgroundColor: "rgba(255, 0, 0, 0.2)", 
-                    borderWidth: 0
-                };
-            });
             
             chartInstance = new Chart(ctx, {
             type: "line",
             data: {
                 labels: frames,
+                pointStyle: false,
                 datasets: [{
                 label: "Culvert Score",
                 backgroundColor:"rgba(0,0,255,1.0)",
@@ -116,16 +81,12 @@ async function uploadVideo() {
                 }]
             },
             options: {
-                responsive: true,
-                    scales: {
-                        x: { type: "linear", position: "bottom" }
-                    },
-                    plugins: {
-                        annotation: {
-                            annotations: fatal_region
-                        }
-                    }
-                }
+                fill: false,
+                interaction: {
+                    intersect: false
+                },
+                radius: 0,
+            }
             });
         } else {
         loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
