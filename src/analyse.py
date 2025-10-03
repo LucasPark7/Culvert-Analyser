@@ -68,10 +68,14 @@ def process_video(file_path):
         _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
         _, thresh2 = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
         _, thresh3 = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
+        _, thresh4 = cv2.threshold(gray, 116, 255, cv2.THRESH_BINARY)
+        _, thresh5 = cv2.threshold(gray, 72, 255, cv2.THRESH_BINARY)
 
         text1 = pytesseract.image_to_string(thresh, config="--psm 6 digits")
         text2 = pytesseract.image_to_string(thresh2, config="--psm 6 digits")
         text3 = pytesseract.image_to_string(thresh3, config="--psm 6 digits")
+        text4 = pytesseract.image_to_string(thresh4, config="--psm 6 digits")
+        text5 = pytesseract.image_to_string(thresh5, config="--psm 6 digits")
 
         # Scan for fatal strike using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
@@ -86,10 +90,10 @@ def process_video(file_path):
         else:
             fatal_active = False
 
-        return [clean_number(text1, text2, text3), fatal_active]
+        return [clean_number(text1, text2, text3, text4, text5), fatal_active]
 
     # convert text from pytesseract to integer
-    def clean_number(text1, text2, text3):
+    def clean_number(text1, text2, text3, text4, text5):
         num1 = re.search(r"\d+", text1)
         num1 = int(num1.group()) if num1 else None
 
@@ -98,8 +102,14 @@ def process_video(file_path):
 
         num3 = re.search(r"\d+", text3)
         num3 = int(num3.group()) if num3 else None
+
+        num4 = re.search(r"\d+", text4)
+        num4 = int(num4.group()) if num4 else None
+
+        num5 = re.search(r"\d+", text5)
+        num5 = int(num5.group()) if num5 else None
     
-        return [num1, num2, num3]
+        return [num1, num2, num3, num4, num5]
 
     # helper function for processing frames
     def all_equal(iterable):

@@ -44,7 +44,7 @@ async function uploadVideo() {
 
     const data = await response.json();
     loading.style.display = "none";
-    result.innerText = JSON.stringify(data);
+    result.innerText = JSON.stringify(data.status);
 
     const maxTime = 600 * 1000;
     const startTime = Date.now();
