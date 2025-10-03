@@ -1,4 +1,4 @@
-import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging, sys
+import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging, sys, shutil, glob
 import pandas as pd
 import matplotlib.pyplot as plt
 from itertools import groupby
@@ -89,6 +89,16 @@ def process_video(file_path):
             fatal_active = True
         else:
             fatal_active = False
+
+        # log memory usage and free temp files after each OCR cycle
+        total, used, free = shutil.disk_usage("/tmp")
+        logger.info(f"/tmp usage: {used/1024/1024:.2f} MB used of {total/1024/1024:.2f} MB, {free/1024/1024} MB left")
+
+        for file in glob.glob("/tmp/*.png)"):
+            try:
+                os.remove(file)
+            except:
+                pass
 
         return [clean_number(text1, text2, text3, text4, text5), fatal_active]
 
