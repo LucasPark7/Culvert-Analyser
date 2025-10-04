@@ -1,4 +1,3 @@
-import requests
 import time
 import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging, sys
 import pandas as pd
@@ -12,8 +11,9 @@ from redis import Redis
 API_BASE = "https://culvert-analyse.onrender.com"
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
-ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
+ROI = (1020, 95, 180, 47)  # (x, y, w, h) adjust to where numbers appear
 
+'''
 def upload_video(video_path: str):
     with open(video_path, "rb") as f:
         files = {"file": f}
@@ -30,7 +30,6 @@ def upload_video(video_path: str):
             raise KeyError(f"'job_id' missing in response: {data}")
         
         return data["job_id"]
-
 
 def poll_status(task_id: str, interval: int = 3, timeout: int = 300):
     """Poll the status endpoint until completion or timeout (in seconds)."""
@@ -50,6 +49,8 @@ def poll_status(task_id: str, interval: int = 3, timeout: int = 300):
         time.sleep(interval)
     
     raise TimeoutError(f"Task {task_id} did not complete within {timeout} seconds")
+
+'''
 
 def process_video(file_path):
     def extract_frames(video_path, step=FRAME_STEP):
@@ -97,12 +98,12 @@ def process_video(file_path):
 
         # Scan for fatal strike using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
-        fatal = cv2.imread("resources/FatalStrikeIcon.png")
+        fatal = cv2.imread("resources/fatal_icon.png")
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
         res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-        threshold = 0.75
+        threshold = 0.8
         if max_val >= threshold:
             fatal_active = True
         else:
@@ -238,7 +239,7 @@ def process_video(file_path):
     return values
 
 if __name__ == "__main__":
-    video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\103kCulv.mp4"
+    video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject.mp4"
 
     result = process_video(video_file)
 

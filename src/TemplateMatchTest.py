@@ -1,9 +1,9 @@
 import cv2
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\78kCulvCut2.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\103kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (75*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (107*60)+2)
 ret, frame = cap.read()
 cap.release()
 
@@ -15,7 +15,7 @@ cv2.namedWindow("ROI Selector")
 
 # Initial ROI values (x, y, w, h)
 h_frame, w_frame, _ = frame.shape
-init_x, init_y, init_w, init_h = 1575, 35, 325, 115
+init_x, init_y, init_w, init_h = 1265, 35, 900, 225
 
 # Trackbar callback (does nothing, just needed)
 def nothing(val):
@@ -42,10 +42,10 @@ while True:
 
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
-    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\FatalStrikeIcon.png")
+    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\FatalStrikeIcon.png")
 
     # Convert to grayscale for better template matching
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
 
     if roi.size > 0:
@@ -61,7 +61,8 @@ while True:
         res = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-        threshold = 0.8
+        threshold = 0.75
+        print(max_val)
         if max_val >= threshold:
             top_left = max_loc
             bottom_right = (top_left[0] + w, top_left[1] + h)

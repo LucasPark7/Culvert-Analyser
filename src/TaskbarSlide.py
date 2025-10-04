@@ -3,7 +3,7 @@ import pytesseract
 import re
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\Culvert POC\TestVid1.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject2.mp4"
 cap = cv2.VideoCapture(video_path)
 cap.set(cv2.CAP_PROP_POS_FRAMES, (97*60)+2)
 ret, frame = cap.read()
@@ -60,7 +60,7 @@ while True:
         #_, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
 
         text = pytesseract.image_to_string(thresh, config="--psm 6 digits")
-        match = re.search(r"\d+", text)
+        match = re.search(r"\d+", text) 
         print(int(match.group())) if match else None
 
         print(f"Final ROI: (x={x}, y={y}, w={w}, h={h})")
