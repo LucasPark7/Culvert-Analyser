@@ -30,6 +30,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.info("Worker started and waiting for jobs...")
 
+FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
+ROI = (1000, 70, 130, 30) # default 1920x1080
+
 def process_video(file_path, resolution):
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
@@ -216,9 +219,6 @@ def process_video(file_path, resolution):
         })
 
         return df
-    
-    FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
-    ROI = (1000, 70, 130, 30) # default 1920x1080
 
     ROI_dict = {
         "1920x1080" : (1000, 70, 130, 30),
