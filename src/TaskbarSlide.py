@@ -3,9 +3,9 @@ import pytesseract
 import re
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject2.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\1024x768.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (97*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (17*60)+2)
 ret, frame = cap.read()
 cap.release()
 
@@ -17,7 +17,7 @@ cv2.namedWindow("ROI Selector")
 
 # Initial ROI values (x, y, w, h)
 h_frame, w_frame, _ = frame.shape
-init_x, init_y, init_w, init_h = 1000, 70, 130, 30
+init_x, init_y, init_w, init_h = 1020, 95, 180, 47
 
 # Trackbar callback (does nothing, just needed)
 def nothing(val):

@@ -45,7 +45,7 @@ def home():
     return {"status": "ok", "message": "Good Response"}
 
 @app.post("/analyse")
-async def anaylse(file: UploadFile = File(...)):
+async def anaylse(file: UploadFile, resolution: str = File(...)):
     # reset global vars
     
     job_id = str(uuid.uuid4())
@@ -68,10 +68,13 @@ async def anaylse(file: UploadFile = File(...)):
         except Exception as e:
             logger.error("S3 upload failed", exc_info=True)  # full traceback
             raise HTTPException(status_code=500, detail=f"S3 upload failed: {str(e)}")
-        redis.lpush("video_jobs", job_id)
+        
+        job_data = {"job_id" : job_id, "resolution": resolution}
+        redis.lpush("video_jobs", json.dumps(job_data))
+
         os.remove(temp.name)
 
-        return {"job_id": job_id, "status": "processing"}
+        return {"job_id": job_id, "status": "Upload successful, processing video"}
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -5,6 +5,7 @@ async function uploadVideo() {
     const loading = document.getElementById("loadingText");
     const result = document.getElementById("result");
     const ctx = document.getElementById("resultChart");
+    const resolution = document.getElementById("resoSelect")
 
     var file = fileInput.files[0];
 
@@ -28,6 +29,7 @@ async function uploadVideo() {
 
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("resolution", resolution.value);
 
     loading.style.display = "block";
     result.innerText = "";

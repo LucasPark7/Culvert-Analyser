@@ -30,10 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.info("Worker started and waiting for jobs...")
 
-FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
-ROI = (1000, 70, 130, 30)  # (x, y, w, h) adjust to where numbers appear
-
-def process_video(file_path):
+def process_video(file_path, resolution):
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
         frame_idx = 0
@@ -220,6 +217,18 @@ def process_video(file_path):
 
         return df
     
+    FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
+    ROI = (1000, 70, 130, 30) # default 1920x1080
+
+    ROI_dict = {
+        "1920x1080" : (1000, 70, 130, 30),
+        "1366x768" : (1020, 95, 180, 47),
+        "1280x720" : (1025, 105, 190, 50),
+        "1024x768" : (1038, 97, 240, 47)
+    }
+
+    ROI = ROI_dict[resolution]
+    
     values = []
     frame_queue = queue.Queue()
     lock = threading.Lock()
@@ -234,14 +243,18 @@ if __name__ == "__main__":
         try:
             job_data = redis.brpop("video_jobs")
             if job_data:
-                _, job_id = job_data
+                _, job_json = job_data
+                job = json.loads(job_json)
+                job_id = job["job_id"]
+                job_reso = job["resolution"]
                 logger.info(f"Job Found: {job_id}")
 
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
                     logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
                     s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
                     temp_path = temp.name
-                result = process_video(temp_path)
+
+                result = process_video(temp_path, job_reso)
 
                 # save result
                 logger.info(f"JOB COMPLETED")

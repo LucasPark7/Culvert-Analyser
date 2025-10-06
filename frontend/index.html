@@ -17,9 +17,18 @@
 
     <input type="file" id="videoFile" accept="video/mp4">
     <script src="analyse-page.js"></script>
+
+    <label for="resoSelect">Select In-Game Resolution:</label>
+    <select id="resoSelect">
+      <option value="1920x1080" selected>1920x1080</option>
+      <option value="1366x768">1366x768</option>
+      <option value="1280x720">1280x720</option>
+      <option value="1024x768">1024x768</option>
+    </select>
+
     <button onclick="uploadVideo()">Upload & Process</button>
 
-    <p id="loadingText" style="display:none; color:blue;">Processing...</p>
+    <p id="loadingText" style="display:none; color:blue;">Uploading...</p>
     <pre id="result"></pre>
 
     <h3>Result:</h3>
