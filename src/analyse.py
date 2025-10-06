@@ -56,10 +56,10 @@ def process_video(file_path, resolution):
 
         cap.release()
 
-    def extract_info_from_frame(frame, roi=None):
+    def extract_info_from_frame(frame, roi):
         full_frame = frame
+        logger.info(f"ROI: {roi}")
         if roi:
-            logger.info(f"ROI: {roi}")
             x, y, w, h = roi
             frame = frame[y:y+h, x:x+w]
 
