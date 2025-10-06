@@ -127,7 +127,7 @@ def process_video(file_path, resolution):
         return next(g, True) and not next(g, False)
 
     # get all frames from video and add all numbers from each frame to list
-    def process_video(roi):
+    def process_frames(roi):
         while not pause_queue.is_set() or not frame_queue.empty():
             try:
                 frame = frame_queue.get(timeout=1)
@@ -173,7 +173,7 @@ def process_video(file_path, resolution):
     
     def process(video_path, roi):
         reader_thread = threading.Thread(target=extract_frames, args=(video_path,))
-        analyzer_thread = threading.Thread(target=process_video, args=(roi))
+        analyzer_thread = threading.Thread(target=process_frames, args=(roi))
 
         reader_thread.start()
         analyzer_thread.start()
@@ -181,6 +181,7 @@ def process_video(file_path, resolution):
         reader_thread.join()
         analyzer_thread.join()
 
+    '''
     # normalize values to scale one score to the other
     def normalize(video1, video2):
         end1 = video1[-1]
@@ -202,11 +203,9 @@ def process_video(file_path, resolution):
         series2 = process_video(video2_path)
 
         # call normalize on two videos
-        '''
         normResult = normalize(series1, series2)
         series1 = normResult[0]
         series2 = normResult[1]
-        '''
 
         # Align lengths
         min_len = min(len(series1), len(series2))
@@ -219,6 +218,7 @@ def process_video(file_path, resolution):
         })
 
         return df
+    '''
 
     ROI_dict = {
         "1920x1080" : (1000, 70, 130, 30),
