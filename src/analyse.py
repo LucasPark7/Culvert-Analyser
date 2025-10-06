@@ -171,9 +171,9 @@ def process_video(file_path, resolution):
             except queue.Empty:
                 continue
     
-    def process(video_path):
+    def process(video_path, roi):
         reader_thread = threading.Thread(target=extract_frames, args=(video_path,))
-        analyzer_thread = threading.Thread(target=process_video)
+        analyzer_thread = threading.Thread(target=process_video, args=(roi))
 
         reader_thread.start()
         analyzer_thread.start()
