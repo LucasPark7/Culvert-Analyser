@@ -31,7 +31,6 @@ logger = logging.getLogger(__name__)
 logger.info("Worker started and waiting for jobs...")
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
-ROI = (1000, 70, 130, 30) # default 1920x1080
 
 def process_video(file_path, resolution):
     def extract_frames(video_path, step=FRAME_STEP):
@@ -60,6 +59,7 @@ def process_video(file_path, resolution):
     def extract_info_from_frame(frame, roi=None):
         full_frame = frame
         if roi:
+            logger.info(f"ROI: {roi}")
             x, y, w, h = roi
             frame = frame[y:y+h, x:x+w]
 
@@ -127,11 +127,11 @@ def process_video(file_path, resolution):
         return next(g, True) and not next(g, False)
 
     # get all frames from video and add all numbers from each frame to list
-    def process_video():
+    def process_video(roi):
         while not pause_queue.is_set() or not frame_queue.empty():
             try:
                 frame = frame_queue.get(timeout=1)
-                result = extract_info_from_frame(frame, ROI)
+                result = extract_info_from_frame(frame, roi)
 
                 OCRList = result[0]
                 logging.info(f"TESSERACT RESULT: {result}")
@@ -227,14 +227,14 @@ def process_video(file_path, resolution):
         "1024x768" : (1038, 97, 240, 47)
     }
 
-    ROI = ROI_dict[resolution]
+    roi = ROI_dict[resolution]
     
     values = []
     frame_queue = queue.Queue()
     lock = threading.Lock()
     pause_queue = Event()
 
-    process(file_path)
+    process(file_path, roi)
     
     return values
 
