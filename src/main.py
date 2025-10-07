@@ -50,8 +50,23 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
     
     job_id = str(uuid.uuid4())
 
-    if not file.filename.endswith(".mp4"):
-        raise HTTPException(status_code=400, detail="Only .mp4 files supported")
+    # strip suspicious path components
+    basename = os.path.basename(file.filename)
+    safename = Path(basename).name
+
+    # validate uploaded file as mp4
+    ext = os.path.splitext(safename)[1].lower()
+    if ext not in {".mp4", ".mov", ".avi"}:
+        raise HTTPException(status_code=400, detail="Invalid file type.")
+    
+    # enforce size limits on file
+    max_size = 200 * 1024 * 1024  # 200 MB
+    file_size = 0
+
+    while chunk := file.file.read(1024 * 1024):
+        file_size += len(chunk)
+        if file_size > max_size:
+            raise HTTPException(status_code=400, detail="File too large.")
 
     try:
         # save the uploaded file to a temporary file

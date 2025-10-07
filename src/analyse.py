@@ -58,7 +58,6 @@ def process_video(file_path, resolution):
 
     def extract_info_from_frame(frame, roi):
         full_frame = frame
-        logger.info(f"ROI: {roi}")
         if roi:
             x, y, w, h = roi
             frame = frame[y:y+h, x:x+w]
