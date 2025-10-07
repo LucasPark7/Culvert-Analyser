@@ -67,6 +67,9 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
         file_size += len(chunk)
         if file_size > max_size:
             raise HTTPException(status_code=400, detail="File too large.")
+        
+    # reset pointer on file for upload
+    file.file.seek(0)
 
     try:
         # save the uploaded file to a temporary file
