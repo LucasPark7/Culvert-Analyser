@@ -14,7 +14,7 @@ AWS_SECRET_KEY = os.environ.get("AWS_SECRET_KEY")
 AWS_REGION = os.environ.get("AWS_DEFAULT_REGION", "us-west-2")
 BUCKET_NAME = os.environ.get("BUCKET_NAME")
 
-# Initialize boto3 client
+# initialize boto3 client for aws
 s3 = boto3.client(
     "s3",
     aws_access_key_id=AWS_ACCESS_KEY,
@@ -30,7 +30,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.info("Worker started and waiting for jobs...")
 
-FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
+FRAME_STEP = 60  # process every 60th frame (1s at 60fps), possible user option later
 
 def process_video(file_path, resolution):
     def extract_frames(video_path, step=FRAME_STEP):
@@ -63,7 +63,7 @@ def process_video(file_path, resolution):
             x, y, w, h = roi
             frame = frame[y:y+h, x:x+w]
 
-        # Convert to grayscale for better OCR
+        # convert to grayscale for better OCR
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
         _, thresh2 = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
@@ -77,7 +77,7 @@ def process_video(file_path, resolution):
         text4 = pytesseract.image_to_string(thresh4, config="--psm 6 digits")
         text5 = pytesseract.image_to_string(thresh5, config="--psm 6 digits")
 
-        # Scan for fatal strike using template matching
+        # scan for fatal strike using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
         fatal = cv2.imread("resources/FatalStrikeIcon.png")
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
@@ -90,10 +90,7 @@ def process_video(file_path, resolution):
         else:
             fatal_active = False
 
-        # log memory usage and free temp files after each OCR cycle
-        total, used, free = shutil.disk_usage("/tmp")
-        logger.info(f"/tmp usage: {used/1024/1024:.2f} MB used of {total/1024/1024:.2f} MB, {free/1024/1024} MB left")
-
+        # free temp files after each OCR cycle
         for file in glob.glob("/tmp/*.png)"):
             try:
                 os.remove(file)
@@ -183,6 +180,8 @@ def process_video(file_path, resolution):
         analyzer_thread.join()
 
     '''
+    possible feature to add in future
+
     # normalize values to scale one score to the other
     def normalize(video1, video2):
         end1 = video1[-1]
@@ -221,6 +220,7 @@ def process_video(file_path, resolution):
         return df
     '''
 
+    # get ROI from resolution selected
     ROI_dict = {
         "1920x1080" : (1000, 70, 130, 30),
         "1366x768" : (1020, 95, 180, 47),

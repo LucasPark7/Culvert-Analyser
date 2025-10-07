@@ -1,9 +1,9 @@
-import tempfile, uuid, json, boto3, os, botocore, logging
+import tempfile, uuid, json, boto3, os, logging
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 from itertools import groupby
-from fastapi import FastAPI, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
@@ -54,7 +54,7 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
         raise HTTPException(status_code=400, detail="Only .mp4 files supported")
 
     try:
-        # Save the uploaded file to a temporary file
+        # save the uploaded file to a temporary file
         temp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
         temp.write(await file.read())
         temp.close()
