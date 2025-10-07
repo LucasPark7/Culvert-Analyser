@@ -172,10 +172,9 @@ def process_video(file_path, resolution):
                 continue
     
     def process(video_path, roi):
-        logger.info(f"ROI INPUT: {roi}")
 
         reader_thread = threading.Thread(target=extract_frames, args=(video_path,))
-        analyzer_thread = threading.Thread(target=process_frames, args=(roi,))
+        analyzer_thread = threading.Thread(target=process_frames, args=((roi),))
 
         reader_thread.start()
         analyzer_thread.start()
