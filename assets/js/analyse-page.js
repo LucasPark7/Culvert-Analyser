@@ -13,7 +13,13 @@ inputButton.addEventListener("click", () => {
 fileInput.addEventListener("change", (event) => {
 var file = event.target.files[0];
     if (file) {
-        document.getElementById("fileDisplay").innerText = file;
+        if (file.size > (200 * 1024 * 1024)) {
+            alert("File too large! Reduce size to less than 200 MB");
+            fileInput.value = "";
+            inputButton.textContent = "Upload Video";
+            return;
+        }
+        inputButton.textContent = `${file.name}`;
     }
 });
 
@@ -22,12 +28,6 @@ async function uploadVideo() {
     if (fileInput.files.length === 0) {
         alert("Please select a video file first!");
         return;
-    }
-
-    if (file.size > (200 * 1024 * 1024)) {
-      alert(`File too large! Reduce size and try again`);
-      file = "";
-      return;
     }
 
     if (chartInstance) {

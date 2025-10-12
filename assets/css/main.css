@@ -2614,9 +2614,9 @@ input, select, textarea {
 			}
 		
 		.image.feature {
-			display: block;
-			width: 400px;
+			width: 100%;
 			height: 400px;
+			object-fit: contain;
 		}
 
 /* List */
