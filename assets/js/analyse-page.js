@@ -1,17 +1,27 @@
 let chartInstance = null;
+const fileInput = document.getElementById("videoFile");
+const inputButton = document.getElementById("uploadButton")
+const loading = document.getElementById("loadingText");
+const result = document.getElementById("result");
+const ctx = document.getElementById("resultChart");
+const resolution = document.getElementById("resoSelect")
+
+inputButton.addEventListener("click", () => {
+        fileInput.click();
+    });
+
+fileInput.addEventListener("change", (event) => {
+var file = event.target.files[0];
+    if (file) {
+        document.getElementById("fileDisplay").innerText = file;
+    }
+});
 
 async function uploadVideo() {
-    const fileInput = document.getElementById("videoFile");
-    const loading = document.getElementById("loadingText");
-    const result = document.getElementById("result");
-    const ctx = document.getElementById("resultChart");
-    const resolution = document.getElementById("resoSelect")
-
-    var file = fileInput.files[0];
 
     if (fileInput.files.length === 0) {
-    alert("Please select a video file first!");
-    return;
+        alert("Please select a video file first!");
+        return;
     }
 
     if (file.size > (200 * 1024 * 1024)) {

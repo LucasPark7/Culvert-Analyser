@@ -2615,7 +2615,7 @@ input, select, textarea {
 		
 		.image.feature {
 			display: block;
-			width: auto;
+			width: 400px;
 			height: 400px;
 		}
 
@@ -3242,8 +3242,7 @@ input, select, textarea {
 			}
 
 		.wrapper.alt {
-			/*background-color: #261c3e;*/
-			background-image: url("images/Arcanus_Altar.png")
+			background-color: #261c3e;
 		}
 
 		.wrapper.style1 {
@@ -3255,7 +3254,8 @@ input, select, textarea {
 		}
 
 		.wrapper.style2 {
-			background-color: #5052b5;
+			/*background-color: #5052b5;*/
+			background-image: url("images/Arcanus_Altar.png")
 		}
 
 		.wrapper.style2-alt {
