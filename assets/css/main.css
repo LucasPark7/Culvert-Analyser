@@ -2615,7 +2615,7 @@ input, select, textarea {
 		
 		.image.feature {
 			width: 100%;
-			height: 400px;
+			height: 200px;
 			object-fit: contain;
 		}
 
@@ -3369,6 +3369,10 @@ input, select, textarea {
 		body.is-preload .wrapper.fade > .inner {
 			opacity: 0;
 		}
+
+	.wrapper.feature {
+		background-image: url("images/Arcanus_Altar.png")
+	}
 
 /* Header */
 
