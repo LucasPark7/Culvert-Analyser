@@ -3877,7 +3877,7 @@ input, select, textarea {
 		background-image: url("images/Arcanus_Altar.png");
 		background-position: center center;
 		background-repeat: no-repeat;
-		background-size: cover;
+		background-size: auto;
 	}
 
 		#intro p {
