@@ -3269,14 +3269,14 @@ input, select, textarea {
 		}
 
 		.wrapper.style4 {
-			background-image: url('images/Arcanus_Altar.png');
+			background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('images/Arcanus_Altar.png');
 			background-size: cover;       
-			background-position: center; 
+			background-position: bottom center; 
 			background-repeat: no-repeat;
 		}
 
 		.wrapper.style5 {
-			background-image: url('images/Prep_Room.png');
+			background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('images/Prep_Room.png');
 			background-size: cover;       
 			background-position: center; 
 			background-repeat: no-repeat;
@@ -3381,10 +3381,6 @@ input, select, textarea {
 		body.is-preload .wrapper.fade > .inner {
 			opacity: 0;
 		}
-
-	.wrapper.feature {
-		background-image: url("images/Arcanus_Altar.png")
-	}
 
 /* Header */
 
