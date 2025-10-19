@@ -2617,7 +2617,7 @@ input, select, textarea {
 			display: block;
 			width: 200px;
 			height: 100%;
-			object-fit: auto;
+			object-fit: cover;
 		}
 
 /* List */
