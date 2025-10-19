@@ -2614,10 +2614,8 @@ input, select, textarea {
 			}
 		
 		.image.feature {
-			display: block;
-			width: 200px;
-			height: 100%;
-			object-fit: cover;
+			width: 100%;
+			height: auto;
 		}
 
 /* List */
