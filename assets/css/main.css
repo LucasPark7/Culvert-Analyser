@@ -3253,7 +3253,7 @@ input, select, textarea {
 		}
 
 		.wrapper.style2 {
-			background-color: #5052b5;
+			background: none !important
 		}
 
 		.wrapper.style2-alt {
@@ -3273,6 +3273,7 @@ input, select, textarea {
 			background-size: cover;       
 			background-position: center; 
 			background-repeat: no-repeat;
+			padding: 4em 0;
 		}
 
 		.wrapper.style5 {
@@ -3280,6 +3281,7 @@ input, select, textarea {
 			background-size: cover;       
 			background-position: center; 
 			background-repeat: no-repeat;
+			padding: 4em 0;
 		}
 
 		.wrapper.fullscreen {
