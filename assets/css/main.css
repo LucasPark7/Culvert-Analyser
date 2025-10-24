@@ -2612,11 +2612,6 @@ input, select, textarea {
 			.image.main img {
 				width: 100%;
 			}
-		
-		.image.feature {
-			width: 100%;
-			height: auto;
-		}
 
 /* List */
 
@@ -3253,7 +3248,8 @@ input, select, textarea {
 		}
 
 		.wrapper.style2 {
-			background: none !important
+			background: none !important;
+			padding: 0 !important;
 		}
 
 		.wrapper.style2-alt {
@@ -3274,6 +3270,7 @@ input, select, textarea {
 			background-position: bottom center; 
 			background-repeat: no-repeat;
 			filter: grayscale(70%);
+			margin: 0 !important;
 		}
 
 		.wrapper.style5 {
@@ -3282,6 +3279,7 @@ input, select, textarea {
 			background-position: center; 
 			background-repeat: no-repeat;
 			filter: grayscale(70%);
+			margin: 0 !important;
 		}
 
 		.wrapper.fullscreen {
