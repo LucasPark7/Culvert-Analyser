@@ -3004,7 +3004,7 @@ input, select, textarea {
 		}
 
 		.spotlights > section > .image {
-			background-position: center center;
+			background-position: top center;
 			background-size: cover;
 			border-radius: 0;
 			display: block;
