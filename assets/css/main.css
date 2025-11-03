@@ -3265,20 +3265,18 @@ input, select, textarea {
 		}
 
 		.wrapper.style4 {
-			background-image: url('images/Arcanus_Altar.png');
+			background-image: url('images/Altar_BG.png');
 			background-size: cover;       
 			background-position: bottom center; 
 			background-repeat: no-repeat;
-			filter: grayscale(70%);
 			margin: 0 !important;
 		}
 
 		.wrapper.style5 {
-			background-image: url('images/Prep_Room.png');
+			background-image: url('images/Prep_BG.png');
 			background-size: cover;       
 			background-position: center; 
 			background-repeat: no-repeat;
-			filter: grayscale(70%);
 			margin: 0 !important;
 		}
 
