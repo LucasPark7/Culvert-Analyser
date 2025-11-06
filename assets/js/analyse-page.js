@@ -55,6 +55,7 @@ async function uploadVideo() {
         chartInstance.destroy();
     }
     */
+    file = fileInput.files;
 
     loading.style.display = "block";
     result.textContent = "";
