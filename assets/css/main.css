@@ -2351,6 +2351,7 @@ input, select, textarea {
 		background-position: calc(100% - 1rem) center;
 		height: 2.75em;
 		padding-right: 2.75em;
+		padding-bottom: 1em;
 		text-overflow: ellipsis;
 	}
 

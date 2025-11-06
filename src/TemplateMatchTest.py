@@ -1,9 +1,9 @@
 import cv2
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\103kCulv.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject2.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (105*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (117*60)+2)
 ret, frame = cap.read()
 cap.release()
 
@@ -43,7 +43,7 @@ while True:
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
     #roi = cv2.resize(roi, (720, 240))
-    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\FatalStrikeIcon.png")
+    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\test_fatal.png")
 
     # Convert to grayscale for better template matching
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
