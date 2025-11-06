@@ -30,7 +30,7 @@ chartInstance = new Chart(ctx, {
         datasets: [{
         label: "Culvert Score",
         backgroundColor:"rgba(0,0,255,1.0)",
-        borderColor: "rgba(0, 0, 255, 0.3)",
+        borderColor: "rgba(20, 179, 228, 1)",
         data: []
         }]
     },
