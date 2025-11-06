@@ -22,6 +22,25 @@ var file = event.target.files[0];
         inputButton.textContent = `${file.name}`;
     }
 });
+chartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: frames,
+        pointStyle: false,
+        datasets: [{
+        label: "Culvert Score",
+        backgroundColor:"rgba(0,0,255,1.0)",
+        borderColor: "rgba(0, 0, 255, 0.3)"
+        }]
+    },
+    options: {
+        fill: false,
+        interaction: {
+            intersect: false
+        },
+        radius: 0,
+    }
+    });
 
 async function uploadVideo() {
 
@@ -30,9 +49,11 @@ async function uploadVideo() {
         return;
     }
 
+    /*
     if (chartInstance) {
         chartInstance.destroy();
     }
+    */
 
     loading.style.display = "block";
     result.textContent = "";
