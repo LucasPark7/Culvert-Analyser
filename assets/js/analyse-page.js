@@ -102,6 +102,10 @@ async function uploadVideo() {
                 values.push(value[0]);
                 fatal_list.push(value[1]);
             });
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
             
             chartInstance = new Chart(ctx, {
             type: "line",
