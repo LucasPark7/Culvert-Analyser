@@ -128,7 +128,7 @@ async function uploadVideo() {
             }
             });
         } else {
-        loading.innerHTML = `Processing... (${statusData.progress || "pending"})`;
+        loading.innerHTML = "Analyzing Video...";
         }
 
         // timeout

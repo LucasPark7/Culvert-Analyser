@@ -44,14 +44,11 @@ while True:
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
     #roi = cv2.resize(roi, (720, 240))
-    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\test_fatal.png")
+    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\fatal_icon.png")
 
     # Convert to grayscale for better template matching
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
-
-    img = cv2.equalizeHist(gray)
-    template = cv2.equalizeHist(grayFatal)
 
     if roi.size > 0:
         cv2.imshow("Cropped ROI", gray)
@@ -63,12 +60,7 @@ while True:
     if cv2.waitKey(30) & 0xFF == ord("q"):
         
         # template matching
-        #res = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
-        #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-
-        edges_img = cv2.Canny(img, 50, 150)
-        edges_template = cv2.Canny(template, 50, 150)
-        res = cv2.matchTemplate(edges_img, edges_template, cv2.TM_CCOEFF_NORMED)
+        res = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
         threshold = 0.75
