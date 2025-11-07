@@ -1,4 +1,5 @@
 import cv2
+import matplotlib.pyplot as plt
 
 # Load a frame from video
 video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject2.mp4"
@@ -49,6 +50,10 @@ while True:
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
 
+    orb = cv2.ORB_create()
+    kp1, des1 = orb.detectAndCompute(gray,None)
+    kp2, des2 = orb.detectAndCompute(grayFatal,None)
+
     if roi.size > 0:
         cv2.imshow("Cropped ROI", gray)
 
@@ -61,6 +66,24 @@ while True:
         # template matching
         res = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+        # create BFMatcher object
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+
+        if des1 is None or des2 is None:
+            print("No descriptors found!")
+        print(grayFatal.shape, gray.shape)
+        
+        # Match descriptors.
+        matches = bf.match(des1,des2)
+        
+        # Sort them in the order of their distance.
+        matches = sorted(matches, key = lambda x:x.distance)
+        
+        # Draw first 10 matches.
+        img3 = cv2.drawMatches(gray,kp1,grayFatal,kp2,matches[:10],None,flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+        
+        plt.imshow(img3),plt.show()
 
         threshold = 0.75
         print(max_val)
