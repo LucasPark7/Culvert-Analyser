@@ -2320,7 +2320,7 @@ input, select, textarea {
 		color: inherit;
 		display: block;
 		outline: 0;
-		padding: 0 1em;
+		padding-left: 1em;
 		padding-bottom: 1em;
 		text-decoration: none;
 		width: 100%;
@@ -2352,7 +2352,6 @@ input, select, textarea {
 		background-position: calc(100% - 1rem) center;
 		height: 2.75em;
 		padding-right: 2.75em;
-		padding-bottom: 1em;
 		text-overflow: ellipsis;
 	}
 
