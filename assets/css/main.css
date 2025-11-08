@@ -1844,7 +1844,7 @@ input, select, textarea {
 		letter-spacing: 0.25em;
 		line-height: 4.75em;
 		outline: 0;
-		padding: 1em 3.75em;
+		padding: 0 3.75em;
 		position: relative;
 		text-align: center;
 		text-decoration: none;
@@ -2627,7 +2627,7 @@ input, select, textarea {
 
 	ul {
 		list-style: disc;
-		margin: 0 0 2em 0;
+		margin: 2em 0 2em 0;
 		padding-left: 1em;
 	}
 
