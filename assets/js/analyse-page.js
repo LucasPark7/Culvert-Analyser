@@ -57,9 +57,6 @@ async function uploadVideo() {
     */
     file = fileInput.files[0];
 
-    loading.style.display = "block";
-    result.textContent = "";
-
     const formData = new FormData();
     formData.append("file", file);
     formData.append("resolution", resolution.value);
@@ -79,7 +76,9 @@ async function uploadVideo() {
 
     const data = await response.json();
     loading.style.display = "none";
-    result.innerText = JSON.stringify(data.status);
+    if (JSON.stringify(data.status)) {
+        result.innerText = "Upload successful, processing video..."
+    }
 
     const maxTime = 600 * 1000;
     const startTime = Date.now();
@@ -90,7 +89,7 @@ async function uploadVideo() {
 
         if (statusData.status === "complete") {
             clearInterval(interval);      
-            loading.innerHTML = "Processing complete!";
+            result.innerHTML = "Processing complete!";
             var dataSet = JSON.stringify(statusData.results, null, 2);
             dataSet = JSON.parse(dataSet);
             //result.innerHTML = dataSet;
@@ -127,15 +126,13 @@ async function uploadVideo() {
                 radius: 0,
             }
             });
-        } else {
-        loading.innerHTML = "Analyzing Video...";
         }
 
         // timeout
         if (Date.now() - startTime > maxTime) {
-        clearInterval(interval);
-        loading.innerHTML = "process timeout error";
-        return;
+            clearInterval(interval);
+            loading.innerHTML = "process timeout error";
+            return;
         }
     }, 10000); // poll every 10 seconds
     } catch (err) {

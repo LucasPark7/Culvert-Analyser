@@ -92,7 +92,7 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
 
         os.remove(temp.name)
 
-        return {"job_id": job_id, "status": "Upload successful, processing video"}
+        return {"job_id": job_id, "status": "processing"}
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -2321,6 +2321,7 @@ input, select, textarea {
 		display: block;
 		outline: 0;
 		padding: 0 1em;
+		padding-bottom: 1em;
 		text-decoration: none;
 		width: 100%;
 	}
