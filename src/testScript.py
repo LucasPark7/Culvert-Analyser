@@ -203,17 +203,6 @@ if __name__ == "__main__":
     video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject.mp4"
 
     result = process_video(video_file)
-
-    '''
-    task_id = upload_video(video_file)
-    print(f"Task started with ID: {task_id}")
-
-    try:
-        result = poll_status(task_id)
-        print("Final result:", result)
-    except Exception as e:
-        print("Error during polling:", e)
-    '''
     
     # code to test 1 video
     series1 = result
