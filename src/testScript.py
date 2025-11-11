@@ -13,45 +13,6 @@ API_BASE = "https://culvert-analyse.onrender.com"
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1020, 95, 180, 47)  # (x, y, w, h) adjust to where numbers appear
 
-'''
-def upload_video(video_path: str):
-    with open(video_path, "rb") as f:
-        files = {"file": f}
-        resp = requests.post(f"{API_BASE}/analyse", files=files)
-        print(resp)
-        
-        try:
-            data = resp.json()
-        except Exception:
-            print("Non-JSON response:", resp.text)
-            resp.raise_for_status()
-        
-        if "job_id" not in data:
-            raise KeyError(f"'job_id' missing in response: {data}")
-        
-        return data["job_id"]
-
-def poll_status(task_id: str, interval: int = 3, timeout: int = 300):
-    """Poll the status endpoint until completion or timeout (in seconds)."""
-    start = time.time()
-    while time.time() - start < timeout:
-        resp = requests.get(f"{API_BASE}/status/{task_id}")
-        resp.raise_for_status()
-        status_data = resp.json()
-
-        print("Status:", status_data)
-
-        if status_data["status"] == "complete":
-            return status_data["results"]
-        elif status_data["status"] == "failed":
-            raise RuntimeError(f"Task {task_id} failed: {status_data}")
-
-        time.sleep(interval)
-    
-    raise TimeoutError(f"Task {task_id} did not complete within {timeout} seconds")
-
-'''
-
 def process_video(file_path):
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
