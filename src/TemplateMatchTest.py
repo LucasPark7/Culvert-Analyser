@@ -43,7 +43,7 @@ while True:
 
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
-    #roi = cv2.resize(roi, (720, 240))
+    
     fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\fatal_icon.png")
 
     # Convert to grayscale for better template matching
