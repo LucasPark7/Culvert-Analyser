@@ -32,6 +32,11 @@ s3 = boto3.client(
     region_name=AWS_REGION
 )
 
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri=os.environ.get("REDIS_URL")
+)
+
 boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
 
 logger = logging.getLogger("uvicorn.error")
@@ -47,6 +52,7 @@ def home():
     return {"status": "ok", "message": "Good Response"}
 
 @app.post("/analyse")
+@limiter.limit("3/minute")
 async def anaylse(file: UploadFile, resolution: str = File(...)):
     # reset global vars
     
