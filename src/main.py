@@ -7,6 +7,8 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
+#from slowapi import Limiter
+#from slowapi.util import get_remote_address
 
 # --------- CONFIG ---------
 app = FastAPI()
