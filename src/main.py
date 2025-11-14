@@ -52,7 +52,6 @@ def home():
     return {"status": "ok", "message": "Good Response"}
 
 @app.post("/analyse")
-@limiter.limit("3/minute")
 async def anaylse(file: UploadFile, resolution: str = File(...)):
     # reset global vars
     
