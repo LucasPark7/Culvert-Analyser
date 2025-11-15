@@ -7,8 +7,6 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
 # --------- CONFIG ---------
 app = FastAPI()
@@ -30,11 +28,6 @@ s3 = boto3.client(
     aws_access_key_id=AWS_ACCESS_KEY,
     aws_secret_access_key=AWS_SECRET_KEY,
     region_name=AWS_REGION
-)
-
-limiter = Limiter(
-    key_func=get_remote_address,
-    storage_uri=os.environ.get("REDIS_URL")
 )
 
 boto3.set_stream_logger(name="botocore", level=logging.DEBUG)
