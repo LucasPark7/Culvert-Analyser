@@ -30,8 +30,6 @@ chartInstance = new Chart(ctx, {
         pointStyle: false,
         datasets: [{
         label: "Culvert Score",
-        backgroundColor:"rgba(20, 179, 228, 1)",
-        borderColor: "rgba(0, 0, 255, 1)",
         data: []
         }]
     },
@@ -114,7 +112,8 @@ async function uploadVideo() {
                     label: "test",
                     data: values,
                     borderColor: "rgba(20, 179, 228, 1)",
-                    backgroundColor: "rgba(0, 0, 255, 1)",
+                    backgroundColor: "rgba(255, 255, 255, 0.53)",
+                    fill: false
                 });
 
                 chartInstance.update();
