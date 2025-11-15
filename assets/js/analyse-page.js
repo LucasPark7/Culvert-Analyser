@@ -28,17 +28,21 @@ chartInstance = new Chart(ctx, {
     data: {
         labels: frames,
         pointStyle: false,
-        datasets: [{
-        label: "Culvert Score",
-        data: []
-        }]
+        datasets: []
     },
     options: {
         fill: false,
+        responsive: true,
         interaction: {
             intersect: false
         },
         radius: 0,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Culvert Score'
+            }
+        }
     }
     });
 
@@ -111,8 +115,8 @@ async function uploadVideo() {
                 chartInstance.data.datasets.push({
                     label: "test",
                     data: values,
-                    borderColor: "rgba(20, 179, 228, 1)",
-                    backgroundColor: "rgba(255, 255, 255, 0.53)",
+                    borderColor: "rgba(255, 255, 255, 0.53)",
+                    backgroundColor: "rgba(20, 179, 228, 1)",
                     fill: false
                 });
 
