@@ -32,7 +32,7 @@ logger.info("Worker started and waiting for jobs...")
 
 FRAME_STEP = 60  # process every 60th frame (1s at 60fps), possible user option later
 
-def process_video(file_path, resolution):
+def process_video(file_path, resolution, job_id):
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
         frame_idx = 0
@@ -164,6 +164,8 @@ def process_video(file_path, resolution):
                                 values.append(result)
 
                         values.append(result)
+                # update redis with values for live results
+                redis.set(f"result:{job_id}", [json.dumps(values), "processing"])
             except queue.Empty:
                 continue
     
@@ -254,11 +256,11 @@ if __name__ == "__main__":
                     s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
                     temp_path = temp.name
 
-                result = process_video(temp_path, job_reso)
+                result = process_video(temp_path, job_reso, job_id)
 
                 # save result
                 logger.info(f"JOB COMPLETED")
-                redis.set(f"result:{job_id}", json.dumps(result))
+                redis.set(f"result:{job_id}", [json.dumps(result), "complete"])
 
             else:
                 time.sleep(1)
