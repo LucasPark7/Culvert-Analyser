@@ -165,7 +165,7 @@ def process_video(file_path, resolution, job_id):
 
                         values.append(result)
                 # update redis with values for live results
-                redis.set(f"result:{job_id}", [json.dumps(values), "processing"])
+                redis.set(f"result:{job_id}", json.dumps(values))
             except queue.Empty:
                 continue
     
@@ -250,6 +250,7 @@ if __name__ == "__main__":
                 job_id = job["job_id"]
                 job_reso = job["resolution"]
                 logger.info(f"Job Found: {job_id}")
+                redis.set(f"status:{job_id}", "processing")
 
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp:
                     logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
@@ -260,7 +261,8 @@ if __name__ == "__main__":
 
                 # save result
                 logger.info(f"JOB COMPLETED")
-                redis.set(f"result:{job_id}", [json.dumps(result), "complete"])
+                redis.set(f"result:{job_id}", json.dumps(result))
+                redis.set(f"status:{job_id}", "complete")
 
             else:
                 time.sleep(1)

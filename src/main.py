@@ -100,8 +100,9 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
 @app.get("/status/{job_id}")
 def get_status(job_id: str):
     result = redis.get(f"result:{job_id}")
+    status = redis.get(f"status:{job_id}")
     if result:
-        if result[1] == "complete":
-            return {"task_id": job_id, "results": json.loads(result[0]), "status": "complete"}
-        return {"task_id": job_id, "results": json.loads(result[0]), "status": "processing"}
+        if status == "complete":
+            return {"task_id": job_id, "results": json.loads(result), "status": "complete"}
+        return {"task_id": job_id, "results": json.loads(result), "status": "processing"}
     return {"task_id": job_id, "status": "processing"}
