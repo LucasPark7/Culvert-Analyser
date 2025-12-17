@@ -56,6 +56,10 @@ chartInstance.data.datasets.push({
 
 chartInstance.update();
 
+async function updateChart() {
+
+}
+
 async function uploadVideo() {
     if (process_flag) {
         alert("Video currently processing, please wait to try again.");
@@ -103,35 +107,37 @@ async function uploadVideo() {
         const maxTime = 600 * 1000;
         const startTime = Date.now();
 
+        var frames = [];
+        var values = [];
+        var fatal_list = [];
+
+        chartInstance.data.labels = frames;
+        chartInstance.data.datasets.push({
+            label: "test",
+            data: values,
+            borderColor: "rgba(255, 255, 255, 0.53)",
+            backgroundColor: "rgba(20, 179, 228, 1)",
+            fill: false
+        });
+
         const interval = setInterval(async () => {
             const statusResp = await fetch(`https://culvert-analyse.onrender.com/status/${data.job_id}`);
             const statusData = await statusResp.json();
 
+            var dataSet = JSON.stringify(statusData.results, null, 2);
+            dataSet = JSON.parse(dataSet);
+            //result.innerHTML = dataSet;
+            dataSet.forEach(function (value, index) {
+                frames.push(index + 1);
+                values.push(value[0]);
+                fatal_list.push(value[1]);
+            });
+
+            chartInstance.update();
+
             if (statusData.status === "complete") {
                 clearInterval(interval);      
                 result.innerHTML = "Processing complete!";
-                var dataSet = JSON.stringify(statusData.results, null, 2);
-                dataSet = JSON.parse(dataSet);
-                //result.innerHTML = dataSet;
-                var frames = [];
-                var values = [];
-                var fatal_list = [];
-                dataSet.forEach(function (value, index) {
-                    frames.push(index + 1);
-                    values.push(value[0]);
-                    fatal_list.push(value[1]);
-                });
-                
-                chartInstance.data.labels = frames;
-                chartInstance.data.datasets.push({
-                    label: "test",
-                    data: values,
-                    borderColor: "rgba(255, 255, 255, 0.53)",
-                    backgroundColor: "rgba(20, 179, 228, 1)",
-                    fill: false
-                });
-
-                chartInstance.update();
                 process_flag = false;
             }
 

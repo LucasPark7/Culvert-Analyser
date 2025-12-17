@@ -105,4 +105,4 @@ def get_status(job_id: str):
         if status == "complete":
             return {"task_id": job_id, "results": json.loads(result), "status": "complete"}
         return {"task_id": job_id, "results": json.loads(result), "status": "processing"}
-    return {"task_id": job_id, "status": "processing"}
+    return {"task_id": job_id, "results": "", "status": "processing"}
