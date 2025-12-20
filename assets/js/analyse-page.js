@@ -124,6 +124,11 @@ async function uploadVideo() {
             const statusResp = await fetch(`https://culvert-analyse.onrender.com/status/${data.job_id}`);
             const statusData = await statusResp.json();
 
+            // reset values so we don't duplicate data
+            frames = [];
+            values = [];
+            fatal_list = [];
+
             var dataSet = JSON.stringify(statusData.results, null, 2);
             dataSet = JSON.parse(dataSet);
             //result.innerHTML = dataSet;
@@ -148,7 +153,7 @@ async function uploadVideo() {
                 process_flag = false;
                 return;
             }
-        }, 10000); // poll every 10 seconds
+        }, 3000); // poll every 3 seconds
     } catch (err) {
         loading.style.display = "none";
         result.innerText = "Error: " + err;
