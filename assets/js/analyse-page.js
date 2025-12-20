@@ -56,7 +56,7 @@ chartInstance.data.datasets.push({
     fill: false
 });
 
-chartInstance.data.datasets.pop();
+//chartInstance.data.datasets.pop();
 chartInstance.update();
 
 async function uploadVideo() {
