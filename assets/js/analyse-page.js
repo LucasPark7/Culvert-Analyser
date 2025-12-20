@@ -23,9 +23,11 @@ var file = event.target.files[0];
         inputButton.textContent = `${file.name}`;
     }
 });
+defaultLabels = Array.from(Array(120).keys())
 chartInstance = new Chart(ctx, {
     type: "line",
     data: {
+        labels: defaultLabels,
         pointStyle: false,
         datasets: []
     },
@@ -45,20 +47,7 @@ chartInstance = new Chart(ctx, {
     }
     });
 
-chartInstance.data.labels = [0, 1, 2, 3, 4];
-chartInstance.data.datasets.push({
-    label: "test",
-    data: [1000, 2000, 4000, 8000, 15000],
-    borderColor: "rgba(255, 255, 255, 0.53)",
-    backgroundColor: "rgba(20, 179, 228, 1)",
-    fill: false
-});
-
 chartInstance.update();
-
-async function updateChart() {
-
-}
 
 async function uploadVideo() {
     if (process_flag) {
