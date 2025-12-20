@@ -47,6 +47,16 @@ chartInstance = new Chart(ctx, {
     }
     });
 
+chartInstance.data.labels = [0];
+chartInstance.data.datasets.push({
+    label: "temp",
+    data: [0],
+    borderColor: "rgba(255, 255, 255, 0.53)",
+    backgroundColor: "rgba(20, 179, 228, 1)",
+    fill: false
+});
+
+chartInstance.data.datasets.pop();
 chartInstance.update();
 
 async function uploadVideo() {
