@@ -124,18 +124,16 @@ async function uploadVideo() {
             const statusResp = await fetch(`https://culvert-analyse.onrender.com/status/${data.job_id}`);
             const statusData = await statusResp.json();
 
-            // reset values so we don't duplicate data
-            frames = [];
-            values = [];
-            fatal_list = [];
-
             var dataSet = JSON.stringify(statusData.results, null, 2);
             dataSet = JSON.parse(dataSet);
             //result.innerHTML = dataSet;
             dataSet.forEach(function (value, index) {
-                frames.push(index + 1);
-                values.push(value[0]);
-                fatal_list.push(value[1]);
+                // if frame isn't in dataset yet then we can push, otherwise ignore
+                if ((index + 1) > frames[frames.length - 1]) {
+                    frames.push(index + 1);
+                    values.push(value[0]);
+                    fatal_list.push(value[1]);
+                }
             });
 
             chartInstance.update();
