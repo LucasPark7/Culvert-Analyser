@@ -24,10 +24,7 @@ var file = event.target.files[0];
     }
 });
 
-labelList = [];
-for (let i = 0; i <= 120; i++) {
-    labelList.append(i);
-}
+const labelList = Array.from({ length: 120 }, (_, i) => i + 1);
 chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
