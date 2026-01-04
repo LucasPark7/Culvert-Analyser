@@ -24,10 +24,14 @@ var file = event.target.files[0];
     }
 });
 
+labelList = [];
+for (let i = 0; i <= 120; i++) {
+    labelList.append(i);
+}
 chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        labels: labelList,
         datasets: [{
             label: 'Culvert Score',
             borderWidth: 1
@@ -42,17 +46,7 @@ chartInstance = new Chart(ctx, {
     }
 });
 
-/*chartInstance.data.labels = [0, 1, 2, 3, 4];
-chartInstance.data.datasets.push({
-    label: "test",
-    data: [1000, 2000, 4000, 8000, 15000],
-    borderColor: "rgba(255, 255, 255, 0.53)",
-    backgroundColor: "rgba(20, 179, 228, 1)",
-    fill: false
-});*/
-
-//chartInstance.data.datasets.pop();
-//chartInstance.update();
+chartInstance.update();
 
 async function uploadVideo() {
     if (process_flag) {
