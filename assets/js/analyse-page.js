@@ -23,29 +23,26 @@ var file = event.target.files[0];
         inputButton.textContent = `${file.name}`;
     }
 });
-/*chartInstance = new Chart(ctx, {
-    type: "line",
+
+chartInstance = new Chart(ctx, {
+    type: 'line',
     data: {
-        pointStyle: false,
-        datasets: []
+        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        datasets: [{
+            label: 'Culvert Score',
+            borderWidth: 1
+        }]
     },
     options: {
-        fill: false,
-        responsive: true,
-        interaction: {
-            intersect: false
-        },
-        radius: 0,
-        plugins: {
-            title: {
-                display: true,
-                text: 'Culvert Score'
+        scales: {
+            y: {
+            beginAtZero: true
             }
         }
     }
-    });
+});
 
-chartInstance.data.labels = [0, 1, 2, 3, 4];
+/*chartInstance.data.labels = [0, 1, 2, 3, 4];
 chartInstance.data.datasets.push({
     label: "test",
     data: [1000, 2000, 4000, 8000, 15000],
