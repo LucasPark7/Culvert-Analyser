@@ -43,7 +43,7 @@ chartInstance = new Chart(ctx, {
     }
 });
 
-chartInstance.update();
+//chartInstance.update();
 
 async function uploadVideo() {
     if (process_flag) {
