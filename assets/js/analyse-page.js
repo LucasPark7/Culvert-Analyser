@@ -28,7 +28,7 @@ var file = event.target.files[0];
 chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: [0,1,2,3,4,5,6],
+        labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         datasets: [{
             label: 'Culvert Score',
             borderWidth: 1
