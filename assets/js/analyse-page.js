@@ -24,11 +24,11 @@ var file = event.target.files[0];
     }
 });
 
-const labelList = Array.from({ length: 120 }, (_, i) => i + 1);
+//const labelList = Array.from({ length: 120 }, (_, i) => i + 1);
 chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: labelList,
+        labels: [0,1,2,3,4,5,6],
         datasets: [{
             label: 'Culvert Score',
             borderWidth: 1
