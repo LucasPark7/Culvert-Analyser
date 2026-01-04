@@ -23,7 +23,7 @@ var file = event.target.files[0];
         inputButton.textContent = `${file.name}`;
     }
 });
-chartInstance = new Chart(ctx, {
+/*chartInstance = new Chart(ctx, {
     type: "line",
     data: {
         pointStyle: false,
@@ -52,10 +52,10 @@ chartInstance.data.datasets.push({
     borderColor: "rgba(255, 255, 255, 0.53)",
     backgroundColor: "rgba(20, 179, 228, 1)",
     fill: false
-});
+});*/
 
 //chartInstance.data.datasets.pop();
-chartInstance.update();
+//chartInstance.update();
 
 async function uploadVideo() {
     if (process_flag) {
