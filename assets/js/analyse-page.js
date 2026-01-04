@@ -25,6 +25,7 @@ var file = event.target.files[0];
 });
 
 const labelList = Array.from({ length: 120 }, (_, i) => i + 1);
+
 chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
