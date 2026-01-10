@@ -115,7 +115,7 @@ async function uploadVideo() {
             //result.innerHTML = dataSet;
             dataSet.forEach(function (value, index) {
                 // if frame isn't in dataset yet then we can push, otherwise ignore
-                if ((index + 1) > frames[frames.length - 1]) {
+                if ((index) > frames[frames.length - 1]) {
                     frames.push(index + 1);
                     values.push(value[0]);
                     fatal_list.push(value[1]);
