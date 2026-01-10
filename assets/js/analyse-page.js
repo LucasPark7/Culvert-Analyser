@@ -116,7 +116,7 @@ async function uploadVideo() {
             dataSet.forEach(function (value, index) {
                 // if frame isn't in dataset yet then we can push, otherwise ignore
                 console.log(index)
-                console.log(frames[frames.length - 1])
+                console.log(frames)
                 if ((index + 1) > frames[frames.length - 1]) {
                     frames.push(index + 1);
                     values.push(value[0]);
