@@ -93,7 +93,7 @@ async function uploadVideo() {
         const maxTime = 600 * 1000;
         const startTime = Date.now();
 
-        var frames = [];
+        var frames = [0];
         var values = [];
         var fatal_list = [];
 
