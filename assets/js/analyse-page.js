@@ -63,6 +63,7 @@ chartInstance.data.datasets.push({
     },
     spanGaps: true
 });
+chartInstance.update();
 
 async function uploadVideo() {
     if (process_flag) {
