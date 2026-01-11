@@ -48,7 +48,7 @@ chartInstance = new Chart(ctx, {
 
 // sample culvert for testing
 var test_culvert = { frames: [1, 2, 3, 4, 5], values: [5, 25, 50, 100, 150], fatal_list: [false, false, true, true, false] };
-list_runs.push(new_culvert);
+list_runs.push(test_culvert);
 
 chartInstance.data.labels = frames;
 chartInstance.data.datasets.push({
