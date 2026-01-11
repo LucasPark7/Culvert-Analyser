@@ -8,7 +8,6 @@ const resolution = document.getElementById("resoSelect")
 let chartInstance = null;
 var process_flag = false;
 var list_runs = [];
-const fatal = (ctx, value, fatals) => fatals[ctx.p0DataIndex] ? value : undefined;
 
 inputButton.addEventListener("click", () => {
         fileInput.click();
@@ -49,12 +48,12 @@ chartInstance = new Chart(ctx, {
 // sample culvert for testing
 var test_culvert = { frames: [1, 2, 3, 4, 5], values: [5, 25, 50, 100, 150], fatal_list: [false, false, true, true, false] };
 list_runs.push(test_culvert);
+const fatal = (ctx, value, fatals) => fatal_list[ctx.p0DataIndex] ? value : undefined;
 
 chartInstance.data.labels = frames;
 chartInstance.data.datasets.push({
     label: "Culvert #" + list_runs.length,
     data: test_culvert.values,
-    fatals: test_culvert.fatal_list,
     borderColor: "rgba(255, 255, 255, 0.53)",
     backgroundColor: "rgba(20, 179, 228, 1)",
     fill: false,
