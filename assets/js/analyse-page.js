@@ -8,7 +8,7 @@ const resolution = document.getElementById("resoSelect")
 let chartInstance = null;
 var process_flag = false;
 var list_runs = [];
-const fatal = (ctx, value, flags) => flags[ctx.p0DataIndex] ? value : undefined;
+const fatal = (ctx, value, fatals) => fatals[ctx.p0DataIndex] ? value : undefined;
 
 inputButton.addEventListener("click", () => {
         fileInput.click();
