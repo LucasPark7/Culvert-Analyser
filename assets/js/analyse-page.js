@@ -46,6 +46,7 @@ chartInstance = new Chart(ctx, {
 });
 
 // sample culvert for testing
+/*
 var test_culvert = { frames: [1, 2, 3, 4, 5], values: [5, 25, 50, 100, 150], fatal_list: [false, false, true, true, false] };
 list_runs.push(test_culvert);
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
@@ -61,6 +62,7 @@ chartInstance.data.datasets.push({
     spanGaps: true
 });
 chartInstance.update();
+*/
 
 async function uploadVideo() {
     if (process_flag) {
@@ -107,14 +109,19 @@ async function uploadVideo() {
         // declare new culvert object to store data
         var new_culvert = { frames: [0], values: [], fatal_list: [] };
         list_runs.push(new_culvert);
+        
+        // segmenting for fatals
+        const fatal = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
         // consider arr of 0-120 for fixed label set
         chartInstance.data.labels = new_culvert.frames;
         chartInstance.data.datasets.push({
             label: "Culvert #" + list_runs.length,
             data: new_culvert.values,
-            borderColor: "rgba(255, 255, 255, 0.53)",
+            borderColor: "rgb(255, 255, 255)",
             backgroundColor: "rgba(20, 179, 228, 1)",
+            segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
+            spanGaps: true,
             fill: false
         });
 
