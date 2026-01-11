@@ -48,7 +48,7 @@ chartInstance = new Chart(ctx, {
 // sample culvert for testing
 var test_culvert = { frames: [1, 2, 3, 4, 5], values: [5, 25, 50, 100, 150], fatal_list: [false, false, true, true, false] };
 list_runs.push(test_culvert);
-const fatal = (ctx, value, fatals) => fatal_list[ctx.p0DataIndex] ? value : undefined;
+const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
 chartInstance.data.labels = frames;
 chartInstance.data.datasets.push({
