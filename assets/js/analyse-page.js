@@ -6,6 +6,7 @@ const result = document.getElementById("result");
 const ctx = document.getElementById("resultChart");
 const resolution = document.getElementById("resoSelect")
 var process_flag = false;
+var list_runs = [];
 
 inputButton.addEventListener("click", () => {
         fileInput.click();
@@ -30,10 +31,9 @@ chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
         labels: labelList,
-        datasets: [{
-            label: 'Culvert Score',
-            borderWidth: 1
-        }]
+        datasets: [
+            //{ label: 'Culvert Score', borderWidth: 1 }
+        ]
     },
     options: {
         scales: {
@@ -43,8 +43,6 @@ chartInstance = new Chart(ctx, {
         }
     }
 });
-
-//chartInstance.update();
 
 async function uploadVideo() {
     if (process_flag) {
@@ -57,11 +55,6 @@ async function uploadVideo() {
         return;
     }
 
-    /*
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
-    */
     file = fileInput.files[0];
 
     const formData = new FormData();
@@ -93,14 +86,14 @@ async function uploadVideo() {
         const maxTime = 600 * 1000;
         const startTime = Date.now();
 
-        var frames = [0];
-        var values = [];
-        var fatal_list = [];
+        // declare new culvert object to store data
+        var new_culvert = { frames: [0], values: [], fatal_list: [] };
+        list_runs.push(new_culvert);
 
         chartInstance.data.labels = frames;
         chartInstance.data.datasets.push({
-            label: "test",
-            data: values,
+            label: "Culvert #" + list_runs.length,
+            data: new_culvert.values,
             borderColor: "rgba(255, 255, 255, 0.53)",
             backgroundColor: "rgba(20, 179, 228, 1)",
             fill: false
@@ -112,22 +105,19 @@ async function uploadVideo() {
 
             var dataSet = JSON.stringify(statusData.results, null, 2);
             dataSet = JSON.parse(dataSet);
-            //result.innerHTML = dataSet;
             dataSet.forEach(function (value, index) {
                 // if frame isn't in dataset yet then we can push, otherwise ignore
-                console.log(index)
-                console.log(frames)
-                if ((index + 1) > frames[frames.length - 1]) {
-                    frames.push(index + 1);
-                    values.push(value[0]);
-                    fatal_list.push(value[1]);
+                if ((index + 1) > new_culvert.frames[new_culvert.frames.length - 1]) {
+                    new_culvert.frames.push(index + 1);
+                    new_culvert.values.push(value[0]);
+                    new_culvert.fatal_list.push(value[1]);
                 }
             });
 
             chartInstance.update();
 
             if (statusData.status === "complete") {
-                clearInterval(interval);      
+                clearInterval(interval);
                 result.innerHTML = "Processing complete!";
                 process_flag = false;
             }
