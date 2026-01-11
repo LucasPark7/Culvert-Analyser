@@ -45,8 +45,8 @@ chartInstance = new Chart(ctx, {
     }
 });
 
-// sample culvert for testing
-/*
+// sample data for testing
+
 var test_culvert = { frames: [1, 2, 3, 4, 5], values: [5, 25, 50, 100, 150], fatal_list: [false, false, true, true, false] };
 list_runs.push(test_culvert);
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
@@ -59,10 +59,11 @@ chartInstance.data.datasets.push({
     backgroundColor: "rgba(20, 179, 228, 1)",
     fill: false,
     segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
-    spanGaps: true
+    spanGaps: true,
+    pointRadius: 0
 });
 chartInstance.update();
-*/
+
 
 async function uploadVideo() {
     if (process_flag) {
@@ -122,7 +123,8 @@ async function uploadVideo() {
             backgroundColor: "rgba(20, 179, 228, 1)",
             segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
             spanGaps: true,
-            fill: false
+            fill: false,
+            pointRadius: 0
         });
 
         const interval = setInterval(async () => {
