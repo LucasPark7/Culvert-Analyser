@@ -8,7 +8,7 @@ const resolution = document.getElementById("resoSelect")
 let chartInstance = null;
 var process_flag = false;
 var list_runs = [];
-const fatal = (ctx, value) => ctx.dataSet.fatals ? value : undefined;
+const fatal = (ctx, value, flags) => flags[ctx.p0DataIndex] ? value : undefined;
 
 inputButton.addEventListener("click", () => {
         fileInput.click();
@@ -58,9 +58,7 @@ chartInstance.data.datasets.push({
     borderColor: "rgba(255, 255, 255, 0.53)",
     backgroundColor: "rgba(20, 179, 228, 1)",
     fill: false,
-    segment: {
-        borderColor: fatal(ctx, 'rgb(192,75,75)')
-    },
+    segment: { borderColor: fatal(ctx, 'rgb(192,75,75)') },
     spanGaps: true
 });
 chartInstance.update();
