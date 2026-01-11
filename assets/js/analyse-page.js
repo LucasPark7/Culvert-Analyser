@@ -54,10 +54,10 @@ chartInstance.data.labels = test_culvert.frames;
 chartInstance.data.datasets.push({
     label: "Culvert #" + list_runs.length,
     data: test_culvert.values,
-    borderColor: "rgba(255, 255, 255, 0.53)",
+    borderColor: "rgb(255, 255, 255)",
     backgroundColor: "rgba(20, 179, 228, 1)",
     fill: false,
-    segment: { borderColor: fatal(ctx, 'rgb(192,75,75)') },
+    segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
     spanGaps: true
 });
 chartInstance.update();
@@ -108,6 +108,7 @@ async function uploadVideo() {
         var new_culvert = { frames: [0], values: [], fatal_list: [] };
         list_runs.push(new_culvert);
 
+        // consider arr of 0-120 for fixed label set
         chartInstance.data.labels = new_culvert.frames;
         chartInstance.data.datasets.push({
             label: "Culvert #" + list_runs.length,
