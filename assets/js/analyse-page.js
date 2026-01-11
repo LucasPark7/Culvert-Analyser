@@ -50,7 +50,7 @@ var test_culvert = { frames: [1, 2, 3, 4, 5], values: [5, 25, 50, 100, 150], fat
 list_runs.push(test_culvert);
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
-chartInstance.data.labels = frames;
+chartInstance.data.labels = test_culvert.frames;
 chartInstance.data.datasets.push({
     label: "Culvert #" + list_runs.length,
     data: test_culvert.values,
@@ -108,7 +108,7 @@ async function uploadVideo() {
         var new_culvert = { frames: [0], values: [], fatal_list: [] };
         list_runs.push(new_culvert);
 
-        chartInstance.data.labels = frames;
+        chartInstance.data.labels = new_culvert.frames;
         chartInstance.data.datasets.push({
             label: "Culvert #" + list_runs.length,
             data: new_culvert.values,
