@@ -41,7 +41,7 @@
 							<input type="file" id="videoFile" accept="video/mp4" style="display:none;">
 							
 							<label for="resoSelect">Select In-Game Resolution:</label>
-							<select id="resoSelect" class="select reso">
+							<select id="resoSelect" class="select" style="display:inline-block;max-width:30%;width:100%">
 								<option value="1920x1080" selected>1920x1080</option>
 								<option value="1366x768">1366x768</option>
 								<option value="1280x720">1280x720</option>
@@ -62,21 +62,7 @@
 							
 							<canvas id="resultChart"></canvas>
 
-							<div class="row" style="padding-top: 10px;">
-								<div class="col-6 col-12-medium">
-									<aside id="infoPanel" class="info-card">
-										<h3 id="Test Title">
-											title test
-										</h3>
-										<div id="stats">
-											<!-- Add table for stats -->
-											<!-- Fatal # | Time | Score gained | % Score | Score/s (increase?) -->
-											<p> stats test: </p>
-											<p> Fatal Strikes: </p>
-											<p> 1-4, 31-35, 124-1241 </p>
-										</div>
-									</aside>
-								</div>
+							<div class="row" style="padding-top: 50px;">
 								<div class="col-3 col-12-medium">
 									<div class="table-wrapper">
 										<table class="alt">
@@ -104,6 +90,20 @@
 											</tbody>
 										</table>
 									</div>
+								</div>
+								<div class="col-6 col-12-medium">
+									<aside id="infoPanel" class="info-card">
+										<h3 id="Test Title">
+											title test
+										</h3>
+										<div id="stats">
+											<!-- Add table for stats -->
+											<!-- Fatal # | Time | Score gained | % Score | Score/s (increase?) -->
+											<p> stats test: </p>
+											<p> Fatal Strikes: </p>
+											<p> 1-4, 31-35, 124-1241 </p>
+										</div>
+									</aside>
 								</div>
 							</div>
 						</div>
