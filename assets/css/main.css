@@ -3924,3 +3924,26 @@ input, select, textarea {
 			}
 
 		}
+	
+/* Info block */
+.info-card {
+	background: #ffffff;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 16px;
+	width: 280px;
+
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.info-card h3 {
+	margin: 0 0 12px;
+	font-size: 1.1rem;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 6px;
+}
+
+.info-card p {
+	margin: 6px 0;
+	font-size: 0.9rem;
+}
