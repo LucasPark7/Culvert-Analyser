@@ -37,7 +37,7 @@
 						
 							<h1>Upload Video of Culvert</h1>
 
-							<li><a class="button icon solid fa-upload" id="uploadButton">Upload Video</a></li>
+							<li><a class="button icon solid fa-upload" id="uploadButton">Select Video</a></li>
 							<input type="file" id="videoFile" accept="video/mp4" style="display:none;">
 							
 							<label for="resoSelect">Select In-Game Resolution:</label>
@@ -61,6 +61,11 @@
 							<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
 							
 							<canvas id="resultChart"></canvas>
+
+							<aside id="infoPanel">
+								<h3 id="graphTitle"></h3>
+								<div id="stats"></div>
+							</aside>
 						</div>
 					</section>
 

@@ -114,7 +114,7 @@ async function uploadVideo() {
         // segmenting for fatals
         const fatal = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
-        // consider arr of 0-120 for fixed label set
+        // consider list of 0-120 for fixed label set
         chartInstance.data.labels = new_culvert.frames;
         chartInstance.data.datasets.push({
             label: "Culvert #" + list_runs.length,
