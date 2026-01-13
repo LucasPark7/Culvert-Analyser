@@ -3927,8 +3927,8 @@ input, select, textarea {
 	
 /* Info block */
 	.info-card {
-		background: #ffffff;
-		border: 1px solid #e0e0e0;
+		background: #493382;
+		border: 1px solid #e0e0e0a9;
 		border-radius: 8px;
 		padding: 16px;
 		width: 280px;
@@ -3939,7 +3939,7 @@ input, select, textarea {
 	.info-card h3 {
 		margin: 0 0 12px;
 		font-size: 1.1rem;
-		border-bottom: 1px solid #eee;
+		border-bottom: 1px solid #e0e0e0a9;
 		padding-bottom: 6px;
 	}
 
