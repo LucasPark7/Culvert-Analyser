@@ -2367,6 +2367,12 @@ input, select, textarea {
 			display: none;
 		}
 
+		select.reso {
+			width: 30%;
+			color: #ffffff;
+			background: #312450;
+		}
+
 	input[type="text"],
 	input[type="password"],
 	input[type="email"],
