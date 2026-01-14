@@ -92,9 +92,9 @@ function computeStats(culvert_data) {
     // edge case if last frame is part of fatal
     if (openFatal == true) {
         fatalEnd = culvert_data.frames[culvert_data.frames.length - 1];
+        console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
         addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
     }
-    console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
 }
 
 // sample data for testing
