@@ -66,7 +66,7 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
 }
 
 function computeStats(culvert_data) {
-
+    const totalScore = culvert_data.values[culvert_data.frames.length - 1];
     // flag var to track fatal cycles
     var openFatal = false;
     var fatalStart = 0;
@@ -85,14 +85,16 @@ function computeStats(culvert_data) {
         else if (openFatal == true && culvert_data.fatal_list[i] == false) {
             fatalEnd = culvert_data.frames[i];
             openFatal = false;
+            console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
+            addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
         }
     }
     // edge case if last frame is part of fatal
     if (openFatal == true) {
         fatalEnd = culvert_data.frames[culvert_data.frames.length - 1];
+        addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
     }
     console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
-    addStatRow(fatalStart, fatalEnd, fatalGain, culvert_data.values[culvert_data.frames.length - 1]);
 }
 
 // sample data for testing
@@ -100,7 +102,7 @@ function computeStats(culvert_data) {
 var test_culvert =  {  
                       frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
                       values: [5, 25, 50, 100, 150, 300, 500, 700, 1100, 1500], 
-                      fatal_list: [false, false, true, true, false, false, true, true, false, true] 
+                      fatal_list: [false, false, true, true, false, false, true, true, false, false] 
                     };
 list_runs.push(test_culvert);
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
