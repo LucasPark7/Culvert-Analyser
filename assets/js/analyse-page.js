@@ -91,6 +91,7 @@ function computeStats(culvert_data) {
     if (openFatal == true) {
         fatalEnd = culvert_data.frames[culvert_data.frames.length - 1];
     }
+    console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
     addStatRow(fatalStart, fatalEnd, fatalGain, culvert_data.values[culvert_data.frames.length - 1]);
 }
 
