@@ -85,14 +85,14 @@ function computeStats(culvert_data) {
         else if (openFatal == true && culvert_data.fatal_list[i] == false) {
             fatalEnd = culvert_data.frames[i];
             openFatal = false;
-            console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
+            //console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
             addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
         }
     }
     // edge case if last frame is part of fatal
     if (openFatal == true) {
         fatalEnd = culvert_data.frames[culvert_data.frames.length - 1];
-        console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
+        //console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
         addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
     }
 }
