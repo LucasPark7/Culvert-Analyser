@@ -64,13 +64,11 @@
 
 							<div class="row" style="padding-top: 50px;">
 								<div class="col-3 col-12-medium">
-									<div class="table-wrapper" style="max-height:340px;">
-										<table class="alt">
-											<thead>
-												<tr>
-													<th>Name</th>
-												</tr>
-											</thead>
+									<div class="table-wrapper" style="max-height:380px;">
+										<h3>
+											Additional Info:
+										</h3>
+										<table id="culvList" class="alt">
 											<tbody>
 												<tr>
 													<td>Item One</td>
@@ -99,9 +97,20 @@
 										<div id="stats">
 											<!-- Add table for stats -->
 											<!-- Fatal # | Time | Score gained | % Score | Score/s (increase?) -->
-											<p> stats test: </p>
-											<p> Fatal Strikes: </p>
-											<p> 1-4, 31-35, 124-1241 </p>
+											<div class="table-wrapper">
+												<table id="statsTable" class="alt">
+													<thead>
+														<tr>
+															<th>Fatal Time</th>
+															<th>Score Gained</th>
+															<th>% of Total Score</th>
+															<th>Score/s</th>
+														</tr>
+													</thead>
+													<tbody id="statsTableBody">
+													</tbody>
+												</table>
+											</div>
 										</div>
 									</aside>
 								</div>

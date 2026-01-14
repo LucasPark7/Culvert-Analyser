@@ -3,7 +3,10 @@ const inputButton = document.getElementById("uploadButton")
 const loading = document.getElementById("loadingText");
 const result = document.getElementById("result");
 const ctx = document.getElementById("resultChart");
-const resolution = document.getElementById("resoSelect")
+const resolution = document.getElementById("resoSelect");
+const culvList = document.getElementById("culvList");
+const statsTable = document.getElementById("statsTable");
+const statsTableBody = document.getElementById("statsTableBody");
 
 let chartInstance = null;
 var process_flag = false;
@@ -45,9 +48,59 @@ chartInstance = new Chart(ctx, {
     }
 });
 
+function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
+    const scorePerS = (fatalGain / (fatalEnd - fatalStart));
+    const percentScore = (fatalGain / totalScore) * 100;
+
+    var newRow = statsTableBody.insertRow(-1);
+
+    const timeCell      = newRow.insertCell(0);
+    const gainCell      = newRow.insertCell(1);
+    const percentCell   = newRow.insertCell(2);
+    const perSecondCell = newRow.insertCell(3);
+
+    timeCell.textContent      = fatalStart.toString() + 's - ' + fatalEnd.toString() + 's';
+    gainCell.textContent      = fatalGain.toString();
+    percentCell.textContent   = percentScore.toFixed(3).toString() + '%';
+    perSecondCell.textContent = scorePerS.toFixed(3).toString();
+}
+
+function computeStats(culvert_data) {
+
+    // flag var to track fatal cycles
+    var openFatal = false;
+    var fatalStart = 0;
+    var fatalEnd = 0;
+    var fatalGain = 0;
+    for (let i = 0; i < culvert_data.frames.length; i++) {
+        // once new fatal is detected, start compiling data
+        if (openFatal == false && culvert_data.fatal_list[i] == true) {
+            fatalStart = culvert_data.frames[i];
+            fatalGain = 0;
+            openFatal = true;
+        }
+        else if (openFatal == true && culvert_data.fatal_list[i] == true) {
+            fatalGain += culvert_data.values[i];
+        }
+        else if (openFatal == true && culvert_data.fatal_list[i] == false) {
+            fatalEnd = culvert_data.frames[i];
+            openFatal = false;
+        }
+    }
+    // edge case if last frame is part of fatal
+    if (openFatal == true) {
+        fatalEnd = culvert_data.frames[culvert_data.frames.length - 1];
+    }
+    addStatRow(fatalStart, fatalEnd, fatalGain, culvert_data.values[culvert_data.frames.length - 1]);
+}
+
 // sample data for testing
 
-var test_culvert = { frames: [1, 2, 3, 4, 5], values: [5, 25, 50, 100, 150], fatal_list: [false, false, true, true, false] };
+var test_culvert =  {  
+                      frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
+                      values: [5, 25, 50, 100, 150, 300, 500, 700, 1100, 1500], 
+                      fatal_list: [false, false, true, true, false, false, true, true, false, true] 
+                    };
 list_runs.push(test_culvert);
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
@@ -63,6 +116,8 @@ chartInstance.data.datasets.push({
     pointRadius: 0
 });
 chartInstance.update();
+
+computeStats(test_culvert);
 
 
 async function uploadVideo() {
