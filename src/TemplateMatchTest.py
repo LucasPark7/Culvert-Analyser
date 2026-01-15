@@ -1,10 +1,11 @@
 import cv2
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject2.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\103kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (117*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (20*60)+2)
 ret, frame = cap.read()
 cap.release()
 
@@ -16,7 +17,8 @@ cv2.namedWindow("ROI Selector")
 
 # Initial ROI values (x, y, w, h)
 h_frame, w_frame, _ = frame.shape
-init_x, init_y, init_w, init_h = 1265, 35, 900, 225
+#init_x, init_y, init_w, init_h = 1265, 35, 900, 225
+init_x, init_y, init_w, init_h = 1250, 775, 143, 110
 
 # Trackbar callback (does nothing, just needed)
 def nothing(val):
@@ -44,11 +46,15 @@ while True:
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
     
-    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\fatal_icon.png")
+    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\cont_active.png")
 
     # Convert to grayscale for better template matching
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
+
+    ##Split Both into each R, G, B Channel
+    imageMainR, imageMainG, imageMainB = cv2.split(roi)
+    imageNeedleR, imageNeedleG, imageNeedleB = cv2.split(fatal)
 
     if roi.size > 0:
         cv2.imshow("Cropped ROI", gray)
@@ -60,10 +66,22 @@ while True:
     if cv2.waitKey(30) & 0xFF == ord("q"):
         
         # template matching
-        res = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        #res = cv2.matchTemplate(roi, fatal, cv2.TM_CCOEFF_NORMED)
+        #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        resultB = cv2.matchTemplate(imageMainR, imageNeedleR, cv2.TM_SQDIFF)
+        resultG = cv2.matchTemplate(imageMainG, imageNeedleG, cv2.TM_SQDIFF)
+        resultR = cv2.matchTemplate(imageMainB, imageNeedleB, cv2.TM_SQDIFF)
 
-        threshold = 0.75
+        threshold = 69000000
+        #threshold = 0.75
+
+        # Add together to get the total score
+        result = resultB + resultG + resultR
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        loc = np.where(result >= 3 * threshold)
+        
+        print("loc: ", loc)
+
         print(max_val)
         if max_val >= threshold:
             top_left = max_loc
@@ -72,8 +90,25 @@ while True:
             print("Fatal Strike detected at:", top_left, "Confidence:", max_val)
         else:
             print("Fatal Strike not detected")
+        
 
         print(f"Final ROI: (x={x}, y={y}, w={w}, h={h})")
         break
 
 cv2.destroyAllWindows()
+
+
+# --------------------------------
+# Planning on testing an AI upscaler to detect fatal/oz
+# Outsource or train own model as new project
+#
+# Testing Results:
+# - template matching algorithms need more work
+# - seemingly impossible to find oz rings when capturing full screen
+# - possible options:
+#   - force users to take oz rings off buff favourites
+#       - can capture top right buffs
+#       - kind of a hassle
+#   - find a way to properly detect oz rings off full screen
+#       - maybe AI?
+# --------------------------------
