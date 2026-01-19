@@ -3,7 +3,7 @@ import pytesseract
 import re
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\1024x768.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\144kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
 cap.set(cv2.CAP_PROP_POS_FRAMES, (17*60)+2)
 ret, frame = cap.read()
