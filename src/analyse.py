@@ -180,47 +180,6 @@ def process_video(file_path, resolution, job_id):
         reader_thread.join()
         analyzer_thread.join()
 
-    '''
-    possible feature to add in future
-
-    # normalize values to scale one score to the other
-    def normalize(video1, video2):
-        end1 = video1[-1]
-        end2 = video2[-1]
-
-        scale = max(end1, end2) / min(end1, end2)
-
-        if min(end1, end2) == end1:
-            for i in range(len(video1)):
-                video1[i] = math.floor(video1[i] * scale)
-        else:
-            for i in range(len(video2)):
-                video2[i] = math.floor(video2[i] * scale)
-        
-        return [video1, video2]
-
-    def compare_videos(video1_path, video2_path):
-        series1 = process_video(video1_path)
-        series2 = process_video(video2_path)
-
-        # call normalize on two videos
-        normResult = normalize(series1, series2)
-        series1 = normResult[0]
-        series2 = normResult[1]
-
-        # Align lengths
-        min_len = min(len(series1), len(series2))
-        series1, series2 = series1[:min_len], series2[:min_len]
-
-        df = pd.DataFrame({
-            "time": list(range(min_len)),
-            "video1": series1,
-            "video2": series2
-        })
-
-        return df
-    '''
-
     # get ROI from resolution selected
     ROI_dict = {
         "1920x1080" : (995, 85, 150, 50),
