@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
+from concurrent.futures import ThreadPoolExecutor
 
 API_BASE = "https://culvert-analyse.onrender.com"
 
@@ -45,6 +46,21 @@ def process_video(file_path):
 
         # Convert to grayscale for better OCR
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Define thresholds
+        thresholds = [108, 94, 80, 116, 72]
+
+        # Function to process a single threshold
+        def process_threshold(threshold_value):
+            _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
+            return pytesseract.image_to_string(thresh, config="--psm 6 digits")
+
+        # Run in parallel with threads
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results = list(executor.map(process_threshold, thresholds))
+
+        text1, text2, text3, text4, text5 = results
+
+        '''
         _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
         _, thresh2 = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
         _, thresh3 = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
@@ -56,6 +72,7 @@ def process_video(file_path):
         text3 = pytesseract.image_to_string(thresh3, config="--psm 6 digits")
         text4 = pytesseract.image_to_string(thresh4, config="--psm 6 digits")
         text5 = pytesseract.image_to_string(thresh5, config="--psm 6 digits")
+        '''
 
         # Scan for fatal strike using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)

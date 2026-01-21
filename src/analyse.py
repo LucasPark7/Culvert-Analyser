@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
+from concurrent.futures import ThreadPoolExecutor
 
 redis = Redis.from_url(os.environ.get("REDIS_URL"), decode_responses=True)
 
@@ -64,17 +65,20 @@ def process_video(file_path, resolution, job_id):
 
         # convert to grayscale for better OCR
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
-        _, thresh2 = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
-        _, thresh3 = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
-        _, thresh4 = cv2.threshold(gray, 116, 255, cv2.THRESH_BINARY)
-        _, thresh5 = cv2.threshold(gray, 72, 255, cv2.THRESH_BINARY)
 
-        text1 = pytesseract.image_to_string(thresh, config="--psm 6 digits")
-        text2 = pytesseract.image_to_string(thresh2, config="--psm 6 digits")
-        text3 = pytesseract.image_to_string(thresh3, config="--psm 6 digits")
-        text4 = pytesseract.image_to_string(thresh4, config="--psm 6 digits")
-        text5 = pytesseract.image_to_string(thresh5, config="--psm 6 digits")
+        # thresholds for comparison
+        thresholds = [108, 94, 80, 116, 72]
+
+        # read each threshold with pytesseract
+        def process_threshold(threshold_value):
+            _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
+            return pytesseract.image_to_string(thresh, config="--psm 6 digits")
+        
+        # multithread for efficiency
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results = list(executor.map(process_threshold, thresholds))
+
+        text1, text2, text3, text4, text5 = results
 
         # scan for fatal strike using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
