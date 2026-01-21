@@ -68,7 +68,7 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
 function computeStats(culvert_data) {
 
     // wipe current table for current data
-    $("#statsTable tr").remove();
+    statsTableBody.innerHTML = "";
 
     const totalScore = culvert_data.values[culvert_data.frames.length - 1];
     // flag var to track fatal cycles
@@ -112,7 +112,9 @@ list_runs.push(test_culvert);
 let new_list_run = culvList.insertRow(-1);
 let runCell = new_list_run.insertCell(0);
 runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + test_culvert.values[test_culvert.values.length - 1] + ")";
-new_list_run.addEventListener('click', computeStats(test_culvert));
+window.onload = function() {
+    runCell.addEventListener('click', computeStats(test_culvert));
+}
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
 chartInstance.data.labels = test_culvert.frames;
