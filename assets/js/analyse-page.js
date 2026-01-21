@@ -112,9 +112,7 @@ list_runs.push(test_culvert);
 let new_list_run = culvList.insertRow(-1);
 let runCell = new_list_run.insertCell(0);
 runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + test_culvert.values[test_culvert.values.length - 1] + ")";
-window.onload = function() {
-    runCell.addEventListener('click', computeStats(test_culvert));
-}
+runCell.addEventListener('click', computeStats(test_culvert));
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
 chartInstance.data.labels = test_culvert.frames;
