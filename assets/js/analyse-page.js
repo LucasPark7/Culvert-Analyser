@@ -66,6 +66,10 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
 }
 
 function computeStats(culvert_data) {
+
+    // wipe current table for current data
+    $("#statsTable tr").remove();
+
     const totalScore = culvert_data.values[culvert_data.frames.length - 1];
     // flag var to track fatal cycles
     var openFatal = false;
@@ -99,6 +103,7 @@ function computeStats(culvert_data) {
 
 // sample data for testing
 
+culvList.addEventListener('click', computeStats)
 var test_culvert =  {  
                       frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
                       values: [5, 25, 50, 100, 150, 300, 500, 700, 1100, 1500], 
@@ -107,8 +112,7 @@ var test_culvert =  {
 list_runs.push(test_culvert);
 let new_list_run = culvList.insertRow(-1);
 let runCell = new_list_run.insertCell(0);
-runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + test_culvert.values[-1] + ")";
-new_list_run.onclick = computeStats(test_culvert);
+runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + test_culvert.values[test_culvert.values.length - 1] + ")";
 const fatal = (ctx, value) => test_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
 chartInstance.data.labels = test_culvert.frames;
@@ -116,7 +120,7 @@ chartInstance.data.datasets.push({
     label: "Culvert #" + list_runs.length,
     data: test_culvert.values,
     borderColor: "rgb(255, 255, 255)",
-    backgroundColor: "rgba(20, 179, 228, 1)",
+    backgroundColor: "rgb(255, 255, 255)",
     fill: false,
     segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
     spanGaps: true,
