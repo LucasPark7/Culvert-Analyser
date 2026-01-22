@@ -7,6 +7,7 @@ const resolution = document.getElementById("resoSelect");
 const culvList = document.getElementById("culvList");
 const statsTable = document.getElementById("statsTable");
 const statsTableBody = document.getElementById("statsTableBody");
+const runTitle = document.getElementById("run-title");
 
 let chartInstance = null;
 var process_flag = false;
@@ -70,6 +71,9 @@ function computeStats(culvert_data) {
     // wipe current table for current data
     statsTableBody.innerHTML = "";
 
+    // set title
+    runTitle.innerHTML = "Culvert Run #" + culvert_data.index;
+
     const totalScore = culvert_data.values[culvert_data.frames.length - 1];
     // flag var to track fatal cycles
     var openFatal = false;
@@ -106,12 +110,15 @@ function computeStats(culvert_data) {
 var test_culvert =  {  
                       frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
                       values: [5, 25, 50, 100, 150, 300, 500, 700, 1100, 1500], 
-                      fatal_list: [false, false, true, true, false, false, true, true, false, false] 
+                      fatal_list: [false, false, true, true, false, false, true, true, false, false],
+                      index: list_runs.length + 1
                     };
 list_runs.push(test_culvert);
+test_culvert.index = list_runs.length;
 let new_list_run = culvList.insertRow(-1);
 let runCell = new_list_run.insertCell(0);
 runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + test_culvert.values[test_culvert.values.length - 1] + ")";
+runCell.style.cursor = 'pointer';
 runCell.addEventListener('click', function() {
     computeStats(test_culvert);
 });
@@ -177,7 +184,7 @@ async function uploadVideo() {
         const startTime = Date.now();
 
         // declare new culvert object to store data
-        var new_culvert = { frames: [0], values: [], fatal_list: [] };
+        var new_culvert = { frames: [0], values: [], fatal_list: [], index: list_runs.length + 1 };
         list_runs.push(new_culvert);
         
         // segmenting for fatals
@@ -189,7 +196,7 @@ async function uploadVideo() {
             label: "Culvert #" + list_runs.length,
             data: new_culvert.values,
             borderColor: "rgb(255, 255, 255)",
-            backgroundColor: "rgba(20, 179, 228, 1)",
+            backgroundColor: "rgb(255, 255, 255)",
             segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
             spanGaps: true,
             fill: false,
@@ -217,6 +224,14 @@ async function uploadVideo() {
                 clearInterval(interval);
                 result.innerHTML = "Processing complete!";
                 process_flag = false;
+
+                let new_list_run = culvList.insertRow(-1);
+                let runCell = new_list_run.insertCell(0);
+                runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
+                runCell.style.cursor = 'pointer';
+                runCell.addEventListener('click', function() {
+                    computeStats(new_culvert);
+                });
             }
 
             // timeout

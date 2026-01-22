@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\103kCulv.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\145kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
 cap.set(cv2.CAP_PROP_POS_FRAMES, (20*60)+2)
 ret, frame = cap.read()
@@ -18,7 +18,7 @@ cv2.namedWindow("ROI Selector")
 # Initial ROI values (x, y, w, h)
 h_frame, w_frame, _ = frame.shape
 #init_x, init_y, init_w, init_h = 1265, 35, 900, 225
-init_x, init_y, init_w, init_h = 1250, 775, 143, 110
+init_x, init_y, init_w, init_h = 995, 85, 150, 50
 
 # Trackbar callback (does nothing, just needed)
 def nothing(val):
@@ -47,10 +47,12 @@ while True:
     roi = frame[y:y+h, x:x+w]
     
     fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\cont_active.png")
+    mapae = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\mapae_icon.png")
 
     # Convert to grayscale for better template matching
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
+    grayMapae = cv2.cvtColor(mapae, cv2.COLOR_BGR2GRAY)
 
     ##Split Both into each R, G, B Channel
     imageMainR, imageMainG, imageMainB = cv2.split(roi)
@@ -66,21 +68,25 @@ while True:
     if cv2.waitKey(30) & 0xFF == ord("q"):
         
         # template matching
-        #res = cv2.matchTemplate(roi, fatal, cv2.TM_CCOEFF_NORMED)
-        #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        res = cv2.matchTemplate(gray, grayMapae, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+        '''
         resultB = cv2.matchTemplate(imageMainR, imageNeedleR, cv2.TM_SQDIFF)
         resultG = cv2.matchTemplate(imageMainG, imageNeedleG, cv2.TM_SQDIFF)
         resultR = cv2.matchTemplate(imageMainB, imageNeedleB, cv2.TM_SQDIFF)
+        '''
+        
 
-        threshold = 69000000
-        #threshold = 0.75
+        #threshold = 69000000
+        threshold = 0.75
 
         # Add together to get the total score
-        result = resultB + resultG + resultR
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        loc = np.where(result >= 3 * threshold)
+        #result = resultB + resultG + resultR
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        loc = np.where(res >= 3 * threshold)
         
-        print("loc: ", loc)
+        #print("loc: ", loc)
 
         print(max_val)
         if max_val >= threshold:
