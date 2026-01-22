@@ -80,15 +80,22 @@ def process_video(file_path, resolution, job_id):
 
         text1, text2, text3, text4, text5 = results
 
-        # scan for fatal strike using template matching
+        # scan for special node using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
         fatal = cv2.imread("resources/FatalStrikeIcon.png")
+        mapae = cv2.imread("resources/mapae_icon.png")
+
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
-        res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        grayMapae = cv2.cvColor(mapae, cv2.COLOR_BGR2GRAY)
+
+        resFatal = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
+        resMapae = cv2.matchTemplate(fullGray, grayMapae, cv2.TM_CCOEFF_NORMED)
+
+        min_val, max_val_fatal, min_loc, max_loc = cv2.minMaxLoc(resFatal)
+        min_val, max_val_mapae, min_loc, max_loc = cv2.minMaxLoc(resMapae)
 
         threshold = 0.75
-        if max_val >= threshold:
+        if max_val_fatal >= threshold or max_val_mapae >= threshold:
             fatal_active = True
         else:
             fatal_active = False

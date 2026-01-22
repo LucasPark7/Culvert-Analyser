@@ -5,7 +5,7 @@ import numpy as np
 # Load a frame from video
 video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\145kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (20*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (120*60)+2)
 ret, frame = cap.read()
 cap.release()
 

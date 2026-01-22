@@ -223,12 +223,17 @@ async function uploadVideo() {
                 result.innerHTML = "Processing complete!";
                 process_flag = false;
 
+                // add run to list of runs
                 let new_list_run = culvList.insertRow(-1);
                 let runCell = new_list_run.insertCell(0);
                 runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
                 runCell.style.cursor = 'pointer';
+
+                // store run data into cell and add event listener
+                runCell.dataset.culvert_data = JSON.stringify(new_culvert);
                 runCell.addEventListener('click', function() {
-                    computeStats(new_culvert);
+                    const cellData = JSON.parse(this.dataset.culvert_data);
+                    computeStats(cellData);
                 });
             }
 
