@@ -107,6 +107,7 @@ function computeStats(culvert_data) {
 
 // sample data for testing
 
+/*
 var test_culvert =  {  
                       frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
                       values: [5, 25, 50, 100, 150, 300, 500, 700, 1100, 1500], 
@@ -136,10 +137,7 @@ chartInstance.data.datasets.push({
     pointRadius: 0
 });
 chartInstance.update();
-
-function listCulvert() {
-
-}
+*/
 
 async function uploadVideo() {
     if (process_flag) {
