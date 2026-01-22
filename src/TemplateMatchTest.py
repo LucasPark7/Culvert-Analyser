@@ -68,8 +68,11 @@ while True:
     if cv2.waitKey(30) & 0xFF == ord("q"):
         
         # template matching
-        res = cv2.matchTemplate(gray, grayMapae, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        resFatal = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
+        resMapae = cv2.matchTemplate(gray, grayMapae, cv2.TM_CCOEFF_NORMED)
+
+        min_val, max_val_fatal, min_loc, max_loc = cv2.minMaxLoc(resFatal)
+        min_val, max_val_mapae, min_loc, max_loc = cv2.minMaxLoc(resMapae)
 
         '''
         resultB = cv2.matchTemplate(imageMainR, imageNeedleR, cv2.TM_SQDIFF)
@@ -83,17 +86,17 @@ while True:
 
         # Add together to get the total score
         #result = resultB + resultG + resultR
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        loc = np.where(res >= 3 * threshold)
+        #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        #loc = np.where(res >= 3 * threshold)
         
         #print("loc: ", loc)
 
-        print(max_val)
-        if max_val >= threshold:
+        print(max_val_mapae)
+        if max_val_fatal >= threshold or max_val_mapae >= threshold:
             top_left = max_loc
             bottom_right = (top_left[0] + w, top_left[1] + h)
             cv2.rectangle(frame, top_left, bottom_right, (0, 255, 0), 2)
-            print("Fatal Strike detected at:", top_left, "Confidence:", max_val)
+            print("Fatal Strike detected at:", top_left, "Confidence:", max_val_fatal, max_val_mapae)
         else:
             print("Fatal Strike not detected")
         
