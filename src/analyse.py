@@ -86,7 +86,7 @@ def process_video(file_path, resolution, job_id):
         mapae = cv2.imread("resources/mapae_icon.png")
 
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
-        grayMapae = cv2.cvColor(mapae, cv2.COLOR_BGR2GRAY)
+        grayMapae = cv2.cvtColor(mapae, cv2.COLOR_BGR2GRAY)
 
         resFatal = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
         resMapae = cv2.matchTemplate(fullGray, grayMapae, cv2.TM_CCOEFF_NORMED)
