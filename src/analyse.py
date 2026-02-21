@@ -91,11 +91,11 @@ def process_video(file_path, resolution, job_id):
         return [easyNum, fatal_active]
 
     # get all frames from video and add all numbers from each frame to list
-    def process_frames(roi, executor):
+    def process_frames(roi):
         while not pause_queue.is_set() or not frame_queue.empty():
             try:
                 frame = frame_queue.get(timeout=1)
-                result = extract_info_from_frame(frame, roi, executor)
+                result = extract_info_from_frame(frame, roi)
 
                 if result[0]:
                     logging.info(f"OCR Result: {result}")
