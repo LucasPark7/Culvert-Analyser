@@ -95,6 +95,7 @@ function computeStats(culvert_data) {
             openFatal = false;
             //console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
             addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
+            fatalGain = 0;
         }
     }
     // edge case if last frame is part of fatal
