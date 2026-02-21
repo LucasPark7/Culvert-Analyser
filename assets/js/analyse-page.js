@@ -80,7 +80,7 @@ function computeStats(culvert_data) {
     // set title
     runTitle.innerHTML = "Culvert Run #" + culvert_data.index;
 
-    const totalScore = culvert_data.values[culvert_data.frames.length - 1];
+    const totalScore = culvert_data.values[culvert_data.values.length - 1];
     // flag var to track fatal cycles
     var openFatal = false;
     var fatalStart = 0;
@@ -109,7 +109,7 @@ function computeStats(culvert_data) {
     // edge case if last frame is part of fatal
     if (openFatal == true) {
         fatalEnd = culvert_data.frames[culvert_data.frames.length - 1];
-        fatalGain = culvert_data.values[i] - fatal_init_value;
+        fatalGain = culvert_data.values[culvert_data.values.length - 1] - fatal_init_value;
         //console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
         addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
         fatalGain = 0;
@@ -220,7 +220,6 @@ async function uploadVideo() {
             dataSet.forEach(function (value, index) {
                 // if frame isn't in dataset yet then we can push, otherwise ignore
                 if ((index + 1) > new_culvert.frames[new_culvert.frames.length - 1]) {
-                    console.log(value);
                     new_culvert.frames.push(index + 1);
                     new_culvert.values.push(parseInt(value[0][0]));
                     new_culvert.fatal_list.push(value[1]);
