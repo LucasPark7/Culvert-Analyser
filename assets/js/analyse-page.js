@@ -207,6 +207,7 @@ async function uploadVideo() {
 
             var dataSet = JSON.stringify(statusData.results, null, 2);
             dataSet = JSON.parse(dataSet);
+            console.log(dataSet)
             dataSet.forEach(function (value, index) {
                 // if frame isn't in dataset yet then we can push, otherwise ignore
                 if ((index + 1) > new_culvert.frames[new_culvert.frames.length - 1]) {
