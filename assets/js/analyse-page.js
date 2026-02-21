@@ -60,7 +60,10 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
     const percentCell   = newRow.insertCell(2);
     const perSecondCell = newRow.insertCell(3);
 
-    timeCell.textContent      = fatalStart.toString() + 's - ' + fatalEnd.toString() + 's';
+    const startTime = 120 - fatalStart;
+    const endTime = 120 - fatalEnd;
+
+    timeCell.textContent      = startTime.toString() + 's - ' + endTime.toString() + 's';
     gainCell.textContent      = fatalGain.toString();
     percentCell.textContent   = percentScore.toFixed(3).toString() + '%';
     perSecondCell.textContent = scorePerS.toFixed(3).toString();
@@ -95,6 +98,9 @@ function computeStats(culvert_data) {
             //console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
             addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
             fatalGain = 0;
+        }
+        else {
+            continue;
         }
     }
     // edge case if last frame is part of fatal
