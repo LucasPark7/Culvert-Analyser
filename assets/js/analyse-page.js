@@ -210,8 +210,9 @@ async function uploadVideo() {
             dataSet.forEach(function (value, index) {
                 // if frame isn't in dataset yet then we can push, otherwise ignore
                 if ((index + 1) > new_culvert.frames[new_culvert.frames.length - 1]) {
+                    console.log(value);
                     new_culvert.frames.push(index + 1);
-                    new_culvert.values.push(value[0]);
+                    new_culvert.values.push(int(value[0][0]));
                     new_culvert.fatal_list.push(value[1]);
                 }
             });
