@@ -52,6 +52,9 @@ chartInstance = new Chart(ctx, {
 function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
     const scorePerS = (fatalGain / (fatalEnd - fatalStart));
     const percentScore = (fatalGain / totalScore) * 100;
+    console.log(totalScore);
+    console.log(percentScore);
+
 
     var newRow = statsTableBody.insertRow(-1);
 
