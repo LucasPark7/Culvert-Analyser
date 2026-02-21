@@ -80,17 +80,16 @@ function computeStats(culvert_data) {
     var fatalStart = 0;
     var fatalEnd = 0;
     var fatalGain = 0;
+    var fatal_init_value = 0;
     for (let i = 0; i < culvert_data.frames.length; i++) {
         // once new fatal is detected, start compiling data
         if (openFatal == false && culvert_data.fatal_list[i] == true) {
             fatalStart = culvert_data.frames[i];
-            fatalGain = 0;
+            fatal_init_value = culvert_data.values[i];
             openFatal = true;
         }
-        else if (openFatal == true && culvert_data.fatal_list[i] == true) {
-            fatalGain += culvert_data.values[i];
-        }
         else if (openFatal == true && culvert_data.fatal_list[i] == false) {
+            fatalGain = culvert_data.values[i] - fatal_init_value;
             fatalEnd = culvert_data.frames[i];
             openFatal = false;
             //console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
@@ -101,8 +100,10 @@ function computeStats(culvert_data) {
     // edge case if last frame is part of fatal
     if (openFatal == true) {
         fatalEnd = culvert_data.frames[culvert_data.frames.length - 1];
+        fatalGain = culvert_data.values[i] - fatal_init_value;
         //console.log("Start " + fatalStart + " End " + fatalEnd + " Gain " + fatalGain);
         addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
+        fatalGain = 0;
     }
 }
 
