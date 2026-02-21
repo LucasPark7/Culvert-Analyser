@@ -1,13 +1,16 @@
 import cv2
 import pytesseract
 import re
+import easyocr
 
 # Load a frame from video
 video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\144kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (17*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (87*60)+2)
 ret, frame = cap.read()
 cap.release()
+
+reader = easyocr.Reader(['en'])
 
 if not ret:
     raise Exception("Could not read frame from video")
@@ -17,7 +20,7 @@ cv2.namedWindow("ROI Selector")
 
 # Initial ROI values (x, y, w, h)
 h_frame, w_frame, _ = frame.shape
-init_x, init_y, init_w, init_h = 1020, 95, 180, 47
+init_x, init_y, init_w, init_h = 1000, 95, 125, 35
 
 # Trackbar callback (does nothing, just needed)
 def nothing(val):
@@ -62,6 +65,8 @@ while True:
         text = pytesseract.image_to_string(thresh, config="--psm 6 digits")
         match = re.search(r"\d+", text) 
         print(int(match.group())) if match else None
+        easyResult = reader.readtext(roi)
+        print([item[1] for item in easyResult])
 
         print(f"Final ROI: (x={x}, y={y}, w={w}, h={h})")
         break

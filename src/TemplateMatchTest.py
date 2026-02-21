@@ -1,6 +1,7 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import easyocr
 
 # Load a frame from video
 video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\145kCulv.mp4"
@@ -8,6 +9,8 @@ cap = cv2.VideoCapture(video_path)
 cap.set(cv2.CAP_PROP_POS_FRAMES, (120*60)+2)
 ret, frame = cap.read()
 cap.release()
+
+reader = easyocr.Reader(['en'])
 
 if not ret:
     raise Exception("Could not read frame from video")

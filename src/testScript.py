@@ -8,13 +8,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
 from redis import Redis
 from concurrent.futures import ThreadPoolExecutor
+import cProfile
+import pstats
+import easyocr
 
 API_BASE = "https://culvert-analyse.onrender.com"
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1020, 95, 180, 47)  # (x, y, w, h) adjust to where numbers appear
+fatal = cv2.imread("resources/fatal_icon.png")
 
 def process_video(file_path):
+    reader = easyocr.Reader(['en'])
+
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
         frame_idx = 0
@@ -38,8 +44,9 @@ def process_video(file_path):
 
         cap.release()
 
-    def extract_info_from_frame(frame, roi=None):
+    def extract_info_from_frame(frame, executor, roi=None):
         full_frame = frame
+        
         if roi:
             x, y, w, h = roi
             frame = frame[y:y+h, x:x+w]
@@ -55,28 +62,16 @@ def process_video(file_path):
             return pytesseract.image_to_string(thresh, config="--psm 6 digits")
 
         # Run in parallel with threads
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            results = list(executor.map(process_threshold, thresholds))
+        #results = list(executor.map(process_threshold, thresholds))
 
-        text1, text2, text3, text4, text5 = results
+        #text1, text2, text3, text4, text5 = results
 
-        '''
-        _, thresh = cv2.threshold(gray, 108, 255, cv2.THRESH_BINARY)
-        _, thresh2 = cv2.threshold(gray, 94, 255, cv2.THRESH_BINARY)
-        _, thresh3 = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
-        _, thresh4 = cv2.threshold(gray, 116, 255, cv2.THRESH_BINARY)
-        _, thresh5 = cv2.threshold(gray, 72, 255, cv2.THRESH_BINARY)
-
-        text1 = pytesseract.image_to_string(thresh, config="--psm 6 digits")
-        text2 = pytesseract.image_to_string(thresh2, config="--psm 6 digits")
-        text3 = pytesseract.image_to_string(thresh3, config="--psm 6 digits")
-        text4 = pytesseract.image_to_string(thresh4, config="--psm 6 digits")
-        text5 = pytesseract.image_to_string(thresh5, config="--psm 6 digits")
-        '''
+        easyResult = reader.readtext(frame)
+        easyNum = [item[1] for item in easyResult]
 
         # Scan for fatal strike using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
-        fatal = cv2.imread("resources/fatal_icon.png")
+        #fatal = cv2.imread("resources/fatal_icon.png")
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
         res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
@@ -87,7 +82,8 @@ def process_video(file_path):
         else:
             fatal_active = False
 
-        return [clean_number(text1, text2, text3, text4, text5), fatal_active]
+        #return [clean_number(text1, text2, text3, text4, text5), fatal_active]
+        return [easyNum, fatal_active]
 
     # convert text from pytesseract to integer
     def clean_number(text1, text2, text3, text4, text5):
@@ -114,12 +110,16 @@ def process_video(file_path):
         return next(g, True) and not next(g, False)
 
     # get all frames from video and add all numbers from each frame to list
-    def process_video():
+    def process_video(executor):
         while not pause_queue.is_set() or not frame_queue.empty():
             try:
                 frame = frame_queue.get(timeout=1)
-                result = extract_info_from_frame(frame, ROI)
+                result = extract_info_from_frame(frame, executor, ROI)
+                if result[0]:
+                    print(result)
+                    values.append(result)
 
+                '''
                 OCRList = result[0]
                 print(OCRList)
                 if all_equal(OCRList): # if all OCR checks match then confidence in result is high
@@ -155,12 +155,14 @@ def process_video(file_path):
                                 values.append(result)
 
                         values.append(result)
+                '''
+                
             except queue.Empty:
                 continue
     
-    def process(video_path):
+    def process(video_path, executor):
         reader_thread = threading.Thread(target=extract_frames, args=(video_path,))
-        analyzer_thread = threading.Thread(target=process_video)
+        analyzer_thread = threading.Thread(target=process_video, args=(executor,))
 
         reader_thread.start()
         analyzer_thread.start()
@@ -207,27 +209,39 @@ def process_video(file_path):
 
         return df
     
+    executor = ThreadPoolExecutor(max_workers=5)
+
     values = []
     frame_queue = queue.Queue()
     lock = threading.Lock()
     pause_queue = Event()
 
-    process(file_path)
+    process(file_path, executor)
     
     return values
 
 if __name__ == "__main__":
+    profiler = cProfile.Profile()
+    profiler.enable()
+
     video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject.mp4"
 
     result = process_video(video_file)
+
+    profiler.disable()
+    stats = pstats.Stats(profiler)
+    stats.sort_stats('cumulative')
+    stats.print_stats(10)
     
     # code to test 1 video
     series1 = result
     data = []
+    print(series1)
     for i in range(len(series1)):
+        print(series1[i][0])
         data.append({
             "time": i,
-            "score": series1[i][0],
+            "score": int(series1[i][0][0]),
             "fatal_active": series1[i][1]
         })
     df = pd.DataFrame(data)
