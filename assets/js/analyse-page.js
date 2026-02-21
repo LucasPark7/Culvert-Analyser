@@ -65,6 +65,9 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
 
     const startTime = 120 - fatalStart;
     const endTime = 120 - fatalEnd;
+    if (endTime < 0) {
+        endTime = 0;
+    }
 
     timeCell.textContent      = startTime.toString() + 's - ' + endTime.toString() + 's';
     gainCell.textContent      = fatalGain.toString();
@@ -216,7 +219,6 @@ async function uploadVideo() {
 
             var dataSet = JSON.stringify(statusData.results, null, 2);
             dataSet = JSON.parse(dataSet);
-            console.log(dataSet)
             dataSet.forEach(function (value, index) {
                 // if frame isn't in dataset yet then we can push, otherwise ignore
                 if ((index + 1) > new_culvert.frames[new_culvert.frames.length - 1]) {
