@@ -30,7 +30,7 @@ var file = event.target.files[0];
     }
 });
 
-const labelList = Array.from({ length: 10 }, (_, i) => i + 1);
+const labelList = Array.from({ length: 120 }, (_, i) => i + 1);
 
 chartInstance = new Chart(ctx, {
     type: 'line',
@@ -121,6 +121,7 @@ function computeStats(culvert_data) {
 
 // sample data for testing
 
+/*
 var test_culvert =  {  
                       frames: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 
                       values: [5, 25, 50, 100, 150, 300, 500, 700, 1100, 1500], 
@@ -150,6 +151,7 @@ chartInstance.data.datasets.push({
     pointRadius: 0
 });
 chartInstance.update();
+*/
 
 async function uploadVideo() {
     if (process_flag) {
@@ -201,7 +203,7 @@ async function uploadVideo() {
         const fatal = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
         // consider list of 0-120 for fixed label set
-        chartInstance.data.labels = new_culvert.frames;
+        //chartInstance.data.labels = new_culvert.frames;
         chartInstance.data.datasets.push({
             label: "Culvert #" + list_runs.length,
             data: new_culvert.values,
