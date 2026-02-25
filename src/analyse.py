@@ -120,9 +120,9 @@ def process_video(file_path, resolution, job_id):
     # get ROI from resolution selected
     ROI_dict = {
         "1920x1080" : (995, 85, 150, 50),
-        "1366x768" : (1020, 95, 180, 47),
-        "1280x720" : (1025, 105, 190, 50),
-        "1024x768" : (1038, 97, 240, 47)
+        "1366x768" : (725, 90, 125, 40),
+        "1280x720" : (725, 100, 140, 35),
+        "1024x768" : (725, 95, 130, 32)
     }
 
     roi = ROI_dict[resolution]

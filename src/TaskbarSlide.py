@@ -4,9 +4,9 @@ import re
 import easyocr
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\144kCulv.mp4"
+video_path = r"C:\Users\Lucas\Videos\2026-02-21 17-25-41.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (87*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (69*60)+2)
 ret, frame = cap.read()
 cap.release()
 

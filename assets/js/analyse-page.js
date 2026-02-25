@@ -9,6 +9,7 @@ const statsTable = document.getElementById("statsTable");
 const statsTableBody = document.getElementById("statsTableBody");
 const runTitle = document.getElementById("run-title");
 
+var culvListData = localStorage.getItem('culvert_list_data');
 let chartInstance = null;
 var process_flag = false;
 var list_runs = [];
@@ -21,7 +22,7 @@ fileInput.addEventListener("change", (event) => {
 var file = event.target.files[0];
     if (file) {
         if (file.size > (200 * 1024 * 1024)) {
-            alert("File too large! Reduce size to less than 200 MB");
+            alert("File too large, reduce size to less than 200 MB");
             fileInput.value = "";
             inputButton.textContent = "Upload Video";
             return;
@@ -48,6 +49,9 @@ chartInstance = new Chart(ctx, {
         }
     }
 });
+
+// load local stored data
+
 
 function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
     const scorePerS = (fatalGain / (fatalEnd - fatalStart));
@@ -243,8 +247,10 @@ async function uploadVideo() {
                 runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
                 runCell.style.cursor = 'pointer';
 
-                // store run data into cell and add event listener
-                runCell.dataset.culvert_data = JSON.stringify(new_culvert);
+                // store run data into cell and local storage then add event listener
+                const run_data = JSON.stringify(new_culvert);
+                runCell.dataset.culvert_data = run_data;
+                localStorage.setItem('culvert_list_data', run_data);
                 runCell.addEventListener('click', function() {
                     const cellData = JSON.parse(this.dataset.culvert_data);
                     computeStats(cellData);
