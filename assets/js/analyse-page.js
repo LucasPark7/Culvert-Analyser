@@ -133,7 +133,7 @@ function addRun(new_culvert) {
     const run_data = JSON.stringify(new_culvert);
     runCell.dataset.culvert_data = run_data;
     list_runs.push(run_data);
-    localStorage.setItem('culvert_list_data', list_runs);
+    localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
     runCell.addEventListener('click', function() {
         const cellData = JSON.parse(this.dataset.culvert_data);
         computeStats(cellData);
