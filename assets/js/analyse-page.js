@@ -137,7 +137,7 @@ function addRun(new_culvert) {
 }
 
 // repopulate run list with saved scores
-for (let i = 0; i < list_runs.length; i++) {
+for (let i = 0; i < list_runs.length - 1; i++) {
     addRun(list_runs[i]);
 
     // segmenting for fatals
