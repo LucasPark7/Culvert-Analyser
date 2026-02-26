@@ -129,8 +129,9 @@ function addRun(new_culvert, index) {
         const cellData = JSON.parse(this.dataset.culvert_data);
         computeStats(cellData);
         
-        const deleteBtn = document.createElement('button primary small');
+        const deleteBtn = document.createElement('button');
         deleteBtn.text = "Delete Run Data";
+        deleteBtn.className = 'button primary small';
         deleteBtnDiv.appendChild(deleteBtn);
 
         deleteBtn.addEventListener('click', function() {
