@@ -132,7 +132,7 @@ function addRun(new_culvert) {
     // store run data into cell and local storage then add event listener
     const run_data = JSON.stringify(new_culvert);
     runCell.dataset.culvert_data = run_data;
-    list_runs.append(run_data);
+    list_runs.push(run_data);
     localStorage.setItem('culvert_list_data', list_runs);
     runCell.addEventListener('click', function() {
         const cellData = JSON.parse(this.dataset.culvert_data);
