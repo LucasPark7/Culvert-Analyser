@@ -33,6 +33,9 @@ var file = event.target.files[0];
 
 const labelList = Array.from({ length: 120 }, (_, i) => i + 1);
 
+// segmenting for fatals
+const fatalSeg = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
+
 chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -144,7 +147,7 @@ for (let i = 0; i < list_runs.length; i++) {
         data: list_runs[i].values,
         borderColor: "rgb(255, 255, 255)",
         backgroundColor: "rgb(255, 255, 255)",
-        segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
+        segment: { borderColor: ctx => fatalSeg(ctx, 'rgb(192,75,75)') },
         spanGaps: true,
         fill: false,
         pointRadius: 0
@@ -241,7 +244,7 @@ async function uploadVideo() {
             data: new_culvert.values,
             borderColor: "rgb(255, 255, 255)",
             backgroundColor: "rgb(255, 255, 255)",
-            segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
+            segment: { borderColor: ctx => fatalSeg(ctx, 'rgb(192,75,75)') },
             spanGaps: true,
             fill: false,
             pointRadius: 0
