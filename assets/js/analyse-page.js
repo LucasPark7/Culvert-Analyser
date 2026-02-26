@@ -8,6 +8,7 @@ const culvList = document.getElementById("culvList");
 const statsTable = document.getElementById("statsTable");
 const statsTableBody = document.getElementById("statsTableBody");
 const runTitle = document.getElementById("run-title");
+const deleteRunDiv = document.getElementById("deleteRunDiv");
 
 var culvListData = localStorage.getItem('culvert_list_data');
 let chartInstance = null;
@@ -118,37 +119,49 @@ function computeStats(culvert_data) {
     }
 }
 
-function addRun(new_culvert) {
+function addRun(new_culvert, index) {
     let new_list_run = culvList.insertRow(-1);
     let runCell = new_list_run.insertCell(0);
-    console.log(culvList.rows.length);
     runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
     runCell.style.cursor = 'pointer';
     runCell.dataset.culvert_data = JSON.stringify(new_culvert);
     runCell.addEventListener('click', function() {
         const cellData = JSON.parse(this.dataset.culvert_data);
         computeStats(cellData);
+        
+        const deleteBtn = document.createElement('button primary small');
+        deleteBtn.text = "Delete Run Data";
+        deleteBtnDiv.appendChild(deleteBtn);
+
+        deleteBtn.addEventListener('click', function() {
+            new_list_run.remove();
+            list_runs.splice(index, 1);
+            localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
+        })
     });
 }
 
 // repopulate run list with saved scores
-for (let i = 0; i < list_runs.length - 1; i++) {
-    addRun(list_runs[i]);
+function populateList() {
+    for (let i = 0; i < list_runs.length - 1; i++) {
+        addRun(list_runs[i], i);
 
-    // segmenting for fatals
-    const fatal = (ctx, value) => list_runs[i].fatal_list[ctx.p0DataIndex] ? value : undefined;
+        // segmenting for fatals
+        const fatal = (ctx, value) => list_runs[i].fatal_list[ctx.p0DataIndex] ? value : undefined;
 
-    chartInstance.data.datasets.push({
-        label: "Culvert #" + (i + 1),
-        data: list_runs[i].values,
-        borderColor: "rgb(255, 255, 255)",
-        backgroundColor: "rgb(255, 255, 255)",
-        segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
-        spanGaps: true,
-        fill: false,
-        pointRadius: 0
-    });
+        chartInstance.data.datasets.push({
+            label: "Culvert #" + (i + 1),
+            data: list_runs[i].values,
+            borderColor: "rgb(255, 255, 255)",
+            backgroundColor: "rgb(255, 255, 255)",
+            segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
+            spanGaps: true,
+            fill: false,
+            pointRadius: 0
+        });
+    }
 }
+populateList();
 
 // sample data for testing
 
@@ -269,7 +282,7 @@ async function uploadVideo() {
                 process_flag = false;
 
                 // add run to list of runs
-                addRun(new_culvert);
+                addRun(new_culvert, list_runs.length);
 
                 // store run data into cell and local storage then add event listener
                 const run_data = JSON.stringify(new_culvert);
