@@ -12,7 +12,7 @@ const runTitle = document.getElementById("run-title");
 var culvListData = localStorage.getItem('culvert_list_data');
 let chartInstance = null;
 var process_flag = false;
-var list_runs = [];
+var list_runs = culvListData ? JSON.parse(culvListData) : [];
 
 inputButton.addEventListener("click", () => {
         fileInput.click();
@@ -121,6 +121,28 @@ function computeStats(culvert_data) {
         addStatRow(fatalStart, fatalEnd, fatalGain, totalScore);
         fatalGain = 0;
     }
+}
+
+function addRun(new_culvert) {
+    let new_list_run = culvList.insertRow(-1);
+    let runCell = new_list_run.insertCell(0);
+    runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
+    runCell.style.cursor = 'pointer';
+
+    // store run data into cell and local storage then add event listener
+    const run_data = JSON.stringify(new_culvert);
+    runCell.dataset.culvert_data = run_data;
+    list_runs.append(run_data);
+    localStorage.setItem('culvert_list_data', list_runs);
+    runCell.addEventListener('click', function() {
+        const cellData = JSON.parse(this.dataset.culvert_data);
+        computeStats(cellData);
+    });
+}
+
+// repopulate run list with saved scores
+for (let i = 0; i < list_runs.length; i++) {
+    addRun(list_runs[i]);
 }
 
 // sample data for testing
@@ -242,19 +264,7 @@ async function uploadVideo() {
                 process_flag = false;
 
                 // add run to list of runs
-                let new_list_run = culvList.insertRow(-1);
-                let runCell = new_list_run.insertCell(0);
-                runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
-                runCell.style.cursor = 'pointer';
-
-                // store run data into cell and local storage then add event listener
-                const run_data = JSON.stringify(new_culvert);
-                runCell.dataset.culvert_data = run_data;
-                localStorage.setItem('culvert_list_data', run_data);
-                runCell.addEventListener('click', function() {
-                    const cellData = JSON.parse(this.dataset.culvert_data);
-                    computeStats(cellData);
-                });
+                addRun(new_culvert);
             }
 
             // timeout
