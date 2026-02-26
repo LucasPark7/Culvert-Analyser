@@ -132,7 +132,7 @@ function addRun(new_culvert, index) {
         const deleteBtn = document.createElement('button');
         deleteBtn.text = "Delete Run Data";
         deleteBtn.className = 'button primary small';
-        deleteBtnDiv.appendChild(deleteBtn);
+        deleteRunDiv.appendChild(deleteBtn);
 
         deleteBtn.addEventListener('click', function() {
             new_list_run.remove();
