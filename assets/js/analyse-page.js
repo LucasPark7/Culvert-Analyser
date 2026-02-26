@@ -50,14 +50,9 @@ chartInstance = new Chart(ctx, {
     }
 });
 
-// load local stored data
-
-
 function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
     const scorePerS = (fatalGain / (fatalEnd - fatalStart));
     const percentScore = (fatalGain / totalScore) * 100;
-    console.log(totalScore);
-    console.log(percentScore);
 
 
     var newRow = statsTableBody.insertRow(-1);
@@ -143,6 +138,17 @@ function addRun(new_culvert) {
 // repopulate run list with saved scores
 for (let i = 0; i < list_runs.length; i++) {
     addRun(list_runs[i]);
+
+    chartInstance.data.datasets.push({
+        label: "Culvert #" + (i + 1),
+        data: list_runs[i].values,
+        borderColor: "rgb(255, 255, 255)",
+        backgroundColor: "rgb(255, 255, 255)",
+        segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
+        spanGaps: true,
+        fill: false,
+        pointRadius: 0
+    });
 }
 
 // sample data for testing
