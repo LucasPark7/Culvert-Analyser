@@ -124,9 +124,9 @@ function addRun(new_culvert) {
     console.log(culvList.rows.length);
     runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
     runCell.style.cursor = 'pointer';
-    runCell.dataset.culvert_data = new_culvert;
+    runCell.dataset.culvert_data = JSON.stringify(new_culvert);
     runCell.addEventListener('click', function() {
-        const cellData = this.dataset.culvert_data;
+        const cellData = JSON.parse(this.dataset.culvert_data);
         computeStats(cellData);
     });
 }
