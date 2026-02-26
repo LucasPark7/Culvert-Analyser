@@ -130,14 +130,18 @@ function addRun(new_culvert, index) {
         computeStats(cellData);
         
         const deleteBtn = document.createElement('button');
-        deleteBtn.text = "Delete Run Data";
+        deleteBtn.text = 'Delete Run Data';
         deleteBtn.className = 'button primary small';
         deleteRunDiv.appendChild(deleteBtn);
 
+        // add pop up to confirm deletion
         deleteBtn.addEventListener('click', function() {
             new_list_run.remove();
             list_runs.splice(index, 1);
             localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
+
+            runTitle.innerHTML = 'Select a run for detailed info';
+            statsTableBody.innerHTML = '';
         })
     });
 }
