@@ -121,6 +121,7 @@ function computeStats(culvert_data) {
 function addRun(new_culvert) {
     let new_list_run = culvList.insertRow(-1);
     let runCell = new_list_run.insertCell(0);
+    console.log(culvList.rows.length);
     runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
     runCell.style.cursor = 'pointer';
 
