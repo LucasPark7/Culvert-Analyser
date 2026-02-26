@@ -124,14 +124,9 @@ function addRun(new_culvert) {
     console.log(culvList.rows.length);
     runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
     runCell.style.cursor = 'pointer';
-
-    // store run data into cell and local storage then add event listener
-    const run_data = JSON.stringify(new_culvert);
-    runCell.dataset.culvert_data = run_data;
-    list_runs.push(run_data);
-    localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
+    runCell.dataset.culvert_data = new_culvert;
     runCell.addEventListener('click', function() {
-        const cellData = JSON.parse(this.dataset.culvert_data);
+        const cellData = this.dataset.culvert_data;
         computeStats(cellData);
     });
 }
@@ -275,6 +270,11 @@ async function uploadVideo() {
 
                 // add run to list of runs
                 addRun(new_culvert);
+
+                // store run data into cell and local storage then add event listener
+                const run_data = JSON.stringify(new_culvert);
+                list_runs.push(run_data);
+                localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
             }
 
             // timeout
