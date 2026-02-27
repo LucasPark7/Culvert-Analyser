@@ -64,7 +64,7 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
     const perSecondCell = newRow.insertCell(3);
 
     const startTime = 120 - fatalStart;
-    const endTime = 120 - fatalEnd;
+    var endTime = 120 - fatalEnd;
     if (endTime < 0) {
         endTime = 0;
     }
@@ -127,7 +127,6 @@ function addRun(new_culvert, index) {
     runCell.dataset.culvert_data = JSON.stringify(new_culvert);
     runCell.addEventListener('click', function() {
         const cellData = JSON.parse(this.dataset.culvert_data);
-        console.log(cellData);
         computeStats(cellData);
         
         if (deleteRunDiv.children.length == 0) {
@@ -144,7 +143,9 @@ function addRun(new_culvert, index) {
 
                 runTitle.innerHTML = 'Select a run for detailed info';
                 statsTableBody.innerHTML = '';
-                deleteBtn.remove();
+                if (list_runs.length == 0) {
+                    deleteBtn.remove();
+                }
             })
         }
     });
@@ -250,7 +251,6 @@ async function uploadVideo() {
 
         // declare new culvert object to store data
         var new_culvert = { frames: [0], values: [], fatal_list: [], index: list_runs.length + 1 };
-        list_runs.push(new_culvert);
         
         // segmenting for fatals
         const fatal = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
