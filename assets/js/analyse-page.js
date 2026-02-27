@@ -129,20 +129,22 @@ function addRun(new_culvert, index) {
         const cellData = JSON.parse(this.dataset.culvert_data);
         computeStats(cellData);
         
-        const deleteBtn = document.createElement('button');
-        deleteBtn.text = 'Delete Run Data';
-        deleteBtn.className = 'button primary small';
-        deleteRunDiv.appendChild(deleteBtn);
+        if (deleteRunDiv.children.length == 0) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.innerHTML = 'Delete Run Data';
+            deleteBtn.className = 'button primary small';
+            deleteRunDiv.appendChild(deleteBtn);
 
-        // add pop up to confirm deletion
-        deleteBtn.addEventListener('click', function() {
-            new_list_run.remove();
-            list_runs.splice(index, 1);
-            localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
+            // add pop up to confirm deletion
+            deleteBtn.addEventListener('click', function() {
+                new_list_run.remove();
+                list_runs.splice(index, 1);
+                localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
 
-            runTitle.innerHTML = 'Select a run for detailed info';
-            statsTableBody.innerHTML = '';
-        })
+                runTitle.innerHTML = 'Select a run for detailed info';
+                statsTableBody.innerHTML = '';
+            })
+        }
     });
 }
 
