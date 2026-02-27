@@ -169,6 +169,8 @@ function populateList() {
             fill: false,
             pointRadius: 0
         });
+
+        chartInstance.update();
     }
 }
 populateList();
