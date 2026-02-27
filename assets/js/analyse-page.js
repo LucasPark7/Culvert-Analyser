@@ -137,7 +137,7 @@ function addRun(new_culvert, index) {
 
             // add pop up to confirm deletion
             deleteBtn.addEventListener('click', function() {
-                culvList.remove(index);
+                culvList.deleteRow(index);
                 list_runs.splice(index, 1);
                 localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
 
@@ -291,7 +291,7 @@ async function uploadVideo() {
                 process_flag = false;
 
                 // add run to list of runs
-                addRun(new_culvert, list_runs.length);
+                addRun(new_culvert, list_runs.length - 1);
 
                 // store run data into cell and local storage then add event listener
                 const run_data = JSON.stringify(new_culvert);
