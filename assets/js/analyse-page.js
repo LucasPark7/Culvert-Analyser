@@ -139,10 +139,12 @@ function addRun(new_culvert, index) {
             deleteBtn.addEventListener('click', function() {
                 culvList.deleteRow(index);
                 list_runs.splice(index, 1);
+                chartInstance.data.datasets.splice(index, 1);
                 localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
 
                 runTitle.innerHTML = 'Select a run for detailed info';
                 statsTableBody.innerHTML = '';
+                chartInstance.update();
                 deleteBtn.remove();
             })
         }
