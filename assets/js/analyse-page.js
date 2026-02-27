@@ -292,12 +292,12 @@ async function uploadVideo() {
                 result.innerHTML = "Processing complete!";
                 process_flag = false;
 
-                // add run to list of runs
-                addRun(new_culvert, list_runs.length - 1);
-
                 // store run data into cell and local storage then add event listener
                 const run_data = JSON.stringify(new_culvert);
                 list_runs.push(run_data);
+
+                // add run to list of runs
+                addRun(new_culvert, list_runs.length - 1);
                 localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
             }
 
