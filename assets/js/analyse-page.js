@@ -151,7 +151,7 @@ function addRun(new_culvert, index) {
 
 // repopulate run list with saved scores
 function populateList() {
-    for (let i = 0; i < list_runs.length - 1; i++) {
+    for (let i = 0; i < list_runs.length; i++) {
         const culv_data = JSON.parse(list_runs[i]);
         addRun(culv_data, i);
 
