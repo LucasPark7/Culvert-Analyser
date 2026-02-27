@@ -127,6 +127,7 @@ function addRun(new_culvert, index) {
     runCell.dataset.culvert_data = JSON.stringify(new_culvert);
     runCell.addEventListener('click', function() {
         const cellData = JSON.parse(this.dataset.culvert_data);
+        console.log(cellData);
         computeStats(cellData);
         
         if (deleteRunDiv.children.length == 0) {
@@ -143,6 +144,7 @@ function addRun(new_culvert, index) {
 
                 runTitle.innerHTML = 'Select a run for detailed info';
                 statsTableBody.innerHTML = '';
+                deleteBtn.remove();
             })
         }
     });
