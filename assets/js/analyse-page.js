@@ -81,7 +81,7 @@ function computeStats(culvert_data, index) {
     statsTableBody.innerHTML = "";
 
     // set title
-    runTitle.innerHTML = "Culvert Run #" + index;
+    runTitle.innerHTML = "Culvert Run #" + (index + 1);
 
     const totalScore = culvert_data.values[culvert_data.values.length - 1];
     // flag var to track fatal cycles
