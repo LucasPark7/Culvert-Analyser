@@ -156,6 +156,17 @@ function populateList() {
     for (let i = 0; i < list_runs.length - 1; i++) {
         addRun(list_runs[i], i);
 
+        chartInstance.data.datasets.push({
+            label: "Culvert #" + (list_runs.length + 1),
+            data: list_runs[i].values,
+            borderColor: "rgb(255, 255, 255)",
+            backgroundColor: "rgb(255, 255, 255)",
+            segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
+            spanGaps: true,
+            fill: false,
+            pointRadius: 0
+        });
+
         // segmenting for fatals
         const fatal = (ctx, value) => list_runs[i].fatal_list[ctx.p0DataIndex] ? value : undefined;
 
@@ -258,7 +269,7 @@ async function uploadVideo() {
         // consider list of 0-120 for fixed label set
         //chartInstance.data.labels = new_culvert.frames;
         chartInstance.data.datasets.push({
-            label: "Culvert #" + list_runs.length,
+            label: "Culvert #" + (list_runs.length + 1),
             data: new_culvert.values,
             borderColor: "rgb(255, 255, 255)",
             backgroundColor: "rgb(255, 255, 255)",
