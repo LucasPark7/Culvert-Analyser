@@ -122,7 +122,7 @@ function computeStats(culvert_data, index) {
 function updateRuns() {
     for (let i = 0; i < list_runs.length; i++) {
         const currCell = culvList.rows[i].cells[0];
-        currCellData = JSON.parse(currCell.datasets.culvert_data);
+        currCellData = JSON.parse(currCell.dataset.culvert_data);
         currCell.textContent = "Culvert Run #" + (i + 1) + " (" + currCellData.values[currCellData.values.length - 1] + ")";
 
         // segmenting for fatals
