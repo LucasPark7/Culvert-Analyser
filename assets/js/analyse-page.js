@@ -119,6 +119,27 @@ function computeStats(culvert_data, index) {
     }
 }
 
+function updateRuns() {
+    for (let i = 0; i < list_runs.length; i++) {
+        const currCell = culvList.rows[i].cells[0];
+        currCell.textContent = "Culvert Run #" + (i + 1) + " (" + currCell.dataset.culvert_data.values[currCell.dataset.culvert_data.values.length - 1] + ")";
+
+        // segmenting for fatals
+        const fatal = (ctx, value) => culv_data.fatal_list[ctx.p0DataIndex] ? value : undefined;
+
+        chartInstance.data.datasets.push({
+            label: "Culvert #" + (i + 1),
+            data: currCell.dataset.culvert_data.values,
+            borderColor: "rgb(255, 255, 255)",
+            backgroundColor: "rgb(255, 255, 255)",
+            segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
+            spanGaps: true,
+            fill: false,
+            pointRadius: 0
+        });
+    }
+}
+
 function addRun(new_culvert, index) {
     let new_list_run = culvList.insertRow(-1);
     let runCell = new_list_run.insertCell(0);
@@ -142,9 +163,11 @@ function addRun(new_culvert, index) {
                 chartInstance.data.datasets.splice(index, 1);
                 localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
 
+                chartInstance.data.datasets = [];
                 runTitle.innerHTML = 'Select a run for detailed info';
                 statsTableBody.innerHTML = '';
                 chartInstance.update();
+                updateRuns();
                 deleteBtn.remove();
             })
         }
