@@ -122,14 +122,15 @@ function computeStats(culvert_data, index) {
 function updateRuns() {
     for (let i = 0; i < list_runs.length; i++) {
         const currCell = culvList.rows[i].cells[0];
-        currCell.textContent = "Culvert Run #" + (i + 1) + " (" + currCell.dataset.culvert_data.values[currCell.dataset.culvert_data.values.length - 1] + ")";
+        currCellData = JSON.parse(currCell.datasets.culvert_data);
+        currCell.textContent = "Culvert Run #" + (i + 1) + " (" + currCellData.values[currCellData.values.length - 1] + ")";
 
         // segmenting for fatals
-        const fatal = (ctx, value) => culv_data.fatal_list[ctx.p0DataIndex] ? value : undefined;
+        const fatal = (ctx, value) => currCellData.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
         chartInstance.data.datasets.push({
             label: "Culvert #" + (i + 1),
-            data: currCell.dataset.culvert_data.values,
+            data: currCellData.values,
             borderColor: "rgb(255, 255, 255)",
             backgroundColor: "rgb(255, 255, 255)",
             segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
