@@ -117,7 +117,6 @@ function updateRuns() {
     for (let i = 0; i < list_runs.length; i++) {
         const new_culvert_data = JSON.parse(list_runs[i]);
         const new_culvert = { frames: new_culvert_data.frames, values: new_culvert_data.values, fatal_list: new_culvert_data.fatal_list, index: i };
-        console.log(new_culvert);
         const currCell = culvList.rows[i].cells[0];
         currCell.textContent = "Culvert Run #" + (i + 1) + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
         list_runs[i] = JSON.stringify(new_culvert);
@@ -152,6 +151,7 @@ function addRun(new_culvert) {
 
         // set title
         runTitle.innerHTML = "Culvert Run #" + (cellData.index + 1);
+        console.log(cellData.index);
 
         computeStats(cellData);
         
@@ -163,7 +163,6 @@ function addRun(new_culvert) {
 
             // add pop up to confirm deletion
             deleteBtn.addEventListener('click', function() {
-                console.log(cellData.index);
                 culvList.deleteRow(cellData.index);
                 list_runs.splice(cellData.index, 1);
                 chartInstance.data.datasets.splice(cellData.index, 1);
