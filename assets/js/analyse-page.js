@@ -14,6 +14,7 @@ var culvListData = localStorage.getItem('culvert_list_data');
 let chartInstance = null;
 var process_flag = false;
 var list_runs = culvListData ? JSON.parse(culvListData) : [];
+var selected_run_index;
 
 inputButton.addEventListener("click", () => {
         fileInput.click();
@@ -151,6 +152,7 @@ function addRun(new_culvert) {
 
         // set title
         runTitle.innerHTML = "Culvert Run #" + (cellData.index + 1);
+        selected_run_index = cellData.index;
         console.log(cellData.index);
 
         computeStats(cellData);
@@ -163,9 +165,9 @@ function addRun(new_culvert) {
 
             // add pop up to confirm deletion
             deleteBtn.addEventListener('click', function() {
-                culvList.deleteRow(cellData.index);
-                list_runs.splice(cellData.index, 1);
-                chartInstance.data.datasets.splice(cellData.index, 1);
+                culvList.deleteRow(selected_run_index);
+                list_runs.splice(selected_run_index, 1);
+                chartInstance.data.datasets.splice(selected_run_index, 1);
 
                 chartInstance.data.datasets = [];
                 runTitle.innerHTML = 'Select a run for detailed info';
