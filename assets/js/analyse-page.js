@@ -159,6 +159,7 @@ function addRun(new_culvert, index) {
 
             // add pop up to confirm deletion
             deleteBtn.addEventListener('click', function() {
+                console.log(index, culvList[index])
                 culvList.deleteRow(index);
                 list_runs.splice(index, 1);
                 chartInstance.data.datasets.splice(index, 1);
