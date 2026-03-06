@@ -120,7 +120,7 @@ function updateRuns() {
         const new_culvert = { frames: new_culvert_data.frames, values: new_culvert_data.values, fatal_list: new_culvert_data.fatal_list, index: i };
         const currCell = culvList.rows[i].cells[0];
         currCell.textContent = "Culvert Run #" + (i + 1) + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
-        currCell.dataset.culvert_data = new_culvert
+        currCell.dataset.culvert_data = list_runs[i];
         list_runs[i] = JSON.stringify(new_culvert);
 
         // segmenting for fatals
@@ -154,7 +154,6 @@ function addRun(new_culvert) {
         // set title
         runTitle.innerHTML = "Culvert Run #" + (cellData.index + 1);
         selected_run_index = cellData.index;
-        console.log(cellData.index);
 
         computeStats(cellData);
         
