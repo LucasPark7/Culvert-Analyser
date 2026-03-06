@@ -121,17 +121,18 @@ function computeStats(culvert_data) {
 
 function updateRuns() {
     for (let i = 0; i < list_runs.length; i++) {
+        const new_culvert_data = JSON.parse(list_runs[i]);
+        const new_culvert = { frames: new_culvert_data.frames, values: new_culvert_data.values, fatal_list: new_culvert_data.fatal_list, index: i };
         const currCell = culvList.rows[i].cells[0];
-        currCellData = JSON.parse(currCell.dataset.culvert_data);
-        currCellData.index = i;
-        currCell.textContent = "Culvert Run #" + (i + 1) + " (" + currCellData.values[currCellData.values.length - 1] + ")";
+        currCell.textContent = "Culvert Run #" + (i + 1) + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
+        list_runs[i] = JSON.stringify(new_culvert);
 
         // segmenting for fatals
-        const fatal = (ctx, value) => currCellData.fatal_list[ctx.p0DataIndex] ? value : undefined;
+        const fatal = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
 
         chartInstance.data.datasets.push({
             label: "Culvert #" + (i + 1),
-            data: currCellData.values,
+            data: new_culvert.values,
             borderColor: "rgb(255, 255, 255)",
             backgroundColor: "rgb(255, 255, 255)",
             segment: { borderColor: ctx => fatal(ctx, 'rgb(192,75,75)') },
@@ -164,14 +165,15 @@ function addRun(new_culvert) {
                 culvList.deleteRow(new_culvert.index);
                 list_runs.splice(new_culvert.index, 1);
                 chartInstance.data.datasets.splice(new_culvert.index, 1);
-                localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
 
                 chartInstance.data.datasets = [];
                 runTitle.innerHTML = 'Select a run for detailed info';
                 statsTableBody.innerHTML = '';
-                chartInstance.update();
                 updateRuns();
+                chartInstance.update();
                 deleteBtn.remove();
+
+                localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
             })
         }
     });
