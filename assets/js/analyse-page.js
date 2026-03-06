@@ -75,13 +75,13 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
     perSecondCell.textContent = scorePerS.toFixed(3).toString();
 }
 
-function computeStats(culvert_data, index) {
+function computeStats(culvert_data) {
 
     // wipe current table for current data
     statsTableBody.innerHTML = "";
 
     // set title
-    runTitle.innerHTML = "Culvert Run #" + (index + 1);
+    runTitle.innerHTML = "Culvert Run #" + (culvert_data.index + 1);
 
     const totalScore = culvert_data.values[culvert_data.values.length - 1];
     // flag var to track fatal cycles
@@ -123,6 +123,7 @@ function updateRuns() {
     for (let i = 0; i < list_runs.length; i++) {
         const currCell = culvList.rows[i].cells[0];
         currCellData = JSON.parse(currCell.dataset.culvert_data);
+        currCellData.index = i;
         currCell.textContent = "Culvert Run #" + (i + 1) + " (" + currCellData.values[currCellData.values.length - 1] + ")";
 
         // segmenting for fatals
@@ -141,7 +142,7 @@ function updateRuns() {
     }
 }
 
-function addRun(new_culvert, index) {
+function addRun(new_culvert) {
     let new_list_run = culvList.insertRow(-1);
     let runCell = new_list_run.insertCell(0);
     runCell.textContent = "Culvert Run #" + culvList.rows.length + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
@@ -149,7 +150,7 @@ function addRun(new_culvert, index) {
     runCell.dataset.culvert_data = JSON.stringify(new_culvert);
     runCell.addEventListener('click', function() {
         const cellData = JSON.parse(this.dataset.culvert_data);
-        computeStats(cellData, index);
+        computeStats(cellData);
         
         if (deleteRunDiv.children.length == 0) {
             const deleteBtn = document.createElement('button');
@@ -159,10 +160,10 @@ function addRun(new_culvert, index) {
 
             // add pop up to confirm deletion
             deleteBtn.addEventListener('click', function() {
-                console.log(index, culvList[index])
-                culvList.deleteRow(index);
-                list_runs.splice(index, 1);
-                chartInstance.data.datasets.splice(index, 1);
+                console.log(new_culvert.index, culvList[new_culvert.index])
+                culvList.deleteRow(new_culvert.index);
+                list_runs.splice(new_culvert.index, 1);
+                chartInstance.data.datasets.splice(new_culvert.index, 1);
                 localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
 
                 chartInstance.data.datasets = [];
@@ -180,7 +181,7 @@ function addRun(new_culvert, index) {
 function populateList() {
     for (let i = 0; i < list_runs.length; i++) {
         const culv_data = JSON.parse(list_runs[i]);
-        addRun(culv_data, i);
+        addRun(culv_data);
 
         // segmenting for fatals
         const fatal = (ctx, value) => culv_data.fatal_list[ctx.p0DataIndex] ? value : undefined;
@@ -277,7 +278,7 @@ async function uploadVideo() {
         const startTime = Date.now();
 
         // declare new culvert object to store data
-        var new_culvert = { frames: [0], values: [], fatal_list: [], index: list_runs.length + 1 };
+        var new_culvert = { frames: [0], values: [], fatal_list: [], index: list_runs.length };
         
         // segmenting for fatals
         const fatal = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
@@ -322,7 +323,7 @@ async function uploadVideo() {
                 list_runs.push(run_data);
 
                 // add run to list of runs
-                addRun(new_culvert, list_runs.length - 1);
+                addRun(new_culvert);
                 localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
             }
 
