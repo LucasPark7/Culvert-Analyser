@@ -159,13 +159,18 @@ if __name__ == "__main__":
                     logger.info(f"Downloading from bucket={BUCKET_NAME}, key={job_id}")
                     s3.download_file(BUCKET_NAME, f"videos/{job_id}.mp4", temp.name)
                     temp_path = temp.name
+                    temp.close()
 
-                result = process_video(temp_path, job_reso, job_id)
+                try:
+                    result = process_video(temp_path, job_reso, job_id)
 
-                # save result
-                logger.info(f"JOB COMPLETED")
-                redis.set(f"result:{job_id}", json.dumps(result))
-                redis.set(f"status:{job_id}", "complete")
+                    # save result
+                    logger.info(f"JOB COMPLETED")
+                    redis.set(f"result:{job_id}", json.dumps(result))
+                    redis.set(f"status:{job_id}", "complete")
+                    pass
+                finally:
+                    os.unlink(temp_path)
 
             else:
                 time.sleep(1)

@@ -77,12 +77,6 @@ function addStatRow(fatalStart, fatalEnd, fatalGain, totalScore) {
 
 function computeStats(culvert_data) {
 
-    // wipe current table for current data
-    statsTableBody.innerHTML = "";
-
-    // set title
-    runTitle.innerHTML = "Culvert Run #" + (culvert_data.index + 1);
-
     const totalScore = culvert_data.values[culvert_data.values.length - 1];
     // flag var to track fatal cycles
     var openFatal = false;
@@ -151,6 +145,13 @@ function addRun(new_culvert) {
     runCell.dataset.culvert_data = JSON.stringify(new_culvert);
     runCell.addEventListener('click', function() {
         const cellData = JSON.parse(this.dataset.culvert_data);
+
+        // wipe current table for current data
+        statsTableBody.innerHTML = "";
+
+        // set title
+        runTitle.innerHTML = "Culvert Run #" + (cellData.index + 1);
+
         computeStats(cellData);
         
         if (deleteRunDiv.children.length == 0) {
@@ -161,10 +162,10 @@ function addRun(new_culvert) {
 
             // add pop up to confirm deletion
             deleteBtn.addEventListener('click', function() {
-                console.log(new_culvert.index, culvList[new_culvert.index])
-                culvList.deleteRow(new_culvert.index);
-                list_runs.splice(new_culvert.index, 1);
-                chartInstance.data.datasets.splice(new_culvert.index, 1);
+                console.log(cellData.index);
+                culvList.deleteRow(cellData.index);
+                list_runs.splice(cellData.index, 1);
+                chartInstance.data.datasets.splice(cellData.index, 1);
 
                 chartInstance.data.datasets = [];
                 runTitle.innerHTML = 'Select a run for detailed info';
