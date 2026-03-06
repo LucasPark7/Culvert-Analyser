@@ -120,8 +120,8 @@ function updateRuns() {
         const new_culvert = { frames: new_culvert_data.frames, values: new_culvert_data.values, fatal_list: new_culvert_data.fatal_list, index: i };
         const currCell = culvList.rows[i].cells[0];
         currCell.textContent = "Culvert Run #" + (i + 1) + " (" + new_culvert.values[new_culvert.values.length - 1] + ")";
-        currCell.dataset.culvert_data = list_runs[i];
         list_runs[i] = JSON.stringify(new_culvert);
+        currCell.dataset.culvert_data = list_runs[i];
 
         // segmenting for fatals
         const fatal = (ctx, value) => new_culvert.fatal_list[ctx.p0DataIndex] ? value : undefined;
@@ -167,16 +167,14 @@ function addRun(new_culvert) {
             deleteBtn.addEventListener('click', function() {
                 culvList.deleteRow(selected_run_index);
                 list_runs.splice(selected_run_index, 1);
-                chartInstance.data.datasets.splice(selected_run_index, 1);
-
                 chartInstance.data.datasets = [];
                 runTitle.innerHTML = 'Select a run for detailed info';
                 statsTableBody.innerHTML = '';
                 updateRuns();
                 chartInstance.update();
-                deleteBtn.remove();
-
                 localStorage.setItem('culvert_list_data', JSON.stringify(list_runs));
+
+                deleteBtn.remove();
             })
         }
     });
