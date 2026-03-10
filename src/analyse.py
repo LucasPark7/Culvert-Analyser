@@ -119,6 +119,7 @@ def process_video(file_path, resolution, job_id):
 
     # get ROI from resolution selected
     ROI_dict = {
+        "2560x1440" : (1375, 190, 240, 65),
         "1920x1080" : (995, 85, 150, 50),
         "1366x768" : (725, 90, 125, 40),
         "1280x720" : (725, 100, 140, 35),

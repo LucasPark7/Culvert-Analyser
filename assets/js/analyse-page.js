@@ -23,8 +23,8 @@ inputButton.addEventListener("click", () => {
 fileInput.addEventListener("change", (event) => {
 var file = event.target.files[0];
     if (file) {
-        if (file.size > (200 * 1024 * 1024)) {
-            alert("File too large, reduce size to less than 200 MB");
+        if (file.size > (1000 * 1024 * 1024)) {
+            alert("File too large, reduce size to less than 1 GB");
             fileInput.value = "";
             inputButton.textContent = "Upload Video";
             return;

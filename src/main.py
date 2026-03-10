@@ -60,7 +60,7 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
         raise HTTPException(status_code=400, detail="Invalid file type.")
     
     # enforce size limits on file
-    max_size = 200 * 1024 * 1024  # 200 MB
+    max_size = 1000 * 1024 * 1024  # 200 MB
     file_size = 0
 
     while chunk := file.file.read(1024 * 1024):
