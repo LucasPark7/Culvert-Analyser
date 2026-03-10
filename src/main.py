@@ -73,7 +73,7 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
     try:
         try:
             logger.info(f"Uploading {safename} to s3://{BUCKET_NAME}/{job_id}")
-            s3.upload_file(file.file, BUCKET_NAME, f"videos/{job_id}.mp4")
+            s3.upload_fileobj(file.file, BUCKET_NAME, f"videos/{job_id}.mp4")
             logger.info("Upload successful")
         except Exception as e:
             logger.error("S3 upload failed", exc_info=True)  # full traceback
