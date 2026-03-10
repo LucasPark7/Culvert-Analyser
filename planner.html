@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rotation Planner</title>
+  <link rel="stylesheet" href="main.css" />
+  <style>
+    /* ── Only layout/timer logic not covered by main.css ── */
+
+    /* Swimlane scroll container */
+    #timeline-scroll {
+      overflow-y: auto;
+      overflow-x: auto;
+      max-height: calc(100vh - 280px);
+      min-height: 300px;
+      position: relative;
+    }
+
+    #timeline-scroll::-webkit-scrollbar { width: 4px; }
+    #timeline-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+    #timeline-scroll::-webkit-scrollbar-thumb {
+      background: linear-gradient(#5e42a6, #b74e91);
+      border-radius: 2px;
+    }
+
+    /* Timeline inner canvas */
+    #timeline-inner {
+      position: relative;
+      min-width: 620px;
+    }
+
+    /* Column headers row */
+    #col-headers {
+      display: flex;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #261c3e;
+      border-bottom: 2px solid #5e42a6;
+    }
+
+    .col-time-gutter {
+      width: 52px;
+      min-width: 52px;
+      padding: 8px 6px;
+      font-size: 0.45em;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .col-header {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0 6px;
+      border-left: 1px solid rgba(255,255,255,0.06);
+      min-width: 64px;
+    }
+
+    .col-header .ab-icon {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      margin-bottom: 3px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .col-header .ab-key {
+      font-size: 0.45em;
+      font-weight: bold;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .col-header .ab-name {
+      font-size: 0.38em;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.1em;
+    }
+
+    /* Grid rows (time axis + ability dots) */
+    #grid-body {
+      position: relative;
+    }
+
+    .time-row {
+      position: absolute;
+      left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .time-label {
+      width: 52px;
+      min-width: 52px;
+      text-align: right;
+      padding-right: 8px;
+      font-size: 0.42em;
+      letter-spacing: 0.1em;
+    }
+
+    .time-line {
+      flex: 1;
+      height: 1px;
+    }
+
+    /* Phase band */
+    .phase-band {
+      position: absolute;
+      left: 52px; right: 0;
+      pointer-events: none;
+    }
+
+    .phase-label {
+      position: absolute;
+      right: 10px; top: 4px;
+      font-size: 0.38em;
+      font-weight: bold;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      opacity: 0.5;
+    }
+
+    /* Column dividers */
+    .col-divider {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+
+    /* Ability node */
+    .ab-node {
+      position: absolute;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      transition: transform 0.15s ease, opacity 0.35s ease, box-shadow 0.2s ease;
+      cursor: default;
+    }
+
+    .ab-node.done {
+      opacity: 0.2;
+      border-color: rgba(255,255,255,0.1) !important;
+      background: rgba(255,255,255,0.03) !important;
+      box-shadow: none !important;
+    }
+
+    .ab-node.flash {
+      transform: scale(1.45) !important;
+    }
+
+    .ab-node.is-next::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      animation: ring-pulse 1s infinite;
+    }
+
+    @keyframes ring-pulse {
+      0%,100% { opacity: 0.6; transform: scale(1); }
+      50%      { opacity: 0.2; transform: scale(1.1); }
+    }
+
+    /* Playhead */
+    #playhead {
+      position: absolute;
+      left: 0; right: 0;
+      pointer-events: none;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+    }
+
+    #playhead-label {
+      width: 52px;
+      min-width: 52px;
+      text-align: right;
+      padding-right: 6px;
+      font-size: 0.45em;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+    }
+
+    #playhead-line {
+      flex: 1;
+      height: 3px;
+      background: linear-gradient(to right, #b74e91, rgba(183,78,145,0.3));
+      box-shadow: 0 0 10px #b74e91, 0 0 4px #b74e91;
+    }
+
+    #playhead-arrow {
+      position: absolute;
+      left: 44px;
+      width: 0; height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 8px solid #b74e91;
+      filter: drop-shadow(0 0 3px #b74e91);
+    }
+
+    /* Next-up spotlight bar */
+    #next-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 24px;
+      background: rgba(94,66,166,0.15);
+      border: 1px solid rgba(94,66,166,0.35);
+      border-radius: 0.25em;
+      margin-bottom: 1.5em;
+      min-height: 72px;
+    }
+
+    #next-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      border: 2px solid rgba(183,78,145,0.6);
+      background: rgba(183,78,145,0.1);
+      transition: box-shadow 0.2s;
+    }
+
+    #next-icon.urgent {
+      box-shadow: 0 0 20px rgba(183,78,145,0.8);
+      animation: next-pulse 0.5s infinite;
+    }
+
+    @keyframes next-pulse {
+      0%,100% { box-shadow: 0 0 16px rgba(183,78,145,0.6); }
+      50%      { box-shadow: 0 0 32px rgba(183,78,145,1); }
+    }
+
+    #next-info { flex: 1; }
+    #next-label { font-size: 0.45em; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 2px; }
+    #next-name  { font-size: 1.1em; font-weight: bold; color: #ffffff; letter-spacing: 0.05em; }
+    #next-key-hint { font-size: 0.5em; color: rgba(255,255,255,0.35); margin-top: 2px; letter-spacing: 0.1em; }
+
+    #countdown {
+      font-size: 2em;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      min-width: 90px;
+      text-align: right;
+      transition: color 0.2s;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Progress bar */
+    #progress-wrap {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 0.5em;
+    }
+
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, #5e42a6, #b74e91);
+      border-radius: 2px;
+      transition: width 0.05s linear;
+      width: 0%;
+    }
+
+    #progress-ticks {
+      position: relative;
+      height: 6px;
+    }
+
+    .p-tick {
+      position: absolute;
+      top: 0;
+      width: 2px; height: 5px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 1px;
+      transform: translateX(-50%);
+    }
+
+    .p-tick.fired {
+      background: #b74e91;
+    }
+
+    /* Timer display */
+    #timer-display {
+      font-size: 1.6em;
+      font-weight: bold;
+      color: #ffffff;
+      letter-spacing: 0.1em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Ability legend pills */
+    .legend-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px 4px 8px;
+      border-radius: 3em;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      font-size: 0.5em;
+      letter-spacing: 0.1em;
+      margin: 0 4px 6px 0;
+    }
+
+    .legend-pill .p-icon {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+    }
+
+    /* Utility */
+    .grad-text {
+      background-image: linear-gradient(to right, #5e42a6, #b74e91);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .small-caps {
+      font-size: 0.5em;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+  </style>
+</head>
+<body class="is-preload">
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div class="inner">
+      <nav>
+        <ul>
+          <li><a href="#intro"    class="active">Overview</a></li>
+          <li><a href="#planner">Planner</a></li>
+          <li><a href="#legend">Abilities</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div id="wrapper">
+
+    <!-- INTRO -->
+    <section id="intro" class="wrapper style1 fullscreen fade-up">
+      <div class="inner">
+        <h1 class="major">Rotation Planner</h1>
+        <p class="small-caps">2:00 full sequence · vertical swimlane view</p>
+        <p>Track every ability press across a full 2-minute boss fight. Each column shows one skill's timing — scroll down to see the full rotation, or press Start and let it auto-scroll.</p>
+        <ul class="actions">
+          <li><a href="#planner" class="button primary large">Open Planner</a></li>
+          <li><a href="#legend"  class="button large">View Abilities</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- PLANNER -->
+    <section id="planner" class="wrapper style2-alt fade-up">
+      <div class="inner">
+
+        <header>
+          <h2>Live Rotation</h2>
+          <p>Time flows downward. The gradient line tracks your current position. Red segments = fatal windows.</p>
+        </header>
+
+        <!-- Next-up bar -->
+        <div id="next-bar">
+          <div id="next-icon">⚔️</div>
+          <div id="next-info">
+            <div id="next-label">Next Ability</div>
+            <div id="next-name">Press Start</div>
+            <div id="next-key-hint">—</div>
+          </div>
+          <!-- Progress + timer -->
+          <div style="flex:1; max-width: 260px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span id="timer-display">0:00</span>
+              <span style="font-size:0.7em; color:rgba(255,255,255,0.3); align-self:flex-end; letter-spacing:0.1em;">/ 2:00</span>
+            </div>
+            <div id="progress-wrap"><div id="progress-bar"></div></div>
+            <div id="progress-ticks"></div>
+          </div>
+          <div id="countdown" style="color:#ffffff;">—</div>
+        </div>
+
+        <!-- Controls -->
+        <ul class="actions" style="margin-bottom:1.5em;">
+          <li><button id="btn-start" class="button primary" onclick="toggleRun()">▶ Start</button></li>
+          <li><button id="btn-reset" class="button"         onclick="resetRun()">↺ Reset</button></li>
+        </ul>
+
+        <!-- Swimlane timeline -->
+        <div class="box alt" style="border:1px solid rgba(255,255,255,0.08); border-radius:0.25em; overflow:hidden;">
+          <!-- Column headers (sticky) -->
+          <div id="col-headers"></div>
+
+          <!-- Scroll body -->
+          <div id="timeline-scroll">
+            <div id="timeline-inner">
+              <div id="grid-body"></div>
+              <div id="playhead">
+                <div id="playhead-label" style="color:#b74e91;"></div>
+                <div id="playhead-line"></div>
+                <div id="playhead-arrow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- LEGEND -->
+    <section id="legend" class="wrapper style1-alt fade-up">
+      <div class="inner">
+        <header>
+          <h2>Ability Index</h2>
+          <p>All 8 abilities used across the 2-minute rotation.</p>
+        </header>
+        <div class="features" id="features-grid"></div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="footer" class="wrapper alt">
+      <div class="inner">
+        <ul class="menu">
+          <li>Rotation Planner</li>
+          <li>Built with Hyperspace by HTML5 UP</li>
+        </ul>
+      </div>
+    </footer>
+
+  </div><!-- /wrapper -->
+
+  <script>
+  // ─── DATA ────────────────────────────────────────────────────────────
+  const TOTAL = 120;
+  const PX_PER_SEC = 8;
+  const COL_W_FRAC = 1 / 8; // 8 abilities, equal columns
+  const LABEL_W = 52;
+
+  const ABILITIES = [
+    { id:"A", name:"Opener",   key:"Q", color:"#b74e91", bg:"rgba(183,78,145,0.12)",  icon:"⚔️" },
+    { id:"B", name:"Buff",     key:"E", color:"#9b6ecc", bg:"rgba(155,110,204,0.12)", icon:"✨" },
+    { id:"C", name:"Nuke",     key:"R", color:"#b74e91", bg:"rgba(183,78,145,0.12)",  icon:"💥" },
+    { id:"D", name:"Combo 1",  key:"1", color:"#7a5cbf", bg:"rgba(122,92,191,0.12)",  icon:"🌀" },
+    { id:"E", name:"Combo 2",  key:"2", color:"#9b6ecc", bg:"rgba(155,110,204,0.12)", icon:"⚡" },
+    { id:"F", name:"Finisher", key:"F", color:"#b74e91", bg:"rgba(183,78,145,0.12)",  icon:"🔥" },
+    { id:"G", name:"Shield",   key:"T", color:"#7a5cbf", bg:"rgba(122,92,191,0.12)",  icon:"🛡️" },
+    { id:"H", name:"Burst",    key:"G", color:"#9b6ecc", bg:"rgba(155,110,204,0.12)", icon:"💠" },
+  ];
+
+  const ROTATION = [
+    {t:0,id:"A"},{t:1.5,id:"B"},{t:3,id:"C"},{t:4.5,id:"D"},{t:6,id:"E"},{t:8,id:"F"},
+    {t:10,id:"B"},{t:12,id:"C"},{t:14,id:"D"},{t:15.5,id:"E"},{t:17,id:"G"},{t:18.5,id:"C"},
+    {t:20,id:"D"},{t:21.5,id:"E"},{t:23,id:"H"},{t:25,id:"B"},{t:26.5,id:"A"},{t:28,id:"C"},
+    {t:30,id:"F"},{t:32,id:"D"},{t:33.5,id:"E"},{t:35,id:"G"},{t:36.5,id:"C"},{t:38,id:"H"},
+    {t:40,id:"A"},{t:41.5,id:"B"},{t:43,id:"C"},{t:44.5,id:"D"},{t:46,id:"E"},{t:48,id:"F"},
+    {t:50,id:"C"},{t:52,id:"D"},{t:53.5,id:"E"},{t:55,id:"G"},{t:57,id:"C"},{t:58.5,id:"H"},
+    {t:60,id:"B"},{t:62,id:"D"},{t:63.5,id:"E"},{t:65,id:"C"},{t:67,id:"A"},{t:68.5,id:"F"},
+    {t:70,id:"C"},{t:72,id:"D"},{t:73.5,id:"E"},{t:75,id:"G"},{t:77,id:"C"},{t:78.5,id:"H"},
+    {t:80,id:"A"},{t:81.5,id:"B"},{t:83,id:"C"},{t:84.5,id:"D"},{t:86,id:"E"},{t:88,id:"F"},
+    {t:90,id:"C"},{t:92,id:"D"},{t:93.5,id:"E"},{t:95,id:"G"},{t:97,id:"C"},{t:98.5,id:"H"},
+    {t:100,id:"B"},{t:102,id:"A"},{t:104,id:"C"},{t:106,id:"D"},{t:107.5,id:"E"},{t:109,id:"F"},
+    {t:111,id:"G"},{t:113,id:"C"},{t:115,id:"H"},{t:117,id:"A"},{t:118.5,id:"B"},{t:119.5,id:"F"},
+  ].map((e,i) => ({...e, index:i}));
+
+  const PHASES = [
+    {t:0,   label:"Opener",      color:"#b74e91"},
+    {t:10,  label:"Sustain I",   color:"#7a5cbf"},
+    {t:25,  label:"Re-Buff",     color:"#9b6ecc"},
+    {t:40,  label:"Burst II",    color:"#b74e91"},
+    {t:50,  label:"Sustain II",  color:"#7a5cbf"},
+    {t:80,  label:"Burst III",   color:"#b74e91"},
+    {t:90,  label:"Final Phase", color:"#9b6ecc"},
+    {t:117, label:"Finisher",    color:"#b74e91"},
+  ];
+
+  const fmtTime = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
+  const getAb   = id => ABILITIES.find(a => a.id === id);
+
+  // ─── STATE ───────────────────────────────────────────────────────────
+  let elapsed = 0, running = false, fired = new Set(), flashIdx = null;
+  let rafId = null, startTs = null, prevT = 0, autoScroll = true;
+
+  const TOTAL_HEIGHT = TOTAL * PX_PER_SEC + 40;
+
+  // ─── BUILD DOM ───────────────────────────────────────────────────────
+  function buildTimeline() {
+    const scroll = document.getElementById('timeline-scroll');
+    const inner  = document.getElementById('timeline-inner');
+    const grid   = document.getElementById('grid-body');
+    inner.style.height = TOTAL_HEIGHT + 'px';
+    grid.style.height  = TOTAL_HEIGHT + 'px';
+
+    // Column headers
+    const hdr = document.getElementById('col-headers');
+    const gut = document.createElement('div');
+    gut.className = 'col-time-gutter'; gut.textContent = 'Time';
+    hdr.appendChild(gut);
+    ABILITIES.forEach(ab => {
+      const col = document.createElement('div');
+      col.className = 'col-header';
+      col.innerHTML = `
+        <div class="ab-icon" style="border:1.5px solid ${ab.color}; box-shadow:0 0 8px ${ab.color}40">${ab.icon}</div>
+        <div class="ab-key" style="color:${ab.color}">${ab.key}</div>
+        <div class="ab-name">${ab.name}</div>`;
+      hdr.appendChild(col);
+    });
+
+    // Phase bands
+    PHASES.forEach((ph, i) => {
+      const next = PHASES[i+1];
+      const top    = ph.t * PX_PER_SEC;
+      const height = (next ? next.t : TOTAL) * PX_PER_SEC - top;
+      const band = document.createElement('div');
+      band.className = 'phase-band';
+      band.id = 'phase-' + i;
+      band.style.cssText = `top:${top}px; height:${height}px; background:${ph.color}06; border-top:1px solid ${ph.color}20;`;
+      const lbl = document.createElement('div');
+      lbl.className = 'phase-label';
+      lbl.style.color = ph.color;
+      lbl.textContent = ph.label;
+      band.appendChild(lbl);
+      grid.appendChild(band);
+    });
+
+    // Column dividers
+    ABILITIES.forEach((_, ci) => {
+      // We use flex for headers, so dividers are positioned by percentage
+      const div = document.createElement('div');
+      div.className = 'col-divider';
+      // position based on gutter + ci * col fraction
+      div.style.left = (LABEL_W + ci * ((inner.offsetWidth - LABEL_W) / ABILITIES.length || 64)) + 'px';
+      grid.appendChild(div);
+    });
+
+    // Time labels
+    for (let s = 0; s <= TOTAL; s += 5) {
+      const major = s % 10 === 0;
+      const row = document.createElement('div');
+      row.className = 'time-row';
+      row.style.top = (s * PX_PER_SEC) + 'px';
+      row.innerHTML = `
+        <div class="time-label" style="color:${major ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.12)'}; font-weight:${major?'bold':'normal'}">
+          ${fmtTime(s)}
+        </div>
+        <div class="time-line" style="background:${major ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.03)'}"></div>`;
+      grid.appendChild(row);
+    }
+
+    // Ability nodes
+    ROTATION.forEach(ev => {
+      const ab = getAb(ev.id);
+      const ci = ABILITIES.findIndex(a => a.id === ev.id);
+      const node = document.createElement('div');
+      node.className = 'ab-node';
+      node.id = 'node-' + ev.index;
+      node.textContent = ab.icon;
+      node.style.cssText = `
+        background:${ab.bg};
+        border:1.5px solid ${ab.color};
+        box-shadow: 0 2px 8px ${ab.color}30;
+        color:${ab.color};
+        top:${ev.t * PX_PER_SEC - 16}px;
+      `;
+      // left will be set after layout — use JS after build
+      node.dataset.colIdx = ci;
+      node.dataset.evIdx  = ev.index;
+      grid.appendChild(node);
+    });
+
+    // Position nodes after layout
+    requestAnimationFrame(positionNodes);
+
+    // Progress ticks
+    const ticksEl = document.getElementById('progress-ticks');
+    ROTATION.forEach(ev => {
+      const tick = document.createElement('div');
+      tick.className = 'p-tick';
+      tick.id = 'tick-' + ev.index;
+      tick.style.left = ((ev.t / TOTAL) * 100) + '%';
+      ticksEl.appendChild(tick);
+    });
+
+    // Features grid (legend)
+    const fg = document.getElementById('features-grid');
+    ABILITIES.forEach(ab => {
+      const sec = document.createElement('section');
+      sec.innerHTML = `
+        <span class="icon major" style="background:${ab.bg}; border:1.5px solid ${ab.color}; color:${ab.color}; text-align:center; line-height:2.5em; font-size:1em;">
+          ${ab.icon}
+        </span>
+        <h3 style="color:${ab.color}">${ab.name} <span style="opacity:0.5;font-size:0.7em;">[${ab.key}]</span></h3>
+        <p>Used ${ROTATION.filter(e=>e.id===ab.id).length} times across the rotation.</p>`;
+      fg.appendChild(sec);
+    });
+  }
+
+  function positionNodes() {
+    const inner = document.getElementById('timeline-inner');
+    const totalW = inner.offsetWidth;
+    const colW = (totalW - LABEL_W) / ABILITIES.length;
+    document.querySelectorAll('.ab-node').forEach(node => {
+      const ci = parseInt(node.dataset.colIdx);
+      node.style.left = (LABEL_W + ci * colW + colW / 2 - 16) + 'px';
+    });
+    // Reposition column dividers too
+    document.querySelectorAll('.col-divider').forEach((div, ci) => {
+      div.style.left = (LABEL_W + ci * colW) + 'px';
+    });
+  }
+  window.addEventListener('resize', positionNodes);
+
+  // ─── PLAYHEAD ────────────────────────────────────────────────────────
+  function updatePlayhead() {
+    const y = elapsed * PX_PER_SEC;
+    const ph = document.getElementById('playhead');
+    ph.style.top = y + 'px';
+    document.getElementById('playhead-label').textContent = fmtTime(elapsed);
+    document.getElementById('playhead-arrow').style.top = (y - 5) + 'px';
+  }
+
+  // ─── RUN LOOP ────────────────────────────────────────────────────────
+  function tick(now) {
+    if (!startTs) startTs = now;
+    elapsed = Math.min((now - startTs) / 1000, TOTAL);
+
+    // Fire events
+    ROTATION.forEach(ev => {
+      if (elapsed >= ev.t && prevT < ev.t) {
+        fired.add(ev.index);
+        flashNode(ev.index);
+        updateTick(ev.index, true);
+      }
+    });
+    prevT = elapsed;
+
+    updatePlayhead();
+    updateHUD();
+    updatePhases();
+
+    // Auto scroll
+    if (autoScroll) {
+      const sc = document.getElementById('timeline-scroll');
+      const target = elapsed * PX_PER_SEC - sc.clientHeight / 2.5;
+      sc.scrollTop = Math.max(0, target);
+    }
+
+    if (elapsed < TOTAL) rafId = requestAnimationFrame(tick);
+    else stopRun();
+  }
+
+  function flashNode(idx) {
+    const node = document.getElementById('node-' + idx);
+    if (!node) return;
+    node.classList.add('flash');
+    setTimeout(() => node.classList.remove('flash'), 300);
+    // Mark done after flash
+    setTimeout(() => {
+      node.classList.add('done');
+      node.textContent = '✓';
+    }, 350);
+  }
+
+  function updateTick(idx, isFired) {
+    const tick = document.getElementById('tick-' + idx);
+    if (tick) tick.classList.toggle('fired', isFired);
+  }
+
+  function updateHUD() {
+    document.getElementById('timer-display').textContent = fmtTime(elapsed);
+    document.getElementById('progress-bar').style.width = ((elapsed / TOTAL) * 100) + '%';
+
+    const nextEv = ROTATION.find(ev => !fired.has(ev.index));
+    if (nextEv) {
+      const ab = getAb(nextEv.id);
+      const cd = Math.max(0, nextEv.t - elapsed);
+
+      document.getElementById('next-icon').textContent = ab.icon;
+      document.getElementById('next-icon').style.borderColor = ab.color;
+      document.getElementById('next-icon').style.background  = ab.bg;
+      document.getElementById('next-icon').classList.toggle('urgent', cd < 1.5);
+      document.getElementById('next-name').textContent = ab.name;
+      document.getElementById('next-key-hint').textContent = `Press  [ ${ab.key} ]`;
+
+      const cdEl = document.getElementById('countdown');
+      cdEl.textContent = cd < 0.05 ? 'NOW!' : cd.toFixed(1) + 's';
+      cdEl.style.color = cd < 1 ? '#ff6b6b' : cd < 2.5 ? '#f6c90e' : '#ffffff';
+
+      // next ring on node
+      document.querySelectorAll('.ab-node.is-next').forEach(n => n.classList.remove('is-next'));
+      const nNode = document.getElementById('node-' + nextEv.index);
+      if (nNode && !fired.has(nextEv.index)) {
+        nNode.style.color = ab.color;
+        nNode.classList.add('is-next');
+      }
+    } else {
+      document.getElementById('next-name').textContent = elapsed > 0 ? 'Rotation Complete' : 'Press Start';
+      document.getElementById('next-key-hint').textContent = '—';
+      document.getElementById('countdown').textContent = '—';
+    }
+  }
+
+  function updatePhases() {
+    const nextPhIdx = [...PHASES].reverse().findIndex(p => elapsed >= p.t);
+    const activeIdx = PHASES.length - 1 - nextPhIdx;
+    PHASES.forEach((_, i) => {
+      const band = document.getElementById('phase-' + i);
+      if (!band) return;
+      if (i === activeIdx) {
+        band.style.background = PHASES[i].color + '12';
+        band.style.borderTopColor = PHASES[i].color + '50';
+        band.querySelector('.phase-label').style.opacity = '0.8';
+      }
+    });
+  }
+
+  // ─── CONTROLS ────────────────────────────────────────────────────────
+  function toggleRun() {
+    if (running) {
+      cancelAnimationFrame(rafId);
+      running = false;
+      startTs = null;
+      prevT = elapsed;
+      document.getElementById('btn-start').textContent = elapsed > 0 ? '▶ Resume' : '▶ Start';
+    } else {
+      if (elapsed >= TOTAL) return;
+      running = true;
+      autoScroll = true;
+      document.getElementById('btn-start').textContent = '⏸ Pause';
+      rafId = requestAnimationFrame(ts => { startTs = ts - elapsed * 1000; tick(ts); });
+    }
+  }
+
+  function stopRun() {
+    running = false;
+    startTs = null;
+    document.getElementById('btn-start').textContent = '▶ Start';
+  }
+
+  function resetRun() {
+    cancelAnimationFrame(rafId);
+    running = false; elapsed = 0; fired = new Set(); prevT = 0; startTs = null;
+    autoScroll = true;
+    document.getElementById('btn-start').textContent = '▶ Start';
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('timer-display').textContent = '0:00';
+    document.getElementById('countdown').textContent = '—';
+    document.getElementById('next-name').textContent = 'Press Start';
+    document.getElementById('next-key-hint').textContent = '—';
+    document.getElementById('next-icon').textContent = '⚔️';
+    document.getElementById('timeline-scroll').scrollTop = 0;
+    updatePlayhead();
+    // Restore all nodes
+    ROTATION.forEach(ev => {
+      const node = document.getElementById('node-' + ev.index);
+      if (node) {
+        const ab = getAb(ev.id);
+        node.classList.remove('done','flash','is-next');
+        node.textContent = ab.icon;
+        node.style.opacity = '';
+      }
+      updateTick(ev.index, false);
+    });
+    PHASES.forEach((ph, i) => {
+      const band = document.getElementById('phase-' + i);
+      if (band) { band.style.background = ph.color + '06'; band.style.borderTopColor = ph.color + '20'; }
+    });
+  }
+
+  // Disable auto-scroll on manual scroll
+  document.addEventListener('DOMContentLoaded', () => {
+    buildTimeline();
+    updatePlayhead();
+    updateHUD();
+
+    document.getElementById('timeline-scroll').addEventListener('wheel', () => { autoScroll = false; });
+    document.getElementById('timeline-scroll').addEventListener('touchmove', () => { autoScroll = false; });
+
+    // Remove preload class after a tick so transitions fire
+    setTimeout(() => document.body.classList.remove('is-preload'), 100);
+  });
+  </script>
+
+</body>
+</html>
