@@ -63,14 +63,32 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
     max_size = 1000 * 1024 * 1024  # 200 MB
     file_size = 0
 
-    while chunk := file.file.read(1024 * 1024):
-        file_size += len(chunk)
-        if file_size > max_size:
-            raise HTTPException(status_code=400, detail="File too large.")
-        
-    # reset pointer on file for upload
-    file.file.seek(0)
+    def validate_chunk():
+        nonlocal file_size
+        while chunk := file.file.read(1024 * 1024):
+            file_size += len(chunk)
+            if file_size > max_size:
+                raise HTTPException(status_code=400, detail="File too large.")
+            yield chunk
 
+    try:
+        try:
+            logger.info(f"Uploading {file.filename} to s3://{BUCKET_NAME}/{job_id}")
+            s3.upload_fileobj(validate_chunk(), BUCKET_NAME, f"videos/{job_id}.mp4")
+            logger.info("Upload successful")
+        except Exception as e:
+            logger.error("S3 upload failed", exc_info=True)  # full traceback
+            raise HTTPException(status_code=500, detail=f"S3 upload failed: {str(e)}")
+        
+        
+        job_data = {"job_id" : job_id, "resolution": resolution}
+        redis.lpush("video_jobs", json.dumps(job_data))
+
+        return {"job_id": job_id, "status": "processing"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        
+    '''
     try:
         # save the uploaded file to a temporary file
         temp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
@@ -96,6 +114,8 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    '''
+    
     
 @app.get("/status/{job_id}")
 def get_status(job_id: str):
