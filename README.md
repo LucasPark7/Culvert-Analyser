@@ -1,12 +1,14 @@
 # Culvert-Analyser
 
-# for local testing
+Full-stack web application created for the purpose of helping users optimize their culvert scores through analysis of uploaded videos.
 
-run: python -m uvicorn src.main:app --reload --host 0.0.0.0 --port 10000
+Hosted at the URL: https://lucaspark7.github.io/Culvert-Analyser/index.html
+How to run:
+ - Head to Video Analyser page (only available feature currently)
+ - Upload video of your Culvert
+ - Receive graph + analysis
 
-then run testScript.py file
-
-
+Created using vanilla JS/HTML/CSS + React
+Python backend hosted on Render servers
 
 HTML Design: HTML5UP.net
-

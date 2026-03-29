@@ -4,13 +4,16 @@ import numpy as np
 import easyocr
 
 # Load a frame from video
-video_path = r"C:\Medal\Clips\Maplestory\MedalTVMaplestory20260221215728910.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\154kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (5*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (117*60)+2)
 ret, frame = cap.read()
 cap.release()
 
 reader = easyocr.Reader(['en'])
+
+cv2.imshow("result", frame)
+cv2.waitKey(0)
 
 if not ret:
     raise Exception("Could not read frame from video")
@@ -48,8 +51,8 @@ while True:
 
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
-    
-    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\cont_active.png")
+
+    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
     mapae = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\mapae_icon.png")
 
     # Convert to grayscale for better template matching
@@ -69,20 +72,13 @@ while True:
 
     # Press 'q' to quit
     if cv2.waitKey(30) & 0xFF == ord("q"):
-        
+    
         # template matching
         resFatal = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
         resMapae = cv2.matchTemplate(gray, grayMapae, cv2.TM_CCOEFF_NORMED)
 
         min_val, max_val_fatal, min_loc, max_loc = cv2.minMaxLoc(resFatal)
         min_val, max_val_mapae, min_loc, max_loc = cv2.minMaxLoc(resMapae)
-
-        '''
-        resultB = cv2.matchTemplate(imageMainR, imageNeedleR, cv2.TM_SQDIFF)
-        resultG = cv2.matchTemplate(imageMainG, imageNeedleG, cv2.TM_SQDIFF)
-        resultR = cv2.matchTemplate(imageMainB, imageNeedleB, cv2.TM_SQDIFF)
-        '''
-        
 
         #threshold = 69000000
         threshold = 0.75
@@ -91,7 +87,7 @@ while True:
         #result = resultB + resultG + resultR
         #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
         #loc = np.where(res >= 3 * threshold)
-        
+    
         #print("loc: ", loc)
 
         print(max_val_mapae)
@@ -102,13 +98,12 @@ while True:
             print("Fatal Strike detected at:", top_left, "Confidence:", max_val_fatal, max_val_mapae)
         else:
             print("Fatal Strike not detected")
-        
+    
 
         print(f"Final ROI: (x={x}, y={y}, w={w}, h={h})")
         break
 
 cv2.destroyAllWindows()
-
 
 # --------------------------------
 # Planning on testing an AI upscaler to detect fatal/oz
