@@ -8,7 +8,7 @@ How to run:
  - Upload video of your Culvert
  - Receive graph + analysis
 
-Created using vanilla JS/HTML/CSS + React
+Created using React/TypeScript/HTML/CSS
 Python backend hosted on Render servers
 
 HTML Design: HTML5UP.net
