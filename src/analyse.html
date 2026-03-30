@@ -1,12 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Culvert Analyse</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+		<title>Culvert Collections</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+  <body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="title">Culvert Tools</a>
+				<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+						<li><a href="analyse.html" class="active">Analyse</a></li>
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+						<div class="inner">
+							<h1 class="major">Video Analyser</h1>
+							<p>Analysis of your culvert video (mp4)</p>
+							<p>Make sure to select correct in-game resolution or the results may be incorrect. Results may take up to 5 minutes.</p>
+							<p>NOTE: Special Node tracking is only currently available for 1920x1080 resolution videos shown in red lines.</p>
+						
+							<h1>Upload Video of Culvert</h1>
+
+							<li><a class="button icon solid fa-upload" id="uploadButton">Select Video</a></li>
+							<input type="file" id="videoFile" accept="video/mp4" style="display:none;">
+							
+							<label for="resoSelect">Select In-Game Resolution:</label>
+							<select id="resoSelect" class="select" style="display:inline-block;max-width:30%;width:100%">
+								<option value="2560x1440">2560x1440</option>
+								<option value="1920x1080" selected>1920x1080</option>
+								<option value="1366x768">1366x768</option>
+								<option value="1280x720">1280x720</option>
+								<option value="1024x768">1024x768</option>
+							</select>
+
+							<ul class="actions">
+								<button class="button primary" onclick="uploadVideo()">Upload & Process</button>
+							</ul>
+
+							<p id="loadingText" style="display:none;">Uploading...</p>
+							<pre id="result"></pre>
+
+							<h2>Result:</h2>
+							<p>Show/hide runs by clicking them at the top of the chart</p>
+
+							<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+							<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+							
+							<canvas id="resultChart"></canvas>
+
+							<div class="row" style="padding-top: 50px;">
+								<div class="col-3">
+									<h3>
+										Additional Info:
+									</h3>
+									<div class="table-wrapper" style="max-height:380px;">
+										<table id="culvList" class="alt">
+											<tbody>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<div class="col-9">
+									<aside id="infoPanel" class="info-card">
+										<h3 id="run-title">
+											Select a run for detailed info
+										</h3>
+										<div id="stats">
+											<!-- Add table for stats -->
+											<!-- Fatal # | Time | Score gained | % Score | Score/s (increase?) -->
+											<div class="table-wrapper">
+												<table id="statsTable" class="alt" style="width:100%;">
+													<thead>
+														<tr>
+															<th>Special Node Time</th>
+															<th>Score Gained</th>
+															<th>% of Total Score</th>
+															<th>Score/s</th>
+														</tr>
+													</thead>
+													<tbody id="statsTableBody" style="width:auto;">
+													</tbody>
+												</table>
+											</div>
+										</div>
+										<div id="deleteRunDiv">
+										</div>
+									</aside>
+								</div>
+							</div>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>Fan-made project, not affiliated with Nexon.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/analyse-page.js"></script>
+      <script type="module" src="/src/main.tsx"></script>
+
+	</body>
 </html>
