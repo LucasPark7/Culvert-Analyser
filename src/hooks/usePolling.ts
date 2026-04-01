@@ -53,6 +53,8 @@ export function usePolling(): UsePollingReturn {
           results: [[[number]], boolean][];
         };
 
+        if (!statusData.results || !Array.isArray(statusData.results)) return;
+
         statusData.results.forEach((value, index) => {
           if (index + 1 > culvert.frames[culvert.frames.length - 1]) {
             culvert.frames.push(index + 1);
