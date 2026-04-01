@@ -5,6 +5,7 @@ import { resolve } from 'path'
 export default defineConfig({
   base: '/Culvert-Analyser/',
   plugins: [react()],
+  publicDir: '.',
   build: {
     rollupOptions: {
       input: {
