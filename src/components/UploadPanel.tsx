@@ -10,7 +10,7 @@ interface UploadPanelProps {
 export default function UploadPanel({ onUpload, isProcessing }: UploadPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [resolution, setResolution] = useState<string>('720p');
+  const [resolution, setResolution] = useState<string>("1920x1080");
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const file = e.target.files?.[0];
@@ -52,31 +52,38 @@ export default function UploadPanel({ onUpload, isProcessing }: UploadPanelProps
 
       {/* Styled button that triggers the file input */}
       <button
-        className="button primary"
+        className="button icon solid fa-upload"
         onClick={() => fileInputRef.current?.click()}
         disabled={isProcessing}
       >
         {fileName ?? 'Upload Video'}
       </button>
 
+      <label htmlFor="resoSelect">Select In-Game Resolution:</label>
       <select
         id="resoSelect"
+        className="select"
+        style={{ display: 'inline-block', maxWidth: '30%', width: '100%' }}
         value={resolution}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setResolution(e.target.value)}
         disabled={isProcessing}
       >
-        <option value="480p">480p</option>
-        <option value="720p">720p</option>
-        <option value="1080p">1080p</option>
+        <option value="2560x1440">2560x1440</option>
+        <option value="1920x1080">1920x1080</option>
+        <option value="1366x768">1366x768</option>
+        <option value="1280x720">1280x720</option>
+        <option value="1024x768">1024x768</option>
       </select>
 
-      <button
+      <ul className="actions">
+				<button
         className="button primary"
         onClick={handleUploadClick}
-        disabled={isProcessing}
-      >
-        {isProcessing ? 'Processing...' : 'Analyse'}
+        disabled={isProcessing}>
+          {isProcessing ? 'Processing...' : 'Analyse'}
       </button>
+			</ul>
+      
     </div>
   );
 }
