@@ -1,5 +1,5 @@
-import type { CulvertRun, StatRow } from '../types/culvert';
-import { computeStats } from '../utils/computeStats';
+import type { CulvertRun } from '../types/culvert';
+import { useStatsWorker } from '../hooks/useStatsWorker';
 
 interface StatsPanelProps {
   run: CulvertRun | null;
@@ -8,6 +8,7 @@ interface StatsPanelProps {
 }
 
 export default function StatsPanel({ run, runIndex, onDelete }: StatsPanelProps) {
+  const { rows, isComputing } = useStatsWorker(run);
   if (!run) {
     return (
       <div id="statsPanel">
@@ -15,8 +16,6 @@ export default function StatsPanel({ run, runIndex, onDelete }: StatsPanelProps)
       </div>
     );
   }
-
-  const rows: StatRow[] = computeStats(run);
 
   function handleDelete(): void {
     if (window.confirm(`Delete Culvert Run #${runIndex}? This cannot be undone.`)) {
@@ -31,21 +30,25 @@ export default function StatsPanel({ run, runIndex, onDelete }: StatsPanelProps)
       <table id="statsTable">
         <thead>
           <tr>
-            <th>Time</th>
-            <th>Gain</th>
-            <th>% of Total</th>
-            <th>Per Second</th>
+            <th>Special Node Time</th>
+            <th>Score Gained</th>
+            <th>% of Total Score</th>
+            <th>Score/s</th>
           </tr>
         </thead>
         <tbody id="statsTableBody">
-          {rows.map((row, i) => (
-            <tr key={i}>
-              <td>{row.time}</td>
-              <td>{row.gain}</td>
-              <td>{row.percent}</td>
-              <td>{row.perSecond}</td>
-            </tr>
-          ))}
+          {isComputing ? (
+            <tr><td colSpan={4}>Computing...</td></tr>
+          ) : (
+            rows.map((row, i) => (
+              <tr key={i}>
+                <td>{row.time}</td>
+                <td>{row.gain}</td>
+                <td>{row.percent}</td>
+                <td>{row.perSecond}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 
