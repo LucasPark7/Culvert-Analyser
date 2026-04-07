@@ -24,7 +24,7 @@ export function computeStats(culvertData: CulvertRun): StatRow[] {
     }
   }
 
-  // Edge case: last frame is still part of a fatal
+  // edge case: last frame is still part of a fatal
   if (openFatal) {
     fatalEnd = culvertData.frames[culvertData.frames.length - 1];
     fatalGain = culvertData.values[culvertData.values.length - 1] - fatalInitValue;

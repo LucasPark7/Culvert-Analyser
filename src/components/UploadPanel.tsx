@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-const MAX_FILE_SIZE = 1000 * 1024 * 1024; // 1 GB
+const MAX_FILE_SIZE = 1000 * 1024 * 1024; // ~1 GB
 
 interface UploadPanelProps {
   onUpload: (options: { file: File; resolution: string }) => void;
@@ -12,6 +12,7 @@ export default function UploadPanel({ onUpload, isProcessing }: UploadPanelProps
   const [fileName, setFileName] = useState<string | null>(null);
   const [resolution, setResolution] = useState<string>("1920x1080");
 
+  // on change event handler, when video is selected we check size
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>): void {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -40,7 +41,7 @@ export default function UploadPanel({ onUpload, isProcessing }: UploadPanelProps
 
   return (
     <div className="upload-panel">
-      {/* Hidden real file input */}
+      {/* hidden real file input */}
       <input
         ref={fileInputRef}
         id="videoFile"
@@ -50,7 +51,7 @@ export default function UploadPanel({ onUpload, isProcessing }: UploadPanelProps
         onChange={handleFileChange}
       />
 
-      {/* Styled button that triggers the file input */}
+      {/* styled button that triggers the file input */}
       <button
         className="button icon solid fa-upload"
         onClick={() => fileInputRef.current?.click()}

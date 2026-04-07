@@ -1,6 +1,7 @@
 import type { CulvertRun } from '../types/culvert';
 import { useStatsWorker } from '../hooks/useStatsWorker';
 
+// run: selected run, runIndex: selected run index
 interface StatsPanelProps {
   run: CulvertRun | null;
   runIndex: number | null;
@@ -8,6 +9,7 @@ interface StatsPanelProps {
 }
 
 export default function StatsPanel({ run, runIndex, onDelete }: StatsPanelProps) {
+  // use web worker to offload calculations of analysis from main thread
   const { rows, isComputing } = useStatsWorker(run);
   if (!run) {
     return (

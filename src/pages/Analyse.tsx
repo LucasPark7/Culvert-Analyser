@@ -8,6 +8,7 @@ import type { CulvertRun } from '../types/culvert';
 
 const STORAGE_KEY = 'culvert_list_data';
 
+// load saved runs from localStorage
 function loadRuns(): CulvertRun[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -30,7 +31,7 @@ export default function Analyse() {
 
   const { startUpload } = usePolling();
 
-  // Persist runs to localStorage whenever they change
+  // persist runs to localStorage whenever they change
   useEffect(() => {
     saveRuns(runs);
   }, [runs]);

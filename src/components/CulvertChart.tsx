@@ -2,8 +2,12 @@ import { useEffect, useRef } from 'react';
 import Chart, { type ChartDataset, type ScriptableLineSegmentContext } from 'chart.js/auto';
 import type { CulvertRun } from '../types/culvert';
 
+
+// label list 1-120 for each graph on chart
 const LABEL_LIST: number[] = Array.from({ length: 120 }, (_, i) => i + 1);
 
+
+// runs must be list of CulvertRun objects, liveRun must be a single CulvertRun or null
 interface CulvertChartProps {
   runs: CulvertRun[];
   liveRun: CulvertRun | null;
@@ -13,7 +17,7 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<Chart | null>(null);
 
-  // Create the chart once on mount
+  // create the chart once on mount
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -29,19 +33,21 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
       },
     });
 
+    // clean up chart instance
     return () => {
       chartRef.current?.destroy();
       chartRef.current = null;
     };
   }, []);
 
-  // Rebuild datasets whenever saved runs or the live run change
+  // rebuild datasets whenever saved runs or the live run change
   useEffect(() => {
     if (!chartRef.current) return;
 
     const allRuns = [...runs];
     if (liveRun) allRuns.push(liveRun);
 
+    // map each run to new graph on chart
     chartRef.current.data.datasets = allRuns.map((run, i): ChartDataset<'line'> => {
       const fatal = (ctx: ScriptableLineSegmentContext, value: string): string | undefined =>
         run.fatal_list[ctx.p0DataIndex] ? value : undefined;

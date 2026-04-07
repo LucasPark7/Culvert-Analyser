@@ -13,6 +13,7 @@ interface UsePollingReturn {
 export function usePolling(): UsePollingReturn {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // cleanup function for when status interval terminates
   function stopPolling(): void {
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
@@ -20,6 +21,7 @@ export function usePolling(): UsePollingReturn {
     }
   }
 
+  // async function to upload and track video
   async function startUpload({
     file,
     resolution,
@@ -32,6 +34,7 @@ export function usePolling(): UsePollingReturn {
     formData.append('file', file);
     formData.append('resolution', resolution);
 
+    // call backend api and upload video
     const response = await fetch(`${API_BASE}/analyse`, {
       method: 'POST',
       body: formData,
@@ -39,12 +42,14 @@ export function usePolling(): UsePollingReturn {
 
     if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
+    // receive job id we use to request status
     const data = await response.json() as { job_id: string; status: string };
 
-    // Accumulate frames locally so the interval closure always sees latest state
+    // accumulate frames locally so the interval closure always sees latest state
     const culvert: CulvertRun = { frames: [0], values: [], fatal_list: [], index: 0 };
     const startTime = Date.now();
 
+    // interval set to periodically request live results and status
     intervalRef.current = setInterval(async () => {
       try {
         const statusResp = await fetch(`${API_BASE}/status/${data.job_id}`);
@@ -55,6 +60,7 @@ export function usePolling(): UsePollingReturn {
 
         if (!statusData.results || !Array.isArray(statusData.results)) return;
 
+        // map current data retrieved
         statusData.results.forEach((value, index) => {
           if (index + 1 > culvert.frames[culvert.frames.length - 1]) {
             culvert.frames.push(index + 1);
@@ -63,7 +69,7 @@ export function usePolling(): UsePollingReturn {
           }
         });
 
-        // Notify parent with a snapshot so React state updates correctly
+        // notify parent with a snapshot so React state updates correctly
         onFrame({ ...culvert });
 
         if (statusData.status === 'complete') {

@@ -42,6 +42,7 @@ self.onmessage = (e: MessageEvent<CulvertRun>) => {
     }
   }
 
+  // edge case if last frame is part of special node interval
   if (openFatal) {
     fatalEnd = culvertData.frames[culvertData.frames.length - 1];
     fatalGain = culvertData.values[culvertData.values.length - 1] - fatalInitValue;

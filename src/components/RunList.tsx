@@ -1,5 +1,6 @@
 import type { CulvertRun } from '../types/culvert';
 
+// runs: list of CulvertRun objects, selectedIndex: selected run for list of runs index to send to stats panel
 interface RunListProps {
   runs: CulvertRun[];
   selectedIndex: number | null;
@@ -14,7 +15,7 @@ export default function RunList({ runs, selectedIndex, onSelect }: RunListProps)
   return (
     <table id="culvList">
       <tbody>
-        {runs.map((run, i) => {
+        {runs.map((run, i) => { // map runs to a list
           const lastValue = run.values[run.values.length - 1];
           const isSelected = i === selectedIndex;
 

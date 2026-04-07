@@ -10,7 +10,7 @@ export function useStatsWorker(run: CulvertRun | null): {
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
-    // Create the worker once
+    // create the worker once
     workerRef.current = new Worker(
       new URL('../workers/computeStats.worker.ts', import.meta.url),
       { type: 'module' }
