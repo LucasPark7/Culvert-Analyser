@@ -61,7 +61,7 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
         spanGaps: true,
         fill: false,
         pointRadius: 0,
-        borderWidth: 1,
+        borderWidth: 3,
       };
     });
 
