@@ -4,7 +4,7 @@ import numpy as np
 # Load a frame from video
 video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\DrowsyGPQEvent.mov"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (132*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (61*60)+2)
 ret, frame = cap.read()
 cap.release()
 
@@ -82,6 +82,7 @@ while True:
 
         #threshold = 69000000
         threshold = 0.75
+        cont_thresh = 0.6
 
         # Add together to get the total score
         #result = resultB + resultG + resultR
@@ -90,11 +91,13 @@ while True:
     
         #print("loc: ", loc)
 
-        print(max_val_ror)
-        cont_loc = np.where(resCont >= threshold)
+        print(max_val_cont)
+        cont_loc = np.where(resCont >= cont_thresh)
 
         if len(cont_loc[0]) > 1:
-            print("OZ detected, confidence:", max_val_cont)
+            print("Cont detected, confidence:", cont_loc[0])
+        else:
+            print("Cont not detected")
 
         if max_val_ror >= threshold:
             top_left = max_loc_ror

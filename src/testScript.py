@@ -1,22 +1,22 @@
-import time
-import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging, sys
+import cv2, math, threading, queue, os
 import pandas as pd
 import matplotlib.pyplot as plt
-from itertools import groupby
 from fastapi import HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
-from redis import Redis
 from concurrent.futures import ThreadPoolExecutor
 import cProfile
 import pstats
 import easyocr
+import numpy as np
 
 API_BASE = "https://culvert-analyse.onrender.com"
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1020, 95, 180, 47)  # (x, y, w, h) adjust to where numbers appear
-fatal = cv2.imread("resources/fatal_icon.png")
+fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\test_fatal.png")
+mapae = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\mapae_icon.png")
+cont = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\cont_active.png")
+ror = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
 
 def process_video(file_path):
     reader = easyocr.Reader(['en'])
@@ -53,61 +53,51 @@ def process_video(file_path):
 
         # Convert to grayscale for better OCR
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # Define thresholds
-        thresholds = [108, 94, 80, 116, 72]
-
-        # Function to process a single threshold
-        def process_threshold(threshold_value):
-            _, thresh = cv2.threshold(gray, threshold_value, 255, cv2.THRESH_BINARY)
-            return pytesseract.image_to_string(thresh, config="--psm 6 digits")
-
-        # Run in parallel with threads
-        #results = list(executor.map(process_threshold, thresholds))
-
-        #text1, text2, text3, text4, text5 = results
 
         easyResult = reader.readtext(frame)
         easyNum = [item[1] for item in easyResult]
 
         # Scan for fatal strike using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
-        #fatal = cv2.imread("resources/fatal_icon.png")
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
-        res = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        grayMapae = cv2.cvtColor(mapae, cv2.COLOR_BGR2GRAY)
+        grayCont = cv2.cvtColor(cont, cv2.COLOR_BGR2GRAY)
+        grayRor = cv2.cvtColor(ror, cv2.COLOR_BGR2GRAY)
 
-        threshold = 0.8
-        if max_val >= threshold:
+
+        resFatal = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
+        resMapae = cv2.matchTemplate(fullGray, grayMapae, cv2.TM_CCOEFF_NORMED)
+        resCont = cv2.matchTemplate(fullGray, grayCont, cv2.TM_CCOEFF_NORMED)
+        resRor = cv2.matchTemplate(fullGray, grayRor, cv2.TM_CCOEFF_NORMED)
+
+        min_val, max_val_fatal, min_loc, max_loc = cv2.minMaxLoc(resFatal)
+        min_val, max_val_mapae, min_loc, max_loc = cv2.minMaxLoc(resMapae)
+        min_val_cont, max_val_cont, min_loc_cont, max_loc_cont = cv2.minMaxLoc(resCont)
+        min_val_ror, max_val_ror, min_loc_ror, max_loc_ror = cv2.minMaxLoc(resRor)
+
+        threshold = 0.75
+        cont_threshold = 0.6
+        
+        if max_val_fatal >= threshold:
             fatal_active = True
         else:
             fatal_active = False
 
-        #return [clean_number(text1, text2, text3, text4, text5), fatal_active]
-        return [easyNum, fatal_active]
+        cont_loc = np.where(resCont >= cont_threshold)
+        if len(cont_loc[0]) > 1:
+            if cont_loc[0][0] == cont_loc[0][1]:
+                cont_active = True
+            else:
+                cont_active = False
+        else:
+            cont_active = False
 
-    # convert text from pytesseract to integer
-    def clean_number(text1, text2, text3, text4, text5):
-        num1 = re.search(r"\d+", text1)
-        num1 = int(num1.group()) if num1 else None
+        if max_val_ror >= threshold:
+            ror_active = True
+        else:
+            ror_active = False
 
-        num2 = re.search(r"\d+", text2)
-        num2 = int(num2.group()) if num2 else None
-
-        num3 = re.search(r"\d+", text3)
-        num3 = int(num3.group()) if num3 else None
-
-        num4 = re.search(r"\d+", text4)
-        num4 = int(num4.group()) if num4 else None
-
-        num5 = re.search(r"\d+", text5)
-        num5 = int(num5.group()) if num5 else None
-    
-        return [num1, num2, num3, num4, num5]
-
-    # helper function for processing frames
-    def all_equal(iterable):
-        g = groupby(iterable)
-        return next(g, True) and not next(g, False)
+        return [easyNum, fatal_active, cont_active, ror_active]
 
     # get all frames from video and add all numbers from each frame to list
     def process_video(executor):
@@ -186,7 +176,7 @@ if __name__ == "__main__":
     profiler = cProfile.Profile()
     profiler.enable()
 
-    video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\lucasproject.mp4"
+    video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\DrowsyGPQEvent.mov"
 
     result = process_video(video_file)
 
@@ -204,7 +194,9 @@ if __name__ == "__main__":
         data.append({
             "time": i,
             "score": int(series1[i][0][0]),
-            "fatal_active": series1[i][1]
+            "fatal_active": series1[i][1],
+            "cont_active": series1[i][2],
+            "ror_active": series1[i][3]
         })
     df = pd.DataFrame(data)
 
@@ -228,6 +220,36 @@ if __name__ == "__main__":
 
     for start, end in active_periods:
         plt.axvspan(start, end, color="blue", alpha=0.3, label="Fatal Active")
+
+    # Shade cont time
+    active_periods = []
+    active_start = None
+    for i, row in df.iterrows():
+        if row["cont_active"] and active_start is None:
+            active_start = row["time"]
+        if not row["cont_active"] and active_start is not None:
+            active_periods.append((active_start, row["time"]))
+            active_start = None
+    if active_start is not None:  # if buff was active till the end
+        active_periods.append((active_start, df["time"].iloc[-1]))
+
+    for start, end in active_periods:
+        plt.axvspan(start, end, color="green", alpha=0.3, label="Cont Active")
+
+    # Shade ror time
+    active_periods = []
+    active_start = None
+    for i, row in df.iterrows():
+        if row["ror_active"] and active_start is None:
+            active_start = row["time"]
+        if not row["ror_active"] and active_start is not None:
+            active_periods.append((active_start, row["time"]))
+            active_start = None
+    if active_start is not None:  # if buff was active till the end
+        active_periods.append((active_start, df["time"].iloc[-1]))
+
+    for start, end in active_periods:
+        plt.axvspan(start, end, color="red", alpha=0.3, label="Ror Active")
 
     plt.xlabel("Frame")
     plt.ylabel("Score")
