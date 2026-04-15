@@ -118,44 +118,6 @@ def process_video(file_path):
                 if result[0]:
                     print(result)
                     values.append(result)
-
-                '''
-                OCRList = result[0]
-                print(OCRList)
-                if all_equal(OCRList): # if all OCR checks match then confidence in result is high
-                    if OCRList[0] is None or OCRList[0] == 4:
-                        continue
-                    else:
-                        result[0] = result[0][0]
-                        values.append(result)
-                else:   # if OCR checks do not match check which one is more likely to be real
-                    with lock:
-                        if values:
-                            max_diff = math.inf
-                        else:
-                            max_diff = OCRList[0]
-
-                        freq = max(set(OCRList), key=OCRList.count)
-                        if OCRList.count(freq) == 1:
-                            for num in OCRList:
-                                if values:
-                                    if num is None or num < values[-1][0]:
-                                        continue
-                                    elif num - values[-1][0] < max_diff:
-                                        max_diff = num - values[-1][0]
-                                        result[0] = num
-                                else:
-                                    min_val = min(min_val for min_val in OCRList if min_val is not None)
-                                    result[0] = min_val
-                        else:
-                            if freq is None or freq == 4:
-                                continue
-                            else:
-                                result[0] = freq
-                                values.append(result)
-
-                        values.append(result)
-                '''
                 
             except queue.Empty:
                 continue

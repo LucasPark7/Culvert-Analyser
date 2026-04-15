@@ -1,16 +1,12 @@
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-import easyocr
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\154kCulv.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\DrowsyGPQEvent.mov"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (117*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (132*60)+2)
 ret, frame = cap.read()
 cap.release()
-
-reader = easyocr.Reader(['en'])
 
 cv2.imshow("result", frame)
 cv2.waitKey(0)
@@ -23,8 +19,8 @@ cv2.namedWindow("ROI Selector")
 
 # Initial ROI values (x, y, w, h)
 h_frame, w_frame, _ = frame.shape
-#init_x, init_y, init_w, init_h = 1265, 35, 900, 225
-init_x, init_y, init_w, init_h = 995, 85, 150, 50
+init_x, init_y, init_w, init_h = 0, 0, 1920, 1080
+#init_x, init_y, init_w, init_h = 995, 85, 150, 50
 
 # Trackbar callback (does nothing, just needed)
 def nothing(val):
@@ -52,17 +48,17 @@ while True:
     # Show cropped ROI in a separate window
     roi = frame[y:y+h, x:x+w]
 
-    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
+    fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\test_fatal.png")
     mapae = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\mapae_icon.png")
+    cont = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\cont_active.png")
+    ror = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
 
     # Convert to grayscale for better template matching
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
     grayMapae = cv2.cvtColor(mapae, cv2.COLOR_BGR2GRAY)
-
-    ##Split Both into each R, G, B Channel
-    imageMainR, imageMainG, imageMainB = cv2.split(roi)
-    imageNeedleR, imageNeedleG, imageNeedleB = cv2.split(fatal)
+    grayCont = cv2.cvtColor(cont, cv2.COLOR_BGR2GRAY)
+    grayRor = cv2.cvtColor(ror, cv2.COLOR_BGR2GRAY)
 
     if roi.size > 0:
         cv2.imshow("Cropped ROI", gray)
@@ -76,9 +72,13 @@ while True:
         # template matching
         resFatal = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
         resMapae = cv2.matchTemplate(gray, grayMapae, cv2.TM_CCOEFF_NORMED)
+        resCont = cv2.matchTemplate(gray, grayCont, cv2.TM_CCOEFF_NORMED)
+        resRor = cv2.matchTemplate(gray, grayRor, cv2.TM_CCOEFF_NORMED)
 
         min_val, max_val_fatal, min_loc, max_loc = cv2.minMaxLoc(resFatal)
         min_val, max_val_mapae, min_loc, max_loc = cv2.minMaxLoc(resMapae)
+        min_val_cont, max_val_cont, min_loc_cont, max_loc_cont = cv2.minMaxLoc(resCont)
+        min_val_ror, max_val_ror, min_loc_ror, max_loc_ror = cv2.minMaxLoc(resRor)
 
         #threshold = 69000000
         threshold = 0.75
@@ -90,11 +90,21 @@ while True:
     
         #print("loc: ", loc)
 
-        print(max_val_mapae)
+        print(max_val_ror)
+        cont_loc = np.where(resCont >= threshold)
+
+        if len(cont_loc[0]) > 1:
+            print("OZ detected, confidence:", max_val_cont)
+
+        if max_val_ror >= threshold:
+            top_left = max_loc_ror
+            print("Ror detected at:", top_left, "Confidence:", max_val_ror)
+        else:
+            print("Ror not detected")
+
+
         if max_val_fatal >= threshold or max_val_mapae >= threshold:
             top_left = max_loc
-            bottom_right = (top_left[0] + w, top_left[1] + h)
-            cv2.rectangle(frame, top_left, bottom_right, (0, 255, 0), 2)
             print("Fatal Strike detected at:", top_left, "Confidence:", max_val_fatal, max_val_mapae)
         else:
             print("Fatal Strike not detected")

@@ -70,7 +70,7 @@ def process_video(file_path, resolution, job_id):
 
         # scan for special node using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
-        fatal = cv2.imread("resources/FatalStrikeIcon.png")
+        fatal = cv2.imread("resources/test_fatal.png")
         mapae = cv2.imread("resources/mapae_icon.png")
 
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
