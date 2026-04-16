@@ -49,15 +49,34 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
 
     // map each run to new graph on chart
     chartRef.current.data.datasets = allRuns.map((run, i): ChartDataset<'line'> => {
-      const fatal = (ctx: ScriptableLineSegmentContext, value: string): string | undefined =>
-        run.fatal_list[ctx.p0DataIndex] ? value : undefined;
+      const colorLineSeg = (ctx: ScriptableLineSegmentContext, value: [string, string, string, string, string]): string | undefined => {
+        if (run.cont_list[ctx.p0DataIndex]) {
+          if (run.fatal_list[ctx.p0DataIndex]) {
+            return value[1];
+          }
+          else {
+            return value[2];
+          }
+        }
+        else if (run.ror_list[ctx.p0DataIndex]) {
+          if (run.fatal_list[ctx.p0DataIndex]) {
+            return value[4];
+          }
+          else {
+            return value[3];
+          }
+        } else if (run.fatal_list[ctx.p0DataIndex]) {
+          return value[0];
+        } else {
+          return undefined;
+        }};
 
       return {
         label: `Culvert #${i + 1}`,
         data: run.values,
         borderColor: 'rgb(255, 255, 255)',
         backgroundColor: 'rgb(255, 255, 255)',
-        segment: { borderColor: (ctx) => fatal(ctx, 'rgb(192,75,75)') },
+        segment: { borderColor: (ctx) => colorLineSeg(ctx, ['rgb(0, 195, 255)', 'rgb(43, 255, 0)', 'rgb(255, 123, 0)', 'rgb(255, 0, 0)', 'rgb(255, 0, 212)']) },
         spanGaps: true,
         fill: false,
         pointRadius: 0,

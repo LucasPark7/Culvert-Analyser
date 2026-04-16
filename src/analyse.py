@@ -1,7 +1,5 @@
-import cv2, pytesseract, re, math, threading, queue, os, time, json, boto3, tempfile, logging, sys, shutil, glob, easyocr
-import pandas as pd
-import matplotlib.pyplot as plt
-from itertools import groupby
+import cv2, threading, queue, os, time, json, boto3, tempfile, logging, sys, glob, easyocr
+import numpy as np
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from threading import Event
@@ -70,25 +68,49 @@ def process_video(file_path, resolution, job_id):
 
         # scan for special node using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
-        fatal = cv2.imread("resources/FatalStrikeIcon.png")
+        fatal = cv2.imread("resources/test_fatal.png")
         mapae = cv2.imread("resources/mapae_icon.png")
+        cont = cv2.imread("resources/cont_active.png")
+        ror = cv2.imread("resources/ror_active.png")
 
         grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
         grayMapae = cv2.cvtColor(mapae, cv2.COLOR_BGR2GRAY)
+        grayCont = cv2.cvtColor(cont, cv2.COLOR_BGR2GRAY)
+        grayRor = cv2.cvtColor(ror, cv2.COLOR_BGR2GRAY)
 
         resFatal = cv2.matchTemplate(fullGray, grayFatal, cv2.TM_CCOEFF_NORMED)
         resMapae = cv2.matchTemplate(fullGray, grayMapae, cv2.TM_CCOEFF_NORMED)
+        resCont = cv2.matchTemplate(fullGray, grayCont, cv2.TM_CCOEFF_NORMED)
+        resRor = cv2.matchTemplate(fullGray, grayRor, cv2.TM_CCOEFF_NORMED)
 
         min_val, max_val_fatal, min_loc, max_loc = cv2.minMaxLoc(resFatal)
         min_val, max_val_mapae, min_loc, max_loc = cv2.minMaxLoc(resMapae)
+        min_val_cont, max_val_cont, min_loc_cont, max_loc_cont = cv2.minMaxLoc(resCont)
+        min_val_ror, max_val_ror, min_loc_ror, max_loc_ror = cv2.minMaxLoc(resRor)
 
         threshold = 0.75
+        cont_threshold = 0.6
+        
         if max_val_fatal >= threshold or max_val_mapae >= threshold:
             fatal_active = True
         else:
             fatal_active = False
 
-        return [easyNum, fatal_active]
+        cont_loc = np.where(resCont >= cont_threshold)
+        if len(cont_loc[0]) > 1:
+            if cont_loc[0][0] == cont_loc[0][1]:
+                cont_active = True
+            else:
+                cont_active = False
+        else:
+            cont_active = False
+
+        if max_val_ror >= threshold:
+            ror_active = True
+        else:
+            ror_active = False
+
+        return [easyNum, fatal_active, cont_active, ror_active]
 
     # get all frames from video and add all numbers from each frame to list
     def process_frames(roi):

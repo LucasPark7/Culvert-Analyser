@@ -46,7 +46,7 @@ export function usePolling(): UsePollingReturn {
     const data = await response.json() as { job_id: string; status: string };
 
     // accumulate frames locally so the interval closure always sees latest state
-    const culvert: CulvertRun = { frames: [0], values: [], fatal_list: [], index: 0 };
+    const culvert: CulvertRun = { frames: [0], values: [], fatal_list: [], cont_list: [], ror_list: [], index: 0 };
     const startTime = Date.now();
 
     // interval set to periodically request live results and status
@@ -55,7 +55,7 @@ export function usePolling(): UsePollingReturn {
         const statusResp = await fetch(`${API_BASE}/status/${data.job_id}`);
         const statusData = await statusResp.json() as {
           status: string;
-          results: [[[number]], boolean][];
+          results: [[[number]], boolean, boolean, boolean][];
         };
 
         if (!statusData.results || !Array.isArray(statusData.results)) return;
@@ -66,6 +66,8 @@ export function usePolling(): UsePollingReturn {
             culvert.frames.push(index + 1);
             culvert.values.push(parseInt(String(value[0][0])));
             culvert.fatal_list.push(value[1]);
+            culvert.cont_list.push(value[2]);
+            culvert.ror_list.push(value[3]);
           }
         });
 
