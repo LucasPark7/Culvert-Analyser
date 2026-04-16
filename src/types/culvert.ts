@@ -2,6 +2,8 @@ export interface CulvertRun {
   frames: number[];
   values: number[];
   fatal_list: boolean[];
+  cont_list: boolean[];
+  ror_list: boolean[];
   index: number;
 }
 
