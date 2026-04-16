@@ -45,7 +45,7 @@ export default function Analyse() {
   }): Promise<void> {
     setIsProcessing(true);
     setStatusMsg('Uploading...');
-    setLiveRun({ frames: [0], values: [], fatal_list: [], index: 0 });
+    setLiveRun({ frames: [0], values: [], fatal_list: [], cont_list: [], ror_list: [], index: 0 });
 
     try {
       await startUpload({
