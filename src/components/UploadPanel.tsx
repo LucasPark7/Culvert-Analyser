@@ -64,7 +64,7 @@ export default function UploadPanel({ onUpload, isProcessing }: UploadPanelProps
       <select
         id="resoSelect"
         className="select"
-        style={{ display: 'inline-block', maxWidth: '30%', width: '100%' }}
+        style={{ display: 'inline-block', maxWidth: '100%', width: '100%' }}
         value={resolution}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setResolution(e.target.value)}
         disabled={isProcessing}

@@ -96,9 +96,18 @@ export default function Analyse() {
 
   return (
     <div id="analyse-page">
-      <UploadPanel onUpload={handleUpload} isProcessing={isProcessing} />
-
-      {statusMsg && <p id="result">{statusMsg}</p>}
+      <div style={{ display: 'flex', gap: '2rem' }}>
+        <div>
+          <UploadPanel onUpload={handleUpload} isProcessing={isProcessing} />
+          {statusMsg && <p id="result">{statusMsg}</p>}
+        </div>
+        <div className="info-box">
+          <p>Analysis of your culvert video (mp4)</p>
+          <p>Make sure to select the correct in-game resolution or results may be incorrect.</p>
+          <p>Results may take up to 5 minutes.</p>
+          <p>NOTE: Special Node tracking is only available for 1920x1080 resolution videos.</p>
+        </div>
+      </div>
 
       <CulvertChart runs={runs} liveRun={liveRun} />
 

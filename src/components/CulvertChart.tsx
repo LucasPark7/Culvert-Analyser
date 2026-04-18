@@ -49,7 +49,12 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
 
     // map each run to new graph on chart
     chartRef.current.data.datasets = allRuns.map((run, i): ChartDataset<'line'> => {
-      const colorLineSeg = (ctx: ScriptableLineSegmentContext, value: [string, string, string, string, string]): string | undefined => {
+      const colorList = ['rgb(0, 195, 255)', 
+                        'rgb(43, 255, 0)', 
+                        'rgb(255, 123, 0)', 
+                        'rgb(255, 0, 0)', 
+                        'rgb(255, 0, 212)']
+      const colorLineSeg = (ctx: ScriptableLineSegmentContext, value: string[]): string | undefined => {
         if (run.cont_list[ctx.p0DataIndex]) {
           if (run.fatal_list[ctx.p0DataIndex]) {
             return value[1];
@@ -76,7 +81,7 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
         data: run.values,
         borderColor: 'rgb(255, 255, 255)',
         backgroundColor: 'rgb(255, 255, 255)',
-        segment: { borderColor: (ctx) => colorLineSeg(ctx, ['rgb(0, 195, 255)', 'rgb(43, 255, 0)', 'rgb(255, 123, 0)', 'rgb(255, 0, 0)', 'rgb(255, 0, 212)']) },
+        segment: { borderColor: (ctx) => colorLineSeg(ctx, colorList) },
         spanGaps: true,
         fill: false,
         pointRadius: 0,

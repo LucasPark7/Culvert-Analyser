@@ -83,23 +83,6 @@ self.onmessage = (e: MessageEvent<CulvertRun>) => {
     }
   }
 
-  // edge case if last frame is part of interval
-  if (openNode) {
-    nodeEnd = culvertData.frames[culvertData.frames.length - 1];
-    nodeGain = culvertData.values[culvertData.values.length - 1] - nodeInitValue;
-    nodeRow.push(buildRow(nodeStart, nodeEnd, nodeGain, totalScore));
-  }
-  if (openCont) {
-    contEnd = culvertData.frames[culvertData.frames.length - 1];
-    contGain = culvertData.values[culvertData.values.length - 1] - contInitValue;
-    contRow.push(buildRow(contStart, contEnd, contGain, totalScore));
-  }
-  if (openRor) {
-    rorEnd = culvertData.frames[culvertData.frames.length - 1];
-    rorGain = culvertData.values[culvertData.values.length - 1] - rorInitValue;
-    rorRow.push(buildRow(rorStart, rorEnd, rorGain, totalScore));
-  }
-
   // send results back to main thread
   self.postMessage([nodeRow, contRow, rorRow]);
 };
