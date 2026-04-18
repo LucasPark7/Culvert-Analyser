@@ -2,10 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import type { CulvertRun, StatRow } from '../types/culvert';
 
 export function useStatsWorker(run: CulvertRun | null): {
-  rows: StatRow[];
+  rows: StatRow[][];
   isComputing: boolean;
 } {
-  const [rows, setRows] = useState<StatRow[]>([]);
+  const [rows, setRows] = useState<StatRow[][]>([]);
   const [isComputing, setIsComputing] = useState(false);
   const workerRef = useRef<Worker | null>(null);
 
@@ -17,7 +17,7 @@ export function useStatsWorker(run: CulvertRun | null): {
     );
 
     // listen for results coming back
-    workerRef.current.onmessage = (e: MessageEvent<StatRow[]>) => {
+    workerRef.current.onmessage = (e: MessageEvent<StatRow[][]>) => {
       setRows(e.data);
       setIsComputing(false);
     };
