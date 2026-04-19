@@ -12,7 +12,7 @@ from redis import Redis
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://lucaspark7.github.io"],
+    allow_origins=["https://jhoonings.github.io"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
