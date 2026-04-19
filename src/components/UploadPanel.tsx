@@ -76,7 +76,7 @@ export default function UploadPanel({ onUpload, isProcessing }: UploadPanelProps
         <option value="1024x768">1024x768</option>
       </select>
 
-      <ul className="actions">
+      <ul className="actions" style={{ marginLeft: '0px' }}>
 				<button
         className="button primary"
         onClick={handleUploadClick}

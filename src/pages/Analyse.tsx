@@ -96,16 +96,20 @@ export default function Analyse() {
 
   return (
     <div id="analyse-page">
-      <div style={{ display: 'flex', gap: '2rem' }}>
+      <div style={{ display: 'flex' }}>
         <div>
           <UploadPanel onUpload={handleUpload} isProcessing={isProcessing} />
           {statusMsg && <p id="result">{statusMsg}</p>}
         </div>
-        <div className="info-box">
-          <p>Analysis of your culvert video (mp4)</p>
-          <p>Make sure to select the correct in-game resolution or results may be incorrect.</p>
-          <p>Results may take up to 5 minutes.</p>
-          <p>NOTE: Special Node tracking is only available for 1920x1080 resolution videos.</p>
+        <div className="info-box" style={{ marginLeft: 'auto', alignContent: 'center' }}>
+          <pre>
+            Extra Stat Tracking on Graph:<br></br>
+            <span style={{ color: '#00c3ff'}}>Blue</span> -&gt; Special Nodes (Fatal Strike/Mapae/etc)<br></br>
+            <span style={{ color: '#ff7b00'}}>Orange</span> -&gt; Continuous Ring<br></br>
+            <span style={{ color: '#ff0000'}}>Red</span> -&gt; Ring of Restraint<br></br>
+            <span style={{ color: '#2bff00'}}>Green</span> -&gt; Continuous Ring + Special Nodes<br></br>
+            <span style={{ color: '#ff00d4'}}>Pink</span> -&gt; Ring of Restraint + Special Nodes<br></br>
+          </pre>
         </div>
       </div>
 
