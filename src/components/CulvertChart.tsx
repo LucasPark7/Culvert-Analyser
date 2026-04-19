@@ -30,6 +30,14 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
       options: {
         animation: false,
         scales: { y: { beginAtZero: true } },
+        plugins: {
+          legend: {
+            labels: {
+              boxWidth: 0,
+              color: 'rgb(211, 211, 211)'
+            }
+          }
+        }
       },
     });
 
