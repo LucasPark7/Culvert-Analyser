@@ -1,16 +1,16 @@
 import type { CulvertRun, StatRow } from '../types/culvert';
 
 function buildRow(
-  fatalStart: number,
-  fatalEnd: number,
-  fatalGain: number,
+  statStart: number,
+  statEnd: number,
+  statGain: number,
   totalScore: number
 ): StatRow {
-  const scorePerS = fatalGain / (fatalEnd - fatalStart);
-  const percentScore = (fatalGain / totalScore) * 100;
+  const scorePerS = statGain / (statEnd - statStart);
+  const percentScore = (statGain / totalScore) * 100;
   return {
-    time: `${120 - fatalStart}s - ${Math.max(0, 120 - fatalEnd)}s`,
-    gain: fatalGain.toString(),
+    time: `${120 - statStart}s - ${Math.max(0, 120 - statEnd)}s`,
+    gain: statGain.toString(),
     percent: percentScore.toFixed(3) + '%',
     perSecond: scorePerS.toFixed(3),
   };
@@ -20,35 +20,69 @@ function buildRow(
 self.onmessage = (e: MessageEvent<CulvertRun>) => {
   const culvertData = e.data;
   const totalScore = culvertData.values[culvertData.values.length - 1];
-  const rows: StatRow[] = [];
+  const nodeRow: StatRow[] = [];
+  const contRow: StatRow[] = [];
+  const rorRow: StatRow[] = [];
 
-  let openFatal = false;
-  let fatalStart = 0;
-  let fatalEnd = 0;
-  let fatalGain = 0;
-  let fatalInitValue = 0;
+  let openNode = false;
+  let nodeStart = 0;
+  let nodeEnd = 0;
+  let nodeGain = 0;
+  let nodeInitValue = 0;
+
+  let openCont = false;
+  let contStart = 0;
+  let contEnd = 0;
+  let contGain = 0;
+  let contInitValue = 0;
+
+  let openRor = false;
+  let rorStart = 0;
+  let rorEnd = 0;
+  let rorGain = 0;
+  let rorInitValue = 0;
 
   for (let i = 0; i < culvertData.frames.length; i++) {
-    if (!openFatal && culvertData.fatal_list[i] === true) {
-      fatalStart = culvertData.frames[i];
-      fatalInitValue = culvertData.values[i];
-      openFatal = true;
-    } else if (openFatal && culvertData.fatal_list[i] === false) {
-      fatalGain = culvertData.values[i] - fatalInitValue;
-      fatalEnd = culvertData.frames[i];
-      openFatal = false;
-      rows.push(buildRow(fatalStart, fatalEnd, fatalGain, totalScore));
-      fatalGain = 0;
+    // build fatal row
+    if (!openNode && culvertData.fatal_list[i] === true) {
+      nodeStart = culvertData.frames[i];
+      nodeInitValue = culvertData.values[i];
+      openNode = true;
+    } else if (openNode && culvertData.fatal_list[i] === false) {
+      nodeGain = culvertData.values[i] - nodeInitValue;
+      nodeEnd = culvertData.frames[i];
+      openNode = false;
+      nodeRow.push(buildRow(nodeStart, nodeEnd, nodeGain, totalScore));
+      nodeGain = 0;
+    }
+
+    // build cont row
+    if (!openCont && culvertData.cont_list[i] === true) {
+      contStart = culvertData.frames[i];
+      contInitValue = culvertData.values[i];
+      openCont = true;
+    } else if (openCont && culvertData.cont_list[i] === false) {
+      contGain = culvertData.values[i] - contInitValue;
+      contEnd = culvertData.frames[i];
+      openCont = false;
+      contRow.push(buildRow(contStart, contEnd, contGain, totalScore));
+      contGain = 0;
+    }
+
+    //build ror row
+    if (!openRor && culvertData.ror_list[i] === true) {
+      rorStart = culvertData.frames[i];
+      rorInitValue = culvertData.values[i];
+      openRor = true;
+    } else if (openRor && culvertData.ror_list[i] === false) {
+      rorGain = culvertData.values[i] - rorInitValue;
+      rorEnd = culvertData.frames[i];
+      openRor = false;
+      rorRow.push(buildRow(rorStart, rorEnd, rorGain, totalScore));
+      rorGain = 0;
     }
   }
 
-  // edge case if last frame is part of special node interval
-  if (openFatal) {
-    fatalEnd = culvertData.frames[culvertData.frames.length - 1];
-    fatalGain = culvertData.values[culvertData.values.length - 1] - fatalInitValue;
-    rows.push(buildRow(fatalStart, fatalEnd, fatalGain, totalScore));
-  }
-
   // send results back to main thread
-  self.postMessage(rows);
+  self.postMessage([nodeRow, contRow, rorRow]);
 };
