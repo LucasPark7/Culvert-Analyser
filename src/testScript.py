@@ -13,7 +13,7 @@ API_BASE = "https://culvert-analyse.onrender.com"
 
 FRAME_STEP = 60  # process every 60th frame (~1s at 60fps)
 ROI = (1020, 95, 180, 47)  # (x, y, w, h) adjust to where numbers appear
-fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\test_fatal.png")
+fatal = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\fatal_icon.png")
 mapae = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\mapae_icon.png")
 cont = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\cont_active.png")
 ror = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     profiler = cProfile.Profile()
     profiler.enable()
 
-    video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\DrowsyGPQEvent.mov"
+    video_file = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\lucasproject2.mp4"
 
     result = process_video(video_file)
 

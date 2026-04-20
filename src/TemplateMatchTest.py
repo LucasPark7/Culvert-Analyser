@@ -2,11 +2,14 @@ import cv2
 import numpy as np
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\DrowsyGPQEvent.mov"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\lucasproject2.mp4"
+#video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\154kCulv.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (61*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (56*60)+2)
 ret, frame = cap.read()
 cap.release()
+
+#frame = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\low_res_fatal.png")
 
 cv2.imshow("result", frame)
 cv2.waitKey(0)
@@ -53,6 +56,11 @@ while True:
     cont = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\cont_active.png")
     ror = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
 
+    scale_up = 3
+    sg_up = cv2.resize(roi, (roi.shape[1]*scale_up, roi.shape[0]*scale_up), interpolation=cv2.INTER_CUBIC)
+    tg_up = cv2.resize(fatal, (fatal.shape[1]*scale_up, fatal.shape[0]*scale_up), interpolation=cv2.INTER_CUBIC)
+
+
     # Convert to grayscale for better template matching
     gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     grayFatal = cv2.cvtColor(fatal, cv2.COLOR_BGR2GRAY)
@@ -70,28 +78,25 @@ while True:
     if cv2.waitKey(30) & 0xFF == ord("q"):
     
         # template matching
-        resFatal = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
+        #resFatal = cv2.matchTemplate(gray, grayFatal, cv2.TM_CCOEFF_NORMED)
+        resFatal = cv2.matchTemplate(sg_up, tg_up, cv2.TM_CCOEFF_NORMED)
+
         resMapae = cv2.matchTemplate(gray, grayMapae, cv2.TM_CCOEFF_NORMED)
         resCont = cv2.matchTemplate(gray, grayCont, cv2.TM_CCOEFF_NORMED)
         resRor = cv2.matchTemplate(gray, grayRor, cv2.TM_CCOEFF_NORMED)
+
+        cv2.imshow("rescont", resFatal)
+        cv2.waitKey(0)
 
         min_val, max_val_fatal, min_loc, max_loc = cv2.minMaxLoc(resFatal)
         min_val, max_val_mapae, min_loc, max_loc = cv2.minMaxLoc(resMapae)
         min_val_cont, max_val_cont, min_loc_cont, max_loc_cont = cv2.minMaxLoc(resCont)
         min_val_ror, max_val_ror, min_loc_ror, max_loc_ror = cv2.minMaxLoc(resRor)
 
-        #threshold = 69000000
         threshold = 0.75
         cont_thresh = 0.6
 
-        # Add together to get the total score
-        #result = resultB + resultG + resultR
-        #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-        #loc = np.where(res >= 3 * threshold)
-    
-        #print("loc: ", loc)
-
-        print(max_val_cont)
+        print(max_val_fatal)
         cont_loc = np.where(resCont >= cont_thresh)
 
         if len(cont_loc[0]) > 1:
