@@ -2,15 +2,16 @@ import cv2
 import pytesseract
 import re
 import easyocr
+import numpy as np
+
+ror = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\wjtest.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\BA_Test_Vid.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (69*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (6*60)+2)
 ret, frame = cap.read()
 cap.release()
-
-frame = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\BA_OCR_Test.png")
 
 reader = easyocr.Reader(['en'])
 
@@ -22,7 +23,7 @@ cv2.namedWindow("ROI Selector")
 
 # Initial ROI values (x, y, w, h)
 h_frame, w_frame, _ = frame.shape
-init_x, init_y, init_w, init_h = 1000, 95, 125, 35
+init_x, init_y, init_w, init_h = 172, 1015, 240, 65
 
 # Trackbar callback (does nothing, just needed)
 def nothing(val):
@@ -64,11 +65,35 @@ while True:
         #gray = cv2.cvtColor(display_frame, cv2.COLOR_BGR2GRAY)
         #_, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
 
-        text = pytesseract.image_to_string(thresh, config="--psm 6 digits")
-        match = re.search(r"\d+", text) 
-        print(int(match.group())) if match else None
-        easyResult = reader.readtext(roi)
-        print([item[1] for item in easyResult])
+        #text = pytesseract.image_to_string(thresh, config="--psm 6 digits")
+        #match = re.search(r"\d+", text)
+        #print(int(match.group())) if match else None
+        easyResult = reader.readtext(roi, mag_ratio=2.0)
+        resParse = [item[1] for item in easyResult]
+        clean_text = re.sub(r'[a-zA-Z\s\D]', '', resParse[0])
+        if clean_text:
+            print(clean_text)
+        else:
+            print("0 - No number")
+
+        # Scan for fatal strike using template matching
+        fullGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        grayRor = cv2.cvtColor(ror, cv2.COLOR_BGR2GRAY)
+
+        resRor = cv2.matchTemplate(fullGray, grayRor, cv2.TM_CCOEFF_NORMED)
+
+        min_val_ror, max_val_ror, min_loc_ror, max_loc_ror = cv2.minMaxLoc(resRor)
+
+        threshold = 0.75
+
+        ror_loc = np.where(resRor >= threshold)
+        if len(ror_loc[0]) > 1:
+            if ror_loc[0][0] == ror_loc[0][1]:
+                print("ROR")
+            else:
+                print("NO ROR")
+        else:
+            print("NO ROR")
 
         print(f"Final ROI: (x={x}, y={y}, w={w}, h={h})")
         break
