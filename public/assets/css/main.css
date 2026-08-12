@@ -2621,6 +2621,10 @@ input, select, textarea {
 			.image.main img {
 				width: 100%;
 			}
+		
+		.image.icon {
+			max-height: 100%;
+		}
 
 /* List */
 
@@ -3282,9 +3286,9 @@ input, select, textarea {
 		}
 
 		.wrapper.style5 {
-			background-image: url('images/Prep_BG.png');
+			background-image: url('images/Fog_Forest.png');
 			background-size: cover;       
-			background-position: center; 
+			background-position: bottom center; 
 			background-repeat: no-repeat;
 			margin: 0 !important;
 		}
