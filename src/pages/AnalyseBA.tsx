@@ -30,7 +30,7 @@ export default function AnalyseBA() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [page, setPage] = useState('ba');
 
-  const { startUpload } = usePolling({ page });
+  const { startUpload } = usePolling();
 
   // persist runs to localStorage whenever they change
   useEffect(() => {
