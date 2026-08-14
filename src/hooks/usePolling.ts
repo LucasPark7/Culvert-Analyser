@@ -10,7 +10,7 @@ interface UsePollingReturn {
   stopPolling: () => void;
 }
 
-export function usePolling({ page }: {page : string}): UsePollingReturn {
+export function usePolling(): UsePollingReturn {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // cleanup function for when status interval terminates

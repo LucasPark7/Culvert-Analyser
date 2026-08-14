@@ -28,7 +28,7 @@ export default function Analyse() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [statusMsg, setStatusMsg] = useState<string>('');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [page, setPage] = useState('culvert');
+  const [page, _] = useState('culvert');
 
   const { startUpload } = usePolling();
 

@@ -28,7 +28,7 @@ export default function AnalyseBA() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [statusMsg, setStatusMsg] = useState<string>('');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [page, setPage] = useState('ba');
+  const [page, _] = useState('ba');
 
   const { startUpload } = usePolling();
 
