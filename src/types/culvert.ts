@@ -17,6 +17,7 @@ export interface StatRow {
 export interface UploadOptions {
   file: File;
   resolution: string;
+  page: string;
   onFrame: (snapshot: CulvertRun) => void;
   onComplete: (run: CulvertRun) => void;
   onError: (err: Error) => void;

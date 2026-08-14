@@ -28,8 +28,9 @@ export default function Analyse() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [statusMsg, setStatusMsg] = useState<string>('');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [page, setPage] = useState('culvert');
 
-  const { startUpload } = usePolling();
+  const { startUpload } = usePolling({ page });
 
   // persist runs to localStorage whenever they change
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function Analyse() {
       await startUpload({
         file,
         resolution,
+        page,
         onFrame: (snapshot: CulvertRun) => {
           setLiveRun({ ...snapshot });
           setStatusMsg('Upload successful, processing video...');
@@ -98,7 +100,7 @@ export default function Analyse() {
     <div id="analyse-page">
       <div style={{ display: 'flex' }}>
         <div>
-          <UploadPanel onUpload={handleUpload} isProcessing={isProcessing} />
+          <UploadPanel onUpload={handleUpload} isProcessing={isProcessing}/>
           {statusMsg && <p id="result">{statusMsg}</p>}
         </div>
         <div className="info-box" style={{ marginLeft: 'auto', alignContent: 'center' }}>

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import UploadPanel from '../components/UploadPanel';
-import CulvertChart from '../components/CulvertChart';
+import BAChart from '../components/BAChart';
 import RunList from '../components/RunList';
 import StatsPanel from '../components/StatsPanel';
 import { usePolling } from '../hooks/usePolling';
 import type { CulvertRun } from '../types/culvert';
 
-const STORAGE_KEY = 'culvert_list_data';
+const STORAGE_KEY = 'ba_list_data';
 
 // load saved runs from localStorage
 function loadRuns(): CulvertRun[] {
@@ -28,8 +28,9 @@ export default function AnalyseBA() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [statusMsg, setStatusMsg] = useState<string>('');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [page, setPage] = useState('ba');
 
-  const { startUpload } = usePolling();
+  const { startUpload } = usePolling({ page });
 
   // persist runs to localStorage whenever they change
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function AnalyseBA() {
       await startUpload({
         file,
         resolution,
+        page,
         onFrame: (snapshot: CulvertRun) => {
           setLiveRun({ ...snapshot });
           setStatusMsg('Upload successful, processing video...');
@@ -103,7 +105,7 @@ export default function AnalyseBA() {
         </div>
       </div>
 
-      <CulvertChart runs={runs} liveRun={liveRun} />
+      <BAChart runs={runs} liveRun={liveRun} />
 
       <RunList
         runs={runs}

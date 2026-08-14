@@ -3,8 +3,8 @@ import Chart, { type ChartDataset } from 'chart.js/auto';
 import type { CulvertRun } from '../types/culvert';
 
 
-// label list 1-120 for each graph on chart
-const LABEL_LIST: number[] = Array.from({ length: 120 }, (_, i) => i + 1);
+// label list 1-340 for each graph on chart
+const LABEL_LIST: number[] = Array.from({ length: 340 }, (_, i) => i + 1);
 
 
 // runs must be list of CulvertRun objects, liveRun must be a single CulvertRun or null

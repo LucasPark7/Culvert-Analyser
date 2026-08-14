@@ -3,14 +3,14 @@ import type { CulvertRun, UploadOptions } from '../types/culvert';
 
 const API_BASE = 'https://culvert-analyse.onrender.com';
 const POLL_INTERVAL = 3000;
-const MAX_TIME = 600 * 1000;
+const MAX_TIME = 1200 * 1000;
 
 interface UsePollingReturn {
   startUpload: (options: UploadOptions) => Promise<void>;
   stopPolling: () => void;
 }
 
-export function usePolling(): UsePollingReturn {
+export function usePolling({ page }: {page : string}): UsePollingReturn {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // cleanup function for when status interval terminates
@@ -25,6 +25,7 @@ export function usePolling(): UsePollingReturn {
   async function startUpload({
     file,
     resolution,
+    page,
     onFrame,
     onComplete,
     onError,
@@ -33,6 +34,7 @@ export function usePolling(): UsePollingReturn {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('resolution', resolution);
+    formData.append('page', page);
 
     // call backend api and upload video
     const response = await fetch(`${API_BASE}/analyse`, {
