@@ -13,6 +13,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         analyse: resolve(__dirname, 'analyse.html'),
+        analyseba: resolve(__dirname, 'analyseba.html')
       }
     }
   }
