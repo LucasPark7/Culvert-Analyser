@@ -7,9 +7,9 @@ import numpy as np
 ror = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.png")
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\BA_Test_Vid.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\BA_Test_Cut.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (6*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (0*60)+2)
 ret, frame = cap.read()
 cap.release()
 
