@@ -45,7 +45,7 @@ def home():
     return {"status": "ok", "message": "Good Response"}
 
 @app.post("/analyse")
-async def anaylse(file: UploadFile, resolution: str = File(...)):
+async def anaylse(file: UploadFile, resolution: str = File(...), page: str = File(...)):
     # reset global vars
     
     job_id = str(uuid.uuid4())
@@ -60,7 +60,7 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
         raise HTTPException(status_code=400, detail="Invalid file type.")
     
     # enforce size limits on file
-    max_size = 1000 * 1024 * 1024  # 200 MB
+    max_size = 1000 * 1024 * 1024  # 1 GB
     file_size = 0
 
     while chunk := file.file.read(1024 * 1024):
@@ -79,7 +79,7 @@ async def anaylse(file: UploadFile, resolution: str = File(...)):
             logger.error("S3 upload failed", exc_info=True)  # full traceback
             raise HTTPException(status_code=500, detail=f"S3 upload failed: {str(e)}")
         
-        job_data = {"job_id" : job_id, "resolution": resolution}
+        job_data = {"job_id" : job_id, "resolution": resolution, "page": page}
         redis.lpush("video_jobs", json.dumps(job_data))
 
         return {"job_id": job_id, "status": "processing"}

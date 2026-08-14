@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import UploadPanel from '../components/UploadPanel';
-import CulvertChart from '../components/CulvertChart';
+import BAChart from '../components/BAChart';
 import RunList from '../components/RunList';
 import StatsPanel from '../components/StatsPanel';
 import { usePolling } from '../hooks/usePolling';
 import type { CulvertRun } from '../types/culvert';
 
-const STORAGE_KEY = 'culvert_list_data';
+const STORAGE_KEY = 'ba_list_data';
 
 // load saved runs from localStorage
 function loadRuns(): CulvertRun[] {
@@ -22,13 +22,13 @@ function saveRuns(runs: CulvertRun[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(runs));
 }
 
-export default function Analyse() {
+export default function AnalyseBA() {
   const [runs, setRuns] = useState<CulvertRun[]>(loadRuns);
   const [liveRun, setLiveRun] = useState<CulvertRun | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [statusMsg, setStatusMsg] = useState<string>('');
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [page, setPage] = useState('culvert');
+  const [page, setPage] = useState('ba');
 
   const { startUpload } = usePolling();
 
@@ -100,22 +100,12 @@ export default function Analyse() {
     <div id="analyse-page">
       <div style={{ display: 'flex' }}>
         <div>
-          <UploadPanel onUpload={handleUpload} isProcessing={isProcessing}/>
+          <UploadPanel onUpload={handleUpload} isProcessing={isProcessing} />
           {statusMsg && <p id="result">{statusMsg}</p>}
-        </div>
-        <div className="info-box" style={{ marginLeft: 'auto', alignContent: 'center' }}>
-          <pre>
-            Extra Stat Tracking on Graph:<br></br>
-            <span style={{ color: '#00c3ff'}}>Blue</span> -&gt; Special Nodes (Fatal Strike/Mapae/etc)<br></br>
-            <span style={{ color: '#ff7b00'}}>Orange</span> -&gt; Continuous Ring<br></br>
-            <span style={{ color: '#ff0000'}}>Red</span> -&gt; Ring of Restraint<br></br>
-            <span style={{ color: '#2bff00'}}>Green</span> -&gt; Continuous Ring + Special Nodes<br></br>
-            <span style={{ color: '#ff00d4'}}>Pink</span> -&gt; Ring of Restraint + Special Nodes<br></br>
-          </pre>
         </div>
       </div>
 
-      <CulvertChart runs={runs} liveRun={liveRun} />
+      <BAChart runs={runs} liveRun={liveRun} />
 
       <RunList
         runs={runs}

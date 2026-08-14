@@ -1,4 +1,4 @@
-import cv2, threading, queue, os, time, json, boto3, tempfile, logging, sys, glob, easyocr
+import cv2, threading, queue, os, time, json, boto3, tempfile, logging, sys, glob, easyocr, re
 import numpy as np
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,7 +31,7 @@ logger.info("Worker started and waiting for jobs...")
 
 FRAME_STEP = 60  # process every 60th frame (1s at 60fps), possible user option later
 
-def process_video(file_path, resolution, job_id):
+def process_video(file_path, resolution, job_id, page):
     reader = easyocr.Reader(['en'])
 
     def extract_frames(video_path, step=FRAME_STEP):
@@ -63,8 +63,19 @@ def process_video(file_path, resolution, job_id):
             x, y, w, h = roi
             frame = frame[y:y+h, x:x+w]
 
-        easyResult = reader.readtext(frame)
+        easyResult = reader.readtext(frame, mag_ratio=2.0)
         easyNum = [item[1] for item in easyResult]
+
+        if page == 'ba':
+            cleanNum = re.sub(r'[a-zA-Z\s\D]', '', easyNum[0])
+            if cleanNum:
+                easyNum = int(cleanNum)
+            else:
+                easyNum = 0
+
+            nonlocal prevNum
+            easyNum = cleanNum - prevNum
+            prevNum = cleanNum
 
         # scan for special node using template matching
         fullGray = cv2.cvtColor(full_frame, cv2.COLOR_BGR2GRAY)
@@ -105,8 +116,12 @@ def process_video(file_path, resolution, job_id):
         else:
             cont_active = False
 
-        if max_val_ror >= threshold:
-            ror_active = True
+        ror_loc = np.where(resRor >= threshold)
+        if len(ror_loc[0]) > 1:
+            if ror_loc[0][0] == ror_loc[0][1]:
+                ror_active = True
+            else:
+                ror_active = False
         else:
             ror_active = False
 
@@ -140,16 +155,35 @@ def process_video(file_path, resolution, job_id):
         analyzer_thread.join()
 
     # get ROI from resolution selected
-    ROI_dict = {
-        "2560x1440" : (1375, 190, 240, 65),
-        "1920x1080" : (995, 85, 150, 50),
-        "1366x768" : (725, 90, 125, 40),
-        "1280x720" : (725, 100, 140, 35),
-        "1024x768" : (725, 95, 130, 32)
-    }
+
+    if page == 'culvert':
+        ROI_dict = {
+            "2560x1440" : (1375, 190, 240, 65),
+            "1920x1080" : (995, 85, 150, 50),
+            "1366x768" : (725, 90, 125, 40),
+            "1280x720" : (725, 100, 140, 35),
+            "1024x768" : (725, 95, 130, 32)
+        }
+    elif page == 'ba':
+        ROI_dict = {
+            "2560x1440" : (172, 1015, 240, 65),
+            "1920x1080" : (172, 1015, 240, 65),
+            "1366x768" : (172, 1015, 240, 65),
+            "1280x720" : (172, 1015, 240, 65),
+            "1024x768" : (172, 1015, 240, 65)
+        }
+    else:
+        ROI_dict = {
+            "2560x1440" : (1375, 190, 240, 65),
+            "1920x1080" : (995, 85, 150, 50),
+            "1366x768" : (725, 90, 125, 40),
+            "1280x720" : (725, 100, 140, 35),
+            "1024x768" : (725, 95, 130, 32)
+        }
 
     roi = ROI_dict[resolution]
-    
+
+    prevNum = 0
     values = []
     frame_queue = queue.Queue()
     lock = threading.Lock()
@@ -175,6 +209,7 @@ if __name__ == "__main__":
                 job = json.loads(job_json)
                 job_id = job["job_id"]
                 job_reso = job["resolution"]
+                job_page = job["page"]
                 logger.info(f"Job Found: {job_id}")
                 redis.set(f"status:{job_id}", "processing")
 
@@ -185,7 +220,7 @@ if __name__ == "__main__":
                     temp.close()
 
                 try:
-                    result = process_video(temp_path, job_reso, job_id)
+                    result = process_video(temp_path, job_reso, job_id, job_page)
 
                     # save result
                     logger.info(f"JOB COMPLETED")

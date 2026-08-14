@@ -25,7 +25,7 @@ export default function RunList({ runs, selectedIndex, onSelect }: RunListProps)
                 style={{ cursor: 'pointer' }}
                 onClick={() => onSelect(i)}
               >
-                Culvert Run #{i + 1} ({lastValue})
+                Run #{i + 1} ({lastValue})
               </td>
             </tr>
           );
