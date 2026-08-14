@@ -70,11 +70,14 @@ while True:
         #print(int(match.group())) if match else None
         easyResult = reader.readtext(roi, mag_ratio=2.0)
         resParse = [item[1] for item in easyResult]
-        clean_text = re.sub(r'[a-zA-Z\s\D]', '', resParse[0])
-        if clean_text:
-            print(clean_text)
+        if resParse:
+            clean_text = re.sub(r'[a-zA-Z\s\D]', '', resParse[0])
+            if clean_text:
+                print(clean_text)
+            else:
+                print("0 - No number")
         else:
-            print("0 - No number")
+            print("no read")
 
         # Scan for fatal strike using template matching
         fullGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
