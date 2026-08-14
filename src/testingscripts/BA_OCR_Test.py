@@ -70,6 +70,7 @@ while True:
         #print(int(match.group())) if match else None
         easyResult = reader.readtext(roi, mag_ratio=2.0)
         resParse = [item[1] for item in easyResult]
+        print(resParse)
         if resParse:
             clean_text = re.sub(r'[a-zA-Z\s\D]', '', resParse[0])
             if clean_text:
