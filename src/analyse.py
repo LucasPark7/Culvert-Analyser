@@ -67,9 +67,12 @@ def process_video(file_path, resolution, job_id, page):
         easyNum = [item[1] for item in easyResult]
 
         if page == 'ba':
-            cleanNum = re.sub(r'[a-zA-Z\s\D]', '', easyNum[0])
-            if cleanNum:
-                cleanNum = int(cleanNum)
+            if easyNum:
+                cleanNum = re.sub(r'[a-zA-Z\s\D]', '', easyNum[0])
+                if cleanNum:
+                    cleanNum = int(cleanNum)
+                else:
+                    cleanNum = 0
             else:
                 cleanNum = 0
 

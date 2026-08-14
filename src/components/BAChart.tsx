@@ -89,7 +89,7 @@ export default function CulvertChart({ runs, liveRun }: CulvertChartProps) {
       const barColors = run.values.map((_, index) => colorBar(index, colorList));
 
       return {
-        label: `Culvert #${i + 1}`,
+        label: `BA #${i + 1}`,
         data: run.values,
         backgroundColor: barColors,
         borderColor: barColors,
