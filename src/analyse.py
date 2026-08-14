@@ -69,9 +69,9 @@ def process_video(file_path, resolution, job_id, page):
         if page == 'ba':
             cleanNum = re.sub(r'[a-zA-Z\s\D]', '', easyNum[0])
             if cleanNum:
-                easyNum = int(cleanNum)
+                cleanNum = int(cleanNum)
             else:
-                easyNum = 0
+                cleanNum = 0
 
             nonlocal prevNum
             easyNum = cleanNum - prevNum
