@@ -77,7 +77,7 @@ def process_video(file_path, resolution, job_id, page):
                 cleanNum = 0
 
             nonlocal prevNum
-            easyNum = [cleanNum - prevNum]
+            easyNum = [str(cleanNum - prevNum)]
             prevNum = cleanNum
 
         # scan for special node using template matching

@@ -4,7 +4,7 @@ import re
 import easyocr
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Videos\2026-02-21 17-25-41.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\wjtest.mp4"
 cap = cv2.VideoCapture(video_path)
 cap.set(cv2.CAP_PROP_POS_FRAMES, (69*60)+2)
 ret, frame = cap.read()
@@ -62,11 +62,15 @@ while True:
         #gray = cv2.cvtColor(display_frame, cv2.COLOR_BGR2GRAY)
         #_, thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
 
-        text = pytesseract.image_to_string(thresh, config="--psm 6 digits")
-        match = re.search(r"\d+", text) 
-        print(int(match.group())) if match else None
         easyResult = reader.readtext(roi)
-        print([item[1] for item in easyResult])
+        easyNum = [item[1] for item in easyResult]
+
+        print(easyNum)
+        easyNum = int(easyNum[0])
+        print("int easyNum", easyNum)
+
+        easyNum = [str(easyNum)]
+        print("str easyNum", easyNum)
 
         print(f"Final ROI: (x={x}, y={y}, w={w}, h={h})")
         break
