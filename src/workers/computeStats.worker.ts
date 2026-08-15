@@ -7,15 +7,16 @@ function buildRow(
   totalScore: number,
   page: string
 ): StatRow {
-  const scorePerS = statGain / (statEnd - statStart);
+  const scorePerS = page === 'ba' ? String(((statGain / (statEnd - statStart)) / 1000000000000).toFixed(2)) + 'T' : (statGain / (statEnd - statStart)).toFixed(2);
   const percentScore = (statGain / totalScore) * 100;
   const timeLabel = page === 'ba' ? `${statStart}s - ${statEnd}s` : `${120 - statStart}s - ${Math.max(0, 120 - statEnd)}s`;
- 
+  const scoreGain = page === 'ba' ? String((statGain / 1000000000000).toFixed(2)) + 'T' : statGain.toString();
+
   return {
     time: timeLabel,
-    gain: statGain.toString(),
-    percent: percentScore.toFixed(3) + '%',
-    perSecond: scorePerS.toFixed(3),
+    gain: scoreGain,
+    percent: percentScore.toFixed(2) + '%',
+    perSecond: scorePerS,
   };
 }
 

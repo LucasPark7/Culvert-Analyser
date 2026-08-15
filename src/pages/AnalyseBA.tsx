@@ -103,6 +103,16 @@ export default function AnalyseBA() {
           <UploadPanel onUpload={handleUpload} isProcessing={isProcessing} />
           {statusMsg && <p id="result">{statusMsg}</p>}
         </div>
+        <div className="info-box" style={{ marginLeft: 'auto', alignContent: 'center' }}>
+          <pre>
+            Extra Stat Tracking on Graph:<br></br>
+            <span style={{ color: '#00c3ff'}}>Blue</span> -&gt; Special Nodes (Fatal Strike/Mapae/etc)<br></br>
+            <span style={{ color: '#ff7b00'}}>Orange</span> -&gt; Continuous Ring<br></br>
+            <span style={{ color: '#ff0000'}}>Red</span> -&gt; Ring of Restraint<br></br>
+            <span style={{ color: '#2bff00'}}>Green</span> -&gt; Continuous Ring + Special Nodes<br></br>
+            <span style={{ color: '#ff00d4'}}>Pink</span> -&gt; Ring of Restraint + Special Nodes<br></br>
+          </pre>
+        </div>
       </div>
 
       <BAChart runs={runs} liveRun={liveRun} />
