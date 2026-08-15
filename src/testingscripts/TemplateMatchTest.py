@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load a frame from video
-video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\src\testvideos\wjtest.mp4"
+video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\wjtest.mp4"
 cap = cv2.VideoCapture(video_path)
 cap.set(cv2.CAP_PROP_POS_FRAMES, (92*60)+2)
 ret, frame = cap.read()
