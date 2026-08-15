@@ -20,12 +20,12 @@ export default function RunList({ runs, selectedIndex, onSelect, page }: RunList
           const lastValue = run.values[run.values.length - 1];
           const isSelected = i === selectedIndex;
           const valueSum = run.values.reduce((acc, n) => acc + n, 0);
-          let runValue = 0
+          let runValue = ""
           if (page === 'culvert') {
-            runValue = lastValue;
+            runValue = String(lastValue);
           }
           else if (page === 'ba') {
-            runValue = valueSum;
+            runValue = String(valueSum / 1000000000) + 'B';
           }
 
           return (
