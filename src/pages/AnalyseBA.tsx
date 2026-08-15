@@ -111,6 +111,7 @@ export default function AnalyseBA() {
         runs={runs}
         selectedIndex={selectedIndex}
         onSelect={setSelectedIndex}
+        page={page}
       />
 
       <StatsPanel

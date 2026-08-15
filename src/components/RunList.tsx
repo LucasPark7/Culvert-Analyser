@@ -5,9 +5,10 @@ interface RunListProps {
   runs: CulvertRun[];
   selectedIndex: number | null;
   onSelect: (index: number) => void;
+  page: string;
 }
 
-export default function RunList({ runs, selectedIndex, onSelect }: RunListProps) {
+export default function RunList({ runs, selectedIndex, onSelect, page }: RunListProps) {
   if (runs.length === 0) {
     return <p className="no-runs">No runs yet. Upload a video to get started.</p>;
   }
@@ -18,6 +19,14 @@ export default function RunList({ runs, selectedIndex, onSelect }: RunListProps)
         {runs.map((run, i) => { // map runs to a list
           const lastValue = run.values[run.values.length - 1];
           const isSelected = i === selectedIndex;
+          const valueSum = run.values.reduce((acc, n) => acc + n, 0);
+          let runValue = 0
+          if (page === 'culvert') {
+            runValue = lastValue;
+          }
+          else if (page === 'ba') {
+            runValue = valueSum;
+          }
 
           return (
             <tr key={i} className={isSelected ? 'selected-run' : ''}>
@@ -25,7 +34,7 @@ export default function RunList({ runs, selectedIndex, onSelect }: RunListProps)
                 style={{ cursor: 'pointer' }}
                 onClick={() => onSelect(i)}
               >
-                Run #{i + 1} ({lastValue})
+                Run #{i + 1} ({runValue})
               </td>
             </tr>
           );

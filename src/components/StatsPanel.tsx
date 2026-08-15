@@ -30,7 +30,7 @@ export default function StatsPanel({ run, runIndex, onDelete }: StatsPanelProps)
 
   return (
     <div id="statsPanel">
-      <h3 id="run-title">Culvert Run #{runIndex}</h3>
+      <h3 id="run-title">Run #{runIndex}</h3>
 
       <table id="nodeTable">
         <thead>

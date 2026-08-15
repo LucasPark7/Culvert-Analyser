@@ -121,6 +121,7 @@ export default function Analyse() {
         runs={runs}
         selectedIndex={selectedIndex}
         onSelect={setSelectedIndex}
+        page={page}
       />
 
       <StatsPanel
