@@ -118,6 +118,7 @@ export default function AnalyseBA() {
         run={selectedRun}
         runIndex={selectedIndex !== null ? selectedIndex + 1 : null}
         onDelete={handleDeleteRun}
+        page={page}
       />
     </div>
   );
