@@ -197,7 +197,7 @@ def process_video(file_path, resolution, job_id, page):
     process(file_path, roi)
 
     # free temp files
-    for file in glob.glob("/tmp/*.png)"):
+    for file in glob.glob("/tmp/*.png"):
         try:
             os.remove(file)
         except:
