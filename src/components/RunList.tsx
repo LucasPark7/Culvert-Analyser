@@ -25,7 +25,7 @@ export default function RunList({ runs, selectedIndex, onSelect, page }: RunList
             runValue = String(lastValue);
           }
           else if (page === 'ba') {
-            runValue = String(valueSum / 1000000000) + 'B';
+            runValue = String((valueSum / 1000000000000).toFixed(2)) + 'B';
           }
 
           return (

@@ -4,12 +4,15 @@ function buildRow(
   statStart: number,
   statEnd: number,
   statGain: number,
-  totalScore: number
+  totalScore: number,
+  page: string
 ): StatRow {
   const scorePerS = statGain / (statEnd - statStart);
   const percentScore = (statGain / totalScore) * 100;
+  const timeLabel = page === 'ba' ? `${statStart}s - ${statEnd}s` : `${120 - statStart}s - ${Math.max(0, 120 - statEnd)}s`;
+ 
   return {
-    time: `${120 - statStart}s - ${Math.max(0, 120 - statEnd)}s`,
+    time: timeLabel,
     gain: statGain.toString(),
     percent: percentScore.toFixed(3) + '%',
     perSecond: scorePerS.toFixed(3),
@@ -17,9 +20,16 @@ function buildRow(
 }
 
 // listen for messages from the main thread
-self.onmessage = (e: MessageEvent<CulvertRun>) => {
-  const culvertData = e.data;
-  const totalScore = culvertData.values[culvertData.values.length - 1];
+self.onmessage = (e: MessageEvent<{ run: CulvertRun, page: string}>) => {
+  const { run, page } = e.data;
+  const culvertData = run;
+  let totalScore = 0;
+  if (page === 'ba') {
+    totalScore = culvertData.values.reduce((acc, n) => acc + n, 0);
+  }
+  else {
+    totalScore = culvertData.values[culvertData.values.length - 1];
+  }
   const nodeRow: StatRow[] = [];
   const contRow: StatRow[] = [];
   const rorRow: StatRow[] = [];
@@ -49,10 +59,15 @@ self.onmessage = (e: MessageEvent<CulvertRun>) => {
       nodeInitValue = culvertData.values[i];
       openNode = true;
     } else if (openNode && culvertData.fatal_list[i] === false) {
-      nodeGain = culvertData.values[i] - nodeInitValue;
+      if (page === 'ba') {
+        nodeGain += culvertData.values[i];
+      }
+      else {
+        nodeGain = culvertData.values[i] - nodeInitValue;
+      }
       nodeEnd = culvertData.frames[i];
       openNode = false;
-      nodeRow.push(buildRow(nodeStart, nodeEnd, nodeGain, totalScore));
+      nodeRow.push(buildRow(nodeStart, nodeEnd, nodeGain, totalScore, page));
       nodeGain = 0;
     }
 
@@ -62,10 +77,15 @@ self.onmessage = (e: MessageEvent<CulvertRun>) => {
       contInitValue = culvertData.values[i];
       openCont = true;
     } else if (openCont && culvertData.cont_list[i] === false) {
-      contGain = culvertData.values[i] - contInitValue;
+      if (page === 'ba') {
+        contGain += culvertData.values[i];
+      }
+      else {
+        contGain = culvertData.values[i] - contInitValue;
+      }
       contEnd = culvertData.frames[i];
       openCont = false;
-      contRow.push(buildRow(contStart, contEnd, contGain, totalScore));
+      contRow.push(buildRow(contStart, contEnd, contGain, totalScore, page));
       contGain = 0;
     }
 
@@ -75,10 +95,15 @@ self.onmessage = (e: MessageEvent<CulvertRun>) => {
       rorInitValue = culvertData.values[i];
       openRor = true;
     } else if (openRor && culvertData.ror_list[i] === false) {
-      rorGain = culvertData.values[i] - rorInitValue;
+      if (page === 'ba') {
+        rorGain += culvertData.values[i];
+      }
+      else {
+        rorGain = culvertData.values[i] - rorInitValue;
+      }
       rorEnd = culvertData.frames[i];
       openRor = false;
-      rorRow.push(buildRow(rorStart, rorEnd, rorGain, totalScore));
+      rorRow.push(buildRow(rorStart, rorEnd, rorGain, totalScore, page));
       rorGain = 0;
     }
   }

@@ -6,11 +6,12 @@ interface StatsPanelProps {
   run: CulvertRun | null;
   runIndex: number | null;
   onDelete: () => void;
+  page: string;
 }
 
-export default function StatsPanel({ run, runIndex, onDelete }: StatsPanelProps) {
+export default function StatsPanel({ run, runIndex, onDelete, page}: StatsPanelProps) {
   // use web worker to offload calculations of analysis from main thread
-  const { rows, isComputing } = useStatsWorker(run);
+  const { rows, isComputing } = useStatsWorker(run, page);
   const nodeRow = 0 !== null ? rows[0] ?? [] : [];
   const contRow = 1 !== null ? rows[1] ?? [] : [];
   const rorRow = 2 !== null ? rows[2] ?? [] : [];
