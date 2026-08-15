@@ -29,14 +29,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.info("Worker started and waiting for jobs...")
 
-FRAME_STEP = 60  # process every 60th frame (1s at 60fps), possible user option later
-
 def process_video(file_path, resolution, job_id, page):
     reader = easyocr.Reader(['en'])
 
-    def extract_frames(video_path, step=FRAME_STEP):
+    def extract_frames(video_path):
         cap = cv2.VideoCapture(video_path)
+        step = cap.get(cv2.CAP_PROP_FPS)
         frame_idx = 0
+        next_capture_second = 0.0
 
         if not cap.isOpened():
             os.remove(video_path)
@@ -46,12 +46,14 @@ def process_video(file_path, resolution, job_id, page):
             ret, frame = cap.read()
             if not ret:
                 break
-            try:
-                if frame_idx % step == 0:
+            current_time = frame_idx / step
+            if current_time >= next_capture_second:
+                try:
                     frame_queue.put(frame, timeout=1)
-                frame_idx += 1
-            except queue.Full:
-                pass
+                except queue.Full:
+                    pass
+                next_capture_second += 1.0
+            frame_idx += 1
         
         pause_queue.set()
 
@@ -148,7 +150,7 @@ def process_video(file_path, resolution, job_id, page):
     
     def process(video_path, roi):
 
-        reader_thread = threading.Thread(target=extract_frames, args=(video_path, ))
+        reader_thread = threading.Thread(target=extract_frames, args=(video_path))
         analyzer_thread = threading.Thread(target=process_frames, args=((roi),))
 
         reader_thread.start()
