@@ -32,7 +32,7 @@ logger.info("Worker started and waiting for jobs...")
 def process_video(file_path, resolution, job_id, page):
     reader = easyocr.Reader(['en'])
 
-    def extract_frames(video_path):
+    def extract_frames(video_path, ):
         cap = cv2.VideoCapture(video_path)
         step = cap.get(cv2.CAP_PROP_FPS)
         frame_idx = 0
@@ -150,7 +150,7 @@ def process_video(file_path, resolution, job_id, page):
     
     def process(video_path, roi):
 
-        reader_thread = threading.Thread(target=extract_frames, args=(video_path))
+        reader_thread = threading.Thread(target=extract_frames, args=(video_path, ))
         analyzer_thread = threading.Thread(target=process_frames, args=((roi),))
 
         reader_thread.start()
