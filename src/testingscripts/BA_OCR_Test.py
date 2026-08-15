@@ -9,7 +9,10 @@ ror = cv2.imread(r"C:\Users\Lucas\Desktop\Culvert-Analyser\resources\ror_active.
 # Load a frame from video
 video_path = r"C:\Users\Lucas\Desktop\Culvert-Analyser\tests\testvideos\BA_Test_Cut.mp4"
 cap = cv2.VideoCapture(video_path)
-cap.set(cv2.CAP_PROP_POS_FRAMES, (0*60)+2)
+cap.set(cv2.CAP_PROP_POS_FRAMES, (24*60)+2)
+print("FPS:", cap.get(cv2.CAP_PROP_FPS))
+print("Frame count:", cap.get(cv2.CAP_PROP_FRAME_COUNT))
+print("Duration (s):", cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS))
 ret, frame = cap.read()
 cap.release()
 

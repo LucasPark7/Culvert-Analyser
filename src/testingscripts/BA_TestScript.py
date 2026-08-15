@@ -25,7 +25,9 @@ def process_video(file_path):
 
     def extract_frames(video_path, step=FRAME_STEP):
         cap = cv2.VideoCapture(video_path)
+        step = cap.get(cv2.CAP_PROP_FPS)
         frame_idx = 0
+        next_capture_frame = 0.0
 
         if not cap.isOpened():
             os.remove(video_path)
@@ -35,12 +37,15 @@ def process_video(file_path):
             ret, frame = cap.read()
             if not ret:
                 break
-            try:
-                if frame_idx % step == 0:
+
+            current_time = frame_idx / step
+            if current_time >= next_capture_frame:
+                try:
                     frame_queue.put(frame, timeout=1)
-                frame_idx += 1
-            except queue.Full:
-                pass
+                except queue.Full:
+                    pass
+                next_capture_frame += 1.0
+            frame_idx += 1
         
         pause_queue.set()
 
