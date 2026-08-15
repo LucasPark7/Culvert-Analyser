@@ -59,10 +59,7 @@ self.onmessage = (e: MessageEvent<{ run: CulvertRun, page: string}>) => {
       nodeInitValue = culvertData.values[i];
       openNode = true;
     } else if (openNode && culvertData.fatal_list[i] === false) {
-      if (page === 'ba') {
-        nodeGain += culvertData.values[i];
-      }
-      else {
+      if (page === 'culvert') {
         nodeGain = culvertData.values[i] - nodeInitValue;
       }
       nodeEnd = culvertData.frames[i];
@@ -77,10 +74,7 @@ self.onmessage = (e: MessageEvent<{ run: CulvertRun, page: string}>) => {
       contInitValue = culvertData.values[i];
       openCont = true;
     } else if (openCont && culvertData.cont_list[i] === false) {
-      if (page === 'ba') {
-        contGain += culvertData.values[i];
-      }
-      else {
+      if (page === 'culvert') {
         contGain = culvertData.values[i] - contInitValue;
       }
       contEnd = culvertData.frames[i];
@@ -95,16 +89,26 @@ self.onmessage = (e: MessageEvent<{ run: CulvertRun, page: string}>) => {
       rorInitValue = culvertData.values[i];
       openRor = true;
     } else if (openRor && culvertData.ror_list[i] === false) {
-      if (page === 'ba') {
-        rorGain += culvertData.values[i];
-      }
-      else {
+      if (page === 'culvert') {
         rorGain = culvertData.values[i] - rorInitValue;
       }
       rorEnd = culvertData.frames[i];
       openRor = false;
       rorRow.push(buildRow(rorStart, rorEnd, rorGain, totalScore, page));
       rorGain = 0;
+    }
+
+    // track gain intervals if BA
+    if (page === 'ba') {
+      if (openNode) {
+        nodeGain += culvertData.values[i];
+      }
+      if (openCont) {
+        contGain += culvertData.values[i];
+      }
+      if (openRor) {
+        rorGain += culvertData.values[i];
+      }
     }
   }
 
